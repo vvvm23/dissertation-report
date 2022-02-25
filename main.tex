@@ -1,14 +1,15 @@
 \documentclass{article}
 
+
 \input{math_commands.tex}
 \input{notation.tex}
 
 % if you need to pass options to natbib, use, e.g.:
-%     \PassOptionsToPackage{numbers, compress}{natbib}
+     \PassOptionsToPackage{numbers, compress}{natbib}
 % before loading neurips_2020
 
 % ready for submission
-% \usepackage{neurips_2020}
+ %\usepackage{neurips_2020}
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
 % [preprint] option:
@@ -17,7 +18,7 @@
 % to compile a camera-ready version, add the [final] option, e.g.:
 %     \usepackage[final]{neurips_2020}
 
-% to avoid loading the natbib package, add option nonatbib:
+ %to avoid loading the natbib package, add option nonatbib:
      %\usepackage[nonatbib]{neurips_2020}
 
 \usepackage[utf8]{inputenc} % allow utf-8 input
@@ -30,6 +31,8 @@
 \usepackage{microtype}      % microtypography
 
 %\title{Formatting Instructions For NeurIPS 2020}
+\bibliographystyle{plainnat}
+
 \title{Step-unrolled Denoising Autoencoders for Fast Image Generation}
 
 % The \author macro works with any number of authors. There are two commands
@@ -77,6 +80,7 @@
 }
 
 \begin{document}
+\setcitestyle{square}
 
 \maketitle
 
@@ -86,6 +90,8 @@
 
 \section{Introduction}
 \input{sections/introduction.tex}
+
+\cite{bondtaylor2021unleashing}
 
 \section{Related Work}
 \input{sections/related.tex}
@@ -101,5 +107,7 @@
 \end{ack}
 
 \section*{References}
+
+\bibliography{reference}
 
 \end{document}
