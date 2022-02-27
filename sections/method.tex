@@ -42,7 +42,27 @@ with the VQ-GAN decoder $\vqganDecoder$, we obtain a powerful generative model.
 
 \subsection{2D-Aware Hourglass Transformer}
 Inspired by successes in hierarchical transformers for generative language
-modelling, 
+modelling~\cite{nawrot2021hierarchical}, we modify their architecture for use
+with discrete latent representations of image data. We will later use this
+architecture as the discrete prior over the VQ-GAN latents. 
+
+Hourglass transformers have been seen to efficiently handle long-sequences,
+outperform existing models using the same computational budget, and meet the
+same performance as existing models more efficiently by using an explicit
+hierarchical structure~\cite{nawrot2021hierarchical}. The same benefits should
+also apply to vector-quantized image modelling.
+
+Our modifications are 2D-aware downsampling, axial rotary embeddings, and
+removal of causal modelling constraints.
+
+\subsubsection*{2D-Aware Downsampling}
+foobar
+
+\subsubsection*{Axial Rotary Embeddings}
+foobar
+
+\subsubsection*{Removal of Causal Constraints}
+foobar
 
 \subsection{Non-Autoregressive Generator Training}
 
