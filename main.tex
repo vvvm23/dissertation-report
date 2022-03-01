@@ -1,113 +1,93 @@
-\documentclass{article}
+% CVPR 2022 Paper Template
+% based on the CVPR template provided by Ming-Ming Cheng (https://github.com/MCG-NKU/CVPR_Template)
+% modified and extended by Stefan Roth (stefan.roth@NOSPAMtu-darmstadt.de)
 
+\documentclass[10pt,twocolumn,letterpaper]{article}
 
-\input{math_commands.tex}
+%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+%\usepackage[review]{cvpr}      % To produce the REVIEW version
+\usepackage{cvpr}              % To produce the CAMERA-READY version
+%\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+
+% Include other packages here, before hyperref.
+%\input{math_commands.tex}
 \input{notation.tex}
 
-% if you need to pass options to natbib, use, e.g.:
-     \PassOptionsToPackage{numbers, compress}{natbib}
-% before loading neurips_2020
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
 
-% ready for submission
- %\usepackage{neurips_2020}
 
-% to compile a preprint version, e.g., for submission to arXiv, add add the
-% [preprint] option:
-     \usepackage[preprint]{neurips_2020}
-
-% to compile a camera-ready version, add the [final] option, e.g.:
-%     \usepackage[final]{neurips_2020}
-
- %to avoid loading the natbib package, add option nonatbib:
-     %\usepackage[nonatbib]{neurips_2020}
-
-\usepackage[utf8]{inputenc} % allow utf-8 input
-\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
-\usepackage{hyperref}       % hyperlinks
-\usepackage{url}            % simple URL typesetting
-\usepackage{booktabs}       % professional-quality tables
-\usepackage{amsfonts}       % blackboard math symbols
-\usepackage{nicefrac}       % compact symbols for 1/2, etc.
-\usepackage{microtype}      % microtypography
-
-%\title{Formatting Instructions For NeurIPS 2020}
-\bibliographystyle{plainnat}
-
-\title{Step-unrolled Denoising Autoencoders for Fast Image Generation}
-
-% The \author macro works with any number of authors. There are two commands
-% used to separate the names and addresses of multiple authors: \And and \AND.
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, e.g. with the
+% file validation for the camera-ready version.
 %
-% Using \And between authors leaves it to LaTeX to determine where to break the
-% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
-% authors names on the first line, and the last on the second line, try using
-% \AND instead of \And before the third author name.
+% If you comment hyperref and then uncomment it, you should delete
+% ReviewTempalte.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
 
-\author{%
-  %David S.~Hippocampus\thanks{Use footnote for providing further information
-    %about author (webpage, alternative address)---\emph{not} for acknowledging
-    %funding agencies.} \\
-  %Department of Computer Science\\
-  %Cranberry-Lemon University\\
-  %Pittsburgh, PA 15213 \\
-  %\texttt{hippo@cs.cranberry-lemon.edu} \\
-  Alex F. McKinney\\
-  Department of Computer Science\\
-  Durham University\\
-  Durham, UK\\
-  \texttt{alexander.f.mckinney@durham.ac.uk}\\
-  % examples of more authors
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \AND
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-}
+
+% Support for easy cross-referencing
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+
+
+%%%%%%%%% PAPER ID  - PLEASE UPDATE
+\def\cvprPaperID{*****} % *** Enter the CVPR Paper ID here
+\def\confName{CVPR}
+\def\confYear{2022}
 
 \begin{document}
-\setcitestyle{square}
 
+%%%%%%%%% TITLE - PLEASE UPDATE
+\title{Step-unrolled Denoising Autoencoders for Fast Image Generation}
+
+\author{Alex F. McKinney\\
+Durham University\\
+Durham, UK\\
+{\tt\small alexander.f.mckinney@durham.ac.uk}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+\and
+Chris G. Willcocks\\
+Durham University\\
+Durham, UK\\
+{\tt\small christopher.g.willcocks@durham.ac.uk}
+}
 \maketitle
 
+%%%%%%%%% ABSTRACT
 \begin{abstract}
-  \input{sections/abstract.tex}
+    \input{sections/abstract.tex}
 \end{abstract}
 
+%%%%%%%%% BODY TEXT
 \section{Introduction}
+\label{sec:intro}
 \input{sections/introduction.tex}
 
-\cite{bondtaylor2021unleashing}
-
 \section{Related Work}
+\label{sec:related}
 \input{sections/related.tex}
 
 \section{Method}
+\label{sec:method}
 \input{sections/method.tex}
 
-\section*{Broader Impact}
-\input{sections/broader.tex}
-
-\begin{ack}
-\input{sections/acknowledgments.tex}
-\end{ack}
-
-\section*{References}
-
-\bibliography{reference}
+%%%%%%%%% REFERENCES
+{\small
+\bibliographystyle{ieee_fullname}
+\bibliography{egbib}
+}
 
 \end{document}
