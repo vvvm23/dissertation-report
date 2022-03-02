@@ -56,13 +56,44 @@ Our modifications are 2D-aware downsampling, axial rotary embeddings, and
 removal of causal modelling constraints.
 
 \subsubsection*{2D-Aware Downsampling}
-foobar
+
+% TODO: add a figure demonstrating this
+The original formulation of hourglass transformers~\cite{nawrot2021hierarchical}
+introduced both upsampling and downsampling layers, allowing the use of
+hierarchical transformers in tasks that have output sequence length equal to the
+input sequence length. However, applying their proposed resampling strategies directly on
+the vector-quantized image may not be the best strategy. Resampling is applied
+to flattened token sequence, meaning that the corresponding two-dimensional
+vector-quantized image is actually resampled more in one axis compared to the
+other. In their work they did not address this, except for experiments on
+ImageNet32~\cite{russakovsky2015imagenet} where they resampled with a rate of
+$k=3$, corresponding to three colour channels.
+
+In our formulation, we instead reshape the flattened sequence back into a
+two-dimensional form and then apply resampling equally in the last two axes.
+With a resampling rate of $k$ we apply $\sqrt{k}$ in each axis. We found this to
+significantly improve the performance of the discrete prior model, and suspect a
+similar approach could improve performance if applied to pixels directly, which
+we leave for future work.
 
 \subsubsection*{Axial Rotary Embeddings}
-foobar
+
+Rotary positional embeddings~\cite{su2021roformer} are a good default choice for
+injecting positional information into transformer models, requiring no
+additional parameters. Additionally, they can be easily extended to the
+multi-dimensional case~\cite{rope-eleutherai} which we do here. Though
+transformers are clearly capable of learning that elements far apart in a
+flattened sequence may be close in the final output, we find that explicitly
+extending positional embeddings to the multi-dimensional case to provide a
+modest boost in performance.
 
 \subsubsection*{Removal of Causal Constraints}
-foobar
+
+In the original autoregressive formulation of hourglass transformers, great care
+was taken to avoid information leaking during resampling, and hence making the
+model non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive
+method which is therefore not causal. Hence, in our approach we do not make any
+special considerations to avoid information leaking into the future.
 
 \subsection{Non-Autoregressive Generator Training}
 % TODO: discuss SUNDAE training process when applied to latents
