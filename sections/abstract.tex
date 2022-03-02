@@ -1,1 +1,16 @@
-An empty abstract
+Advancements in deep generative modelling has pushed sample resolution higher
+whilst reducing computational requirements and sampling speeds. One approach
+works in two stages: training a powerful vector-quantization image model and
+then training a second discrete prior to predict discrete tokens corresponding
+to image patches. Early work produced high fidelity and diverse samples, but
+were prohibitively slow to sample from as they were autoregressive in nature.
+Later work exploited discrete diffusion models in order to allow for parallel
+token prediction, dramatically speeding up the sampling process. In this work,
+we push the sampling speed and computational requirements further by replacing
+discrete diffusion models with denoising autoencoders, as well as modifications
+to the Transformer backbone including axial embeddings, an hourglass structure,
+and resampling layers more suited to image tasks. Furthermore, the
+non-autoregressive nature of the model allows for arbitrary inpainting patterns.
+Finally, we train new vector-quantization models to allow for the sampling of
+upwards of a megapixel images in seconds, and without relying on sliding window
+mechanisms.
