@@ -55,7 +55,7 @@ also apply to vector-quantized image modelling.
 Our modifications are 2D-aware downsampling, axial rotary embeddings, and
 removal of causal modelling constraints.
 
-\subsubsection*{2D-Aware Downsampling}
+\subsubsection{2D-Aware Downsampling}
 
 % TODO: add a figure demonstrating this
 The original formulation of hourglass transformers~\cite{nawrot2021hierarchical}
@@ -67,27 +67,27 @@ to flattened token sequence, meaning that the corresponding two-dimensional
 vector-quantized image is actually resampled more in one axis compared to the
 other. In their work they did not address this, except for experiments on
 ImageNet32~\cite{russakovsky2015imagenet} where they resampled with a rate of
-$k=3$, corresponding to three colour channels.
+$\hourglassRate=3$, corresponding to three colour channels.
 
 In our formulation, we instead reshape the flattened sequence back into a
 two-dimensional form and then apply resampling equally in the last two axes.
-With a resampling rate of $k$ we apply $\sqrt{k}$ in each axis. We found this to
+With a resampling rate of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in each axis. We found this to
 significantly improve the performance of the discrete prior model, and suspect a
 similar approach could improve performance if applied to pixels directly, which
 we leave for future work.
 
-\subsubsection*{Axial Rotary Embeddings}
+\subsubsection{Axial Rotary Embeddings}
 
 Rotary positional embeddings~\cite{su2021roformer} are a good default choice for
 injecting positional information into transformer models, requiring no
 additional parameters. Additionally, they can be easily extended to the
 multi-dimensional case~\cite{rope-eleutherai} which we do here. Though
 transformers are clearly capable of learning that elements far apart in a
-flattened sequence may be close in the final output, we find that explicitly
-extending positional embeddings to the multi-dimensional case to provide a
-modest boost in performance.
+flattened sequence may be close in a multi-dimensional final output, we find
+that explicitly extending positional embeddings to the multi-dimensional case to
+provide a modest boost in performance.
 
-\subsubsection*{Removal of Causal Constraints}
+\subsubsection{Removal of Causal Constraints}
 
 In the original autoregressive formulation of hourglass transformers, great care
 was taken to avoid information leaking during resampling, and hence making the
@@ -96,11 +96,20 @@ method which is therefore not causal. Hence, in our approach we do not make any
 special considerations to avoid information leaking into the future.
 
 \subsection{Non-Autoregressive Generator Training}
-% TODO: discuss SUNDAE training process when applied to latents
+We follow the same process for training the discrete prior model step-unrolled
+denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}.
+
+% TODO: briefly explain the SUNDAE training procedure.
+% TODO: a figure could be really nice too.
 
 \subsection{Generating High-Resolution Images}
 % TODO: discuss our various sampling strategies and any additional findings over
 % original SUNDAE
+
+% TODO: we found the best sampling parameters to be a little different to their
+% one.
+% TODO: also discuss annealing temperature, low temperature but fast, high
+% temperature but slower, etc.
 
 \subsection{Arbitrary Pattern Inpainting}
 % TODO: discuss how to inpaint with a trained model
