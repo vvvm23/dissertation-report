@@ -43,4 +43,14 @@ foobar
 
 \subsection{Hourglass Transformers}
 \label{subsec:hourglass}
-foobar
+
+Vanilla transformers incur a hefty memory and time complexity of $O(L^2)$ for
+each block~\cite{vaswani2017attention}. This is largely due to the multi-head
+self-attention mechanism, as each input position must attend to every other.
+Most research into efficient transformers focuses on improving the efficiency of
+these attention mechanism, such as through sparse attention patterns or
+approximations of attention.
+
+% TODO: hourglass transformers
+Recent work however, is now focusing on making the overall architecture more
+efficient.
