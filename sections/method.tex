@@ -22,14 +22,16 @@ models are not available and so training our own VQ-GAN was necessary (see
 The second stage is to learn a discrete prior model over these latent variables.
 To enable this, we must first build a latent dataset using our trained VQ-GAN.
 Formally, given a dataset of images $\imageDataset$, a VQ-GAN encoder
-$\vqganEncoder$ with downsample factor $\vqganDownsample$, and vector-quantization codebook $\vqganCodebook$ trained on $\imageDataset,$ we define
-our latent dataset $\latentDataset$ as:
+$\vqganEncoder$ with downsample factor $\vqganDownsample$, and
+vector-quantization codebook $\vqganCodebook$ with number of codewords
+$\vqganNbLatents$, trained on $\imageDataset$, we define our latent dataset
+$\latentDataset$ as:
 \begin{equation}
     \latentDataset = \{\vqganCodebook(\vqganEncoder(\image)) \mid \image \in \imageDataset \}
 \end{equation}
 where $\image \in \real{3 \times H \times W}$ is a single element of the image
 dataset and $\latent = \vqganCodebook(\vqganEncoder(\image)) \in \{1, \dots,
-|\vqganCodebook|\}^{h \times w}$ is the corresponding discrete latent
+v\}^{h \times w}$ is the corresponding discrete latent
 representation. In other words, each $\vqganDownsample \times \vqganDownsample$
 pixels in $\image$ is mapped to a single discrete value from $1$ to
 $|\vqganCodebook|$ (which in turn, corresponds to a vector $\codebookVector \in
@@ -58,14 +60,15 @@ also apply to vector-quantized image modelling.
 %\subsubsection{2D-Aware Downsampling}
 
 % TODO: add a figure demonstrating this
-The original formulation of hourglass transformers~\cite{nawrot2021hierarchical}
-introduced both upsampling and downsampling layers, allowing the use of
-hierarchical transformers in tasks that have output sequence length equal to the
-input sequence length. However, applying their proposed resampling strategies directly on
-the vector-quantized image may not be the best strategy. Resampling is applied
-to flattened token sequence, meaning that the corresponding two-dimensional
-vector-quantized image is actually resampled more in one axis compared to the
-other. In their work they did not address this, except for experiments on
+\textbf{2D-Aware Downsampling} -- The original formulation of hourglass
+transformers~\cite{nawrot2021hierarchical} introduced both upsampling and
+downsampling layers, allowing the use of hierarchical transformers in tasks that
+have output sequence length equal to the input sequence length. However,
+applying their proposed resampling strategies directly on the vector-quantized
+image may not be the best strategy. Resampling is applied to flattened token
+sequence, meaning that the corresponding two-dimensional vector-quantized image
+is actually resampled more in one axis compared to the other. In their work they
+did not address this, except for experiments on
 ImageNet32~\cite{russakovsky2015imagenet} where they resampled with a rate of
 $\hourglassRate=3$, corresponding to three colour channels.
 
@@ -78,9 +81,9 @@ we leave for future work.
 
 %\subsubsection{Axial Rotary Embeddings}
 
-Rotary positional embeddings~\cite{su2021roformer} are a good default choice for
-injecting positional information into transformer models, requiring no
-additional parameters. Additionally, they can be easily extended to the
+\textbf{Rotary Positional Embeddings}~\cite{su2021roformer} are a good default
+choice for injecting positional information into transformer models, requiring
+no additional parameters. Additionally, they can be easily extended to the
 multi-dimensional case~\cite{rope-eleutherai} which we do here. Though
 transformers are clearly capable of learning that elements far apart in a
 flattened sequence may be close in a multi-dimensional final output, we find
@@ -89,17 +92,57 @@ provide a modest boost in performance.
 
 %\subsubsection{Removal of Causal Constraints}
 
-In the original autoregressive formulation of hourglass transformers, great care
-was taken to avoid information leaking during resampling, and hence making the
-model non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive
-method which is therefore not causal. Hence, in our approach we do not make any
-special considerations to avoid information leaking into the future.
+\textbf{Removal of Causal Constraints} -- In the original autoregressive
+formulation of hourglass transformers, great care was taken to avoid information
+leaking during resampling, and hence making the model
+non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive method
+which is therefore not causal. Hence, in our approach we do not make any special
+considerations to avoid information leaking into the future.
 
 \subsection{Non-Autoregressive Generator Training}
 We follow the same process for training the discrete prior model step-unrolled
-denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}.
+denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}. Given a uniform
+prior $p_0$ over our latent space $\latentSpace = \{1, \dots,
+\vqganNbLatents\}^N$ where $N=h\cdot w$, consider the Markov process
+$\latent_t \sim \sundae(\cdot \vert \latent_{t-1})$ where $\sundae$ is a neural
+network
+parameterised by $\sundaeParameters$, then $\{\latent_t\}_t$ forms a Markov
+chain. This gives a $t$-step transition function:
+\begin{equation}\label{eq:markov}
+    p_t(\latent_t \vert \latent_0) = \sum\limits_{\latent_1, \dots,
+    \latent_{t-1} \in \latentSpace} \prod\limits^t_{s=1} \sundae(\latent_s | \latent_{s-1})
+\end{equation}\cite{savinov2022stepunrolled}
+and, given a constant number of steps $\markovSteps$, our model distribution
+$p_\markovSteps(\latent_\markovSteps \vert \latent_0)p_0(\latent_0)$ -- which is
+clearly intractable.
 
-% TODO: briefly explain the SUNDAE training procedure.
+Instead, they propose an \textit{unrolled denoising} training method that uses a
+far lower $\markovSteps$ than is used for
+sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
+chain to start from corrupted data produced by a \textit{corruption
+distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$ rather than from the prior $p_0$ so the model
+encounters samples more akin to those seen during the full unroll at sample
+time~\cite{savinov2022stepunrolled}. The original work defaults to $\markovSteps
+= 2$ during training, noting also that a single step would be similar to the
+training strategy of BERT~\cite{devlin2019bert} but would lead to worse
+performance as seen in earlier work using BERT as a random field language
+model~\cite{wang2019bert}. A good default of $\markovSteps = 2$ held true in our
+experiments on codebook latents.
+
+The training objective of SUNDAE is simply the average of all reconstruction
+losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
+\lossFunction{T} \right)$ of the chain after $t$ steps, which is shown to form
+an upper bound on the actual negative
+log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
+leads to a minor improvement in performance, but considerably slows down
+training time~\cite{savinov2022stepunrolled} and memory usage.
+
+We follow the original choice of corruption
+distribution~\cite{savinov2022stepunrolled}: sample some
+proportion $r \sim U[0, 1]$, randomly selecting positions according to this
+proportion, and then sampling at these selected positions tokens random tokens
+from $\{1, \dots, \vqganNbLatents\}$.
+
 % TODO: a figure could be really nice too.
 
 \subsection{Generating High-Resolution Images}
