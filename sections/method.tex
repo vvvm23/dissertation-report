@@ -52,10 +52,10 @@ same performance as existing models more efficiently by using an explicit
 hierarchical structure~\cite{nawrot2021hierarchical}. The same benefits should
 also apply to vector-quantized image modelling.
 
-Our modifications are 2D-aware downsampling, axial rotary embeddings, and
-removal of causal modelling constraints.
+%Our modifications are 2D-aware downsampling, axial rotary embeddings, and
+%removal of causal modelling constraints.
 
-\subsubsection{2D-Aware Downsampling}
+%\subsubsection{2D-Aware Downsampling}
 
 % TODO: add a figure demonstrating this
 The original formulation of hourglass transformers~\cite{nawrot2021hierarchical}
@@ -76,7 +76,7 @@ significantly improve the performance of the discrete prior model, and suspect a
 similar approach could improve performance if applied to pixels directly, which
 we leave for future work.
 
-\subsubsection{Axial Rotary Embeddings}
+%\subsubsection{Axial Rotary Embeddings}
 
 Rotary positional embeddings~\cite{su2021roformer} are a good default choice for
 injecting positional information into transformer models, requiring no
@@ -87,7 +87,7 @@ flattened sequence may be close in a multi-dimensional final output, we find
 that explicitly extending positional embeddings to the multi-dimensional case to
 provide a modest boost in performance.
 
-\subsubsection{Removal of Causal Constraints}
+%\subsubsection{Removal of Causal Constraints}
 
 In the original autoregressive formulation of hourglass transformers, great care
 was taken to avoid information leaking during resampling, and hence making the

@@ -53,4 +53,13 @@ approximations of attention.
 
 % TODO: hourglass transformers
 Recent work however, is now focusing on making the overall architecture more
-efficient.
+efficient. Funnel-Transformer~\cite{dai2020funneltransformer} progressively
+downsamples the input sequence and hence reduces the computational cost of the
+model. The saved FLOPs can then be reassigned to create deeper or wider models
+and thus outperform vanilla transformers given the same computational
+budget~\cite{dai2020funneltransformer}. However, the final layer does not
+operate at the same granularity as the input, making it unusable for tasks that
+require this such as per-token classification or generative tasks. Hourglass
+transformers~\cite{nawrot2021hierarchical} include both up- and down-sampling
+mechanisms, resulting in a computational saving whilst still being
+general-purpose models.
