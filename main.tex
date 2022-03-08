@@ -71,7 +71,23 @@ Department of Computer Science\\
 Durham University, UK\\
 }
 
+%\maketitle
+
+\twocolumn[{%
+\renewcommand\twocolumn[1][]{#1}%
 \maketitle
+\begin{center}
+    \centering
+    \captionsetup{type=figure}
+    \includegraphics[width=1.0\linewidth]{figures/sample1024.png}
+    \captionof{figure}{
+        High-resolution samples produced using our non-autoregressive approach.
+        Each $1024 \times 1024$ sample was generated in $\approx 2$ seconds on a
+        GTX 1080Ti -- including both discrete latent sampling and subsequent
+        decoding.
+    }
+\end{center}%
+}]
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
