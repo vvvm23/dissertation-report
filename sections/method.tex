@@ -22,14 +22,16 @@ models are not available and so training our own VQ-GAN was necessary (see
 The second stage is to learn a discrete prior model over these latent variables.
 To enable this, we must first build a latent dataset using our trained VQ-GAN.
 Formally, given a dataset of images $\imageDataset$, a VQ-GAN encoder
-$\vqganEncoder$ with downsample factor $\vqganDownsample$, and vector-quantization codebook $\vqganCodebook$ trained on $\imageDataset,$ we define
-our latent dataset $\latentDataset$ as:
+$\vqganEncoder$ with downsample factor $\vqganDownsample$, and
+vector-quantization codebook $\vqganCodebook$ with number of codewords
+$\vqganNbLatents$, trained on $\imageDataset$, we define our latent dataset
+$\latentDataset$ as:
 \begin{equation}
     \latentDataset = \{\vqganCodebook(\vqganEncoder(\image)) \mid \image \in \imageDataset \}
 \end{equation}
 where $\image \in \real{3 \times H \times W}$ is a single element of the image
 dataset and $\latent = \vqganCodebook(\vqganEncoder(\image)) \in \{1, \dots,
-|\vqganCodebook|\}^{h \times w}$ is the corresponding discrete latent
+v\}^{h \times w}$ is the corresponding discrete latent
 representation. In other words, each $\vqganDownsample \times \vqganDownsample$
 pixels in $\image$ is mapped to a single discrete value from $1$ to
 $|\vqganCodebook|$ (which in turn, corresponds to a vector $\codebookVector \in
@@ -52,30 +54,185 @@ same performance as existing models more efficiently by using an explicit
 hierarchical structure~\cite{nawrot2021hierarchical}. The same benefits should
 also apply to vector-quantized image modelling.
 
-Our modifications are 2D-aware downsampling, axial rotary embeddings, and
-removal of causal modelling constraints.
+%Our modifications are 2D-aware downsampling, axial rotary embeddings, and
+%removal of causal modelling constraints.
 
-\subsubsection*{2D-Aware Downsampling}
-foobar
+%\subsubsection{2D-Aware Downsampling}
 
-\subsubsection*{Axial Rotary Embeddings}
-foobar
+% TODO: add a figure demonstrating this
+\textbf{2D-Aware Downsampling} -- The original formulation of hourglass
+transformers~\cite{nawrot2021hierarchical} introduced both upsampling and
+downsampling layers, allowing the use of hierarchical transformers in tasks that
+have output sequence length equal to the input sequence length. However,
+applying their proposed resampling strategies directly on the vector-quantized
+image may not be the best strategy. Resampling is applied to flattened token
+sequence, meaning that the corresponding two-dimensional vector-quantized image
+is actually resampled more in one axis compared to the other. In their work they
+did not address this, except for experiments on
+ImageNet32~\cite{russakovsky2015imagenet} where they resampled with a rate of
+$\hourglassRate=3$, corresponding to three colour channels.
 
-\subsubsection*{Removal of Causal Constraints}
-foobar
+In our formulation, we instead reshape the flattened sequence back into a
+two-dimensional form and then apply resampling equally in the last two axes.
+With a resampling rate of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in each axis. We found this to
+significantly improve the performance of the discrete prior model, and suspect a
+similar approach could improve performance if applied to pixels directly, which
+we leave for future work.
+
+%\subsubsection{Axial Rotary Embeddings}
+
+\textbf{Rotary Positional Embeddings}~\cite{su2021roformer} are a good default
+choice for injecting positional information into transformer models, requiring
+no additional parameters. Additionally, they can be easily extended to the
+multi-dimensional case~\cite{rope-eleutherai} which we do here. Though
+transformers are clearly capable of learning that elements far apart in a
+flattened sequence may be close in a multi-dimensional final output, we find
+that explicitly extending positional embeddings to the multi-dimensional case to
+provide a modest boost in performance.
+
+%\subsubsection{Removal of Causal Constraints}
+
+\textbf{Removal of Causal Constraints} -- In the original autoregressive
+formulation of hourglass transformers, great care was taken to avoid information
+leaking during resampling, and hence making the model
+non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive method
+which is therefore not causal. Hence, in our approach we do not make any special
+considerations to avoid information leaking into the future.
 
 \subsection{Non-Autoregressive Generator Training}
-% TODO: discuss SUNDAE training process when applied to latents
+% TODO: perhaps should move this to the prior work part?
+
+We follow the same process for training the discrete prior model step-unrolled
+denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}. Given a uniform
+prior $p_0$ over our latent space $\latentSpace = \{1, \dots,
+\vqganNbLatents\}^N$ where $N=h\cdot w$, consider the Markov process
+$\latent_t \sim \sundae(\cdot \vert \latent_{t-1})$ where $\sundae$ is a neural
+network
+parameterised by $\sundaeParameters$, then $\{\latent_t\}_t$ forms a Markov
+chain. This gives a $t$-step transition function:
+\begin{equation}\label{eq:markov}
+    p_t(\latent_t \vert \latent_0) = \sum\limits_{\latent_1, \dots,
+    \latent_{t-1} \in \latentSpace} \prod\limits^t_{s=1} \sundae(\latent_s | \latent_{s-1})
+\end{equation}\cite{savinov2022stepunrolled}
+and, given a constant number of steps $\markovSteps$, our model distribution
+$p_\markovSteps(\latent_\markovSteps \vert \latent_0)p_0(\latent_0)$ -- which is
+clearly intractable.
+
+Instead, they propose an \textit{unrolled denoising} training method that uses a
+far lower $\markovSteps$ than is used for
+sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
+chain to start from corrupted data produced by a \textit{corruption
+distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$ rather than from the prior $p_0$ so the model
+encounters samples more akin to those seen during the full unroll at sample
+time~\cite{savinov2022stepunrolled}. The original work defaults to $\markovSteps
+= 2$ during training, noting also that a single step would be similar to the
+training strategy of BERT~\cite{devlin2019bert} but would lead to worse
+performance as seen in earlier work using BERT as a random field language
+model~\cite{wang2019bert}. A good default of $\markovSteps = 2$ held true in our
+experiments on codebook latents.
+
+The training objective of SUNDAE is simply the average of all reconstruction
+losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
+\lossFunction{T} \right)$ of the chain after $t$ steps, which is shown to form
+an upper bound on the actual negative
+log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
+leads to a minor improvement in performance, but considerably slows down
+training time~\cite{savinov2022stepunrolled} and memory usage.
+
+We follow the original choice of corruption
+distribution~\cite{savinov2022stepunrolled}: sample some
+proportion $r \sim U[0, 1]$, randomly selecting positions according to this
+proportion, and then sampling at these selected positions tokens random tokens
+from $\{1, \dots, \vqganNbLatents\}$.
+
+A key advantage of this approach on discrete latents over other
+non-autoregressive methods is that we start from random tokens, rather than a
+dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
+token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
+token. Additionally, the model is able to ``change its mind'' about generated
+positions during the sampling process, allowing it to make fine-grained
+adjustments later in the sampling process.
+
+% TODO: a figure could be really nice too.
 
 \subsection{Generating High-Resolution Images}
 % TODO: discuss our various sampling strategies and any additional findings over
 % original SUNDAE
 
+% TODO: we found the best sampling parameters to be a little different to their
+% one.
+% TODO: also discuss annealing temperature, low temperature but fast, high
+% temperature but slower, etc.
+% in general, the sampling process for SUNDAE is highly tuneable, and probably
+% dataset dependent..
+% we also stop early if nothing has changed.
+
+During sampling, we simply sample sequentially $\latent_t \sim \sundae(\latent_t
+\vert \latent_{t-1})$ for a constant number of steps $\markovSteps$, beginning
+randomly from $\latent_0$~\cite{savinov2022stepunrolled}. The original work
+proposed a number of improved strategies for sampling in smaller number of
+steps, including low-temperature sampling and updating a random subset of
+tokens~\cite{savinov2022stepunrolled}, rather than all simultaneously.
+
+Sampling, however, with a lower temperature can reduce the diversity of the
+resulting samples. To alleviate this, we instead anneal the temperature down
+from a high value ($\approx 1.0$) down to a lower value towards the end of the
+sampling process. We found this retained the fast sampling speed whilst also
+improving diversity.
+
+In certain latent sampling configurations, updating only a random subset of
+tokens does improve performance. However, we found that for low step scenarios
+($\markovSteps<20$) that all tokens must be able to be updated in order to
+produce meaningful samples before the maximum number of steps is reached. Hence
+in these cases, we do not follow this strategy.
+
+Additionally, if a individual sample does not change between step $t-1$ and $t$,
+we freeze it, preventing any further change. If all samples are frozen, sampling
+may terminate early, further improving sampling speed with little cost to
+sample quality.
+
+Once sampling has terminated, the sampled latent code $\latent_T$ can be given
+to the VQGAN decoder $\vqganDecoder$ to produce a final sample $\sample$.
+
 \subsection{Arbitrary Pattern Inpainting}
 % TODO: discuss how to inpaint with a trained model
+% TODO: add more citations in general for other NAR
+% TODO: clear advantage of NAR models against AR, as we are not limited to
+% causal inpainting
+% TODO: initial description may be more suited for prior work.
+As noted in the original work~\cite{savinov2022stepunrolled} and other
+non-autoregressive solutions~\cite{bondtaylor2021unleashing} one clear advantage
+of non-autoregressive models is that they are not limited to causal inpainting.
+In general, they support arbitrary inpainting masks and can draw on context in
+both the past and the future, enabling them to perform inpainting tasks not
+possible with autoregressive sampling.
+
+Given a sampled image $\sample \in \real{3 \times H \times W}$ we can mask a
+proportion of it using a pixel-level binary mask $\pixelMask \in \{0, 1\}^{H
+\times W}$. By taking $\vqganDownsample \times \vqganDownsample$ regions of
+$\pixelMask$ and applying a logical and in them, we can obtain a latent level
+mask $\vqMask \in \{0,1\}^{h \times w}$. We then sample as normal from the
+latents, allowing the model full context, but only update regions that were
+masked according to $\vqMask$. Like with sampling, we then use $\vqganDecoder$
+to decode the sampled latent code, producing the output $\sample$.
 
 \subsection{Training a megapixel VQ-GAN}
 % TODO: details about FFHQ1024 VQGAN.
-% this kind of stuff might be better in "experiments though"
+% this kind of stuff might be better in "evaluation" though
+
+Training at higher resolutions usually means greater computational requirements
+and sampling speeds. With an autoregressive model, the sampling speed can be
+especially immense, even with an auxiliary vector-quantized image
+model~\cite{esser2021taming}. With a non-autoregressive model however, one
+question to explore is whether sampling at very high resolutions becomes
+feasible.
+
+To answer this question, we train a larger variant of VQGAN with
+$\vqganNbLatents = 8192$ operating on $1024 \times 1024$ RGB images. To our
+knowledge, this is the highest resolution VQGAN has been applied
+to~\cite{esser2021taming}. Once trained, we can train SUNDAE samplers on the
+latents as before, the only difference being an increased sequence length --
+greater than was ever tested in the original
+work~\cite{savinov2022stepunrolled}.
 
 \label{sec:megagan}

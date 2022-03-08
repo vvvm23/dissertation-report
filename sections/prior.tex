@@ -1,0 +1,65 @@
+This work builds upon much prior research into powerful deep generative
+models~\cite{bondtaylor2021review}, self-supervised methods, and efficient
+transformer architectures. We briefly cover relevant prior work into deep
+generative models in \S\ref{subsec:agm}-\ref{subsec:sundae} and a recent and
+highly effective development into a efficient transformer architecture in
+\S\ref{subsec:hourglass}.
+
+\subsection{Autoregressive Generative Models}
+\label{subsec:agm}
+One major deep generative model family is autoregressive models, characterised
+by a training and inference process based on the probabilistic chain rule.
+During training, they directly aim to maximise the likelihood of the data they
+are trained on. Prior work using these methods resulted in impressive results in
+terms of both sample quality and diversity, but are ultimately unwieldy for use
+in real world applications due to their slow sampling speed.
+
+% TODO: discuss why it is slow, and the choice of ordering in AR models (i.e
+% text it is obvious, less obvious with images, but also order agnostic models
+% exist)
+The slow sampling speed is due to their sequential nature, defined by the chain
+rule of probability. Given an input $\image = \{ \pixel{1}, \pixel{2}, \dots,
+\pixel{n} \}$, an autoregressive model $p_\theta(\cdot)$ can generates new
+samples sequentially:
+\begin{equation}\label{eq:ar}
+    p_\theta(\image) = p_\theta(\pixel{1}, \dots, \pixel{n}) =
+    \prod\limits^{n}_{i=1} p_\theta(\pixel{i} \vert \pixel{1}, \dots, \pixel{i-1})
+\end{equation}
+meaning that the number of sampling steps is equal to the size of the
+decomposition of $\image$, making this slow for large inputs.
+
+For certain tasks, the ordering of the decomposition of $\image$ is obvious, for
+example on text or speech. For images this is less obvious, however typically a
+raster scan ordering is used. Certain autoregressive models are order-agnostic,
+allow for arbitrary ordering to be used during training and inference.
+
+\subsection{Non-autoregressive Generative Models}
+\label{subsec:nagm}
+foobar
+
+\subsection{Step-unrolled Denoising Autoencoder}
+\label{subsec:sundae}
+foobar
+
+\subsection{Hourglass Transformers}
+\label{subsec:hourglass}
+
+Vanilla transformers incur a hefty memory and time complexity of $O(L^2)$ for
+each block~\cite{vaswani2017attention}. This is largely due to the multi-head
+self-attention mechanism, as each input position must attend to every other.
+Most research into efficient transformers focuses on improving the efficiency of
+these attention mechanism, such as through sparse attention patterns or
+approximations of attention.
+
+% TODO: hourglass transformers
+Recent work however, is now focusing on making the overall architecture more
+efficient. Funnel-Transformer~\cite{dai2020funneltransformer} progressively
+downsamples the input sequence and hence reduces the computational cost of the
+model. The saved FLOPs can then be reassigned to create deeper or wider models
+and thus outperform vanilla transformers given the same computational
+budget~\cite{dai2020funneltransformer}. However, the final layer does not
+operate at the same granularity as the input, making it unusable for tasks that
+require this such as per-token classification or generative tasks. Hourglass
+transformers~\cite{nawrot2021hierarchical} include both up- and down-sampling
+mechanisms, resulting in a computational saving whilst still being
+general-purpose models.

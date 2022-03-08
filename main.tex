@@ -18,7 +18,6 @@
 \usepackage{amssymb}
 \usepackage{booktabs}
 
-
 % It is strongly recommended to use hyperref, especially for the review version.
 % hyperref with option pagebackref eases the reviewers' job.
 % Please disable hyperref *only* if you encounter grave issues, e.g. with the
@@ -48,23 +47,29 @@
 
 %%%%%%%%% TITLE - PLEASE UPDATE
 %\title{Step-unrolled Denoising Autoencoders for Fast Image Generation}
-\title{Mega-pixel Image Generation with Step-unrolled Denoising Autoencoders}
+\title{Megapixel Image Generation with Step-unrolled Denoising Autoencoders}
 
-\author{Alex F. McKinney\\
-Durham University\\
-Durham, UK\\
-{\tt\small alexander.f.mckinney@durham.ac.uk}
-% For a paper whose authors are all at the same institution,
-% omit the following lines up until the closing ``}''.
-% Additional authors and addresses can be added with ``\and'',
-% just like the second author.
-% To save space, use either the email address or home page, not both
-\and
-Chris G. Willcocks\\
-Durham University\\
-Durham, UK\\
-{\tt\small christopher.g.willcocks@durham.ac.uk}
+% \author{Alex F. McKinney\\
+% Durham University\\
+% Durham, UK\\
+% {\tt\small alexander.f.mckinney@durham.ac.uk}
+% % For a paper whose authors are all at the same institution,
+% % omit the following lines up until the closing ``}''.
+% % Additional authors and addresses can be added with ``\and'',
+% % just like the second author.
+% % To save space, use either the email address or home page, not both
+% \and
+% Chris G. Willcocks\\
+% Durham University\\
+% Durham, UK\\
+% {\tt\small christopher.g.willcocks@durham.ac.uk}
+% }
+
+\author{Alex F. McKinney\thanks{Corresponding author: alexander.f.mckinney@durham.ac.uk} \hspace{4px} Chris G. Willcocks\\
+Department of Computer Science\\
+Durham University, UK\\
 }
+
 \maketitle
 
 %%%%%%%%% ABSTRACT
@@ -79,11 +84,19 @@ Durham, UK\\
 
 \section{Related Work}
 \label{sec:related}
-\input{sections/related.tex}
+\input{sections/prior.tex}
 
-\section{Method}
+\section{Methodology}
 \label{sec:method}
 \input{sections/method.tex}
+
+\section{Evaluation}
+\label{sec:evaluation}
+\input{sections/evaluation.tex}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{sections/conclusion.tex}
 
 %%%%%%%%% REFERENCES
 {\small

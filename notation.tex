@@ -2,12 +2,28 @@
 
 \newcommand{\imageDataset}{\mathcal{X}}
 \newcommand{\image}{\mathbf{x}}
+\newcommand{\sample}{\mathbf{y}}
+\newcommand{\pixel}[1]{x_{#1}}
 
 \newcommand{\latentDataset}{\mathcal{L}}
 \newcommand{\latent}{\mathbf{z}}
+\newcommand{\latentSpace}{Z}
 
 \newcommand{\vqganEncoder}{E}
 \newcommand{\vqganDecoder}{G}
 \newcommand{\vqganCodebook}{\mathcal{C}}
 \newcommand{\vqganDownsample}{f}
+\newcommand{\vqganNbLatents}{v}
 \newcommand{\codebookVector}{\mathbf{e}}
+
+\newcommand{\hourglassRate}{k}
+
+\newcommand{\sundaeParameters}{\theta}
+\newcommand{\markovSteps}{T}
+\newcommand{\sundae}{f_\sundaeParameters}
+
+\newcommand{\corruptionDistribution}{q}
+
+\newcommand{\lossFunction}[1]{L^{(#1)}(\sundaeParameters)}
+\newcommand{\pixelMask}{m_p}
+\newcommand{\vqMask}{m_\textrm{vq}}
