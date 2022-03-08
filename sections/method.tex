@@ -168,10 +168,14 @@ adjustments later in the sampling process.
 % we also stop early if nothing has changed.
 
 \begin{figure}[t]
+    \label{fig:sampling}
     \centering
     %\includegraphics[width=0.9\linewidth]{figures/sampling/sampling.pdf}
-    \begin{overpic}[percent,grid=false,tics=20,width=0.9\linewidth]{figures/sampling/sampling.pdf}
+    \begin{overpic}[percent,grid=false,tics=10,width=0.9\linewidth]{figures/sampling/sampling.pdf}
         \put(1, 3){\tiny$\latent_0 \sim U(1, v)$}
+        \put(30, 3){\tiny$\latent_1$}
+        \put(66, 3){\tiny$\latent_{T-1}$}
+        \put(87, 3){\tiny$\latent_T$}
         \put(9, 30.5){$\vqganDecoder$}
         \put(30, 30.5){$\vqganDecoder$}
         \put(66, 30.5){$\vqganDecoder$}
@@ -221,6 +225,15 @@ to the VQGAN decoder $\vqganDecoder$ to produce a final sample $\sample$.
 % TODO: clear advantage of NAR models against AR, as we are not limited to
 % causal inpainting
 % TODO: initial description may be more suited for prior work.
+
+\begin{figure}[t]
+    \label{fig:inpaintExample}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/inpaint.png}
+    \caption{An example of inpainting on a $1024 \times 1024$ image using our
+    model.}
+\end{figure}
+
 As noted in the original work~\cite{savinov2022stepunrolled} and other
 non-autoregressive solutions~\cite{bondtaylor2021unleashing} one clear advantage
 of non-autoregressive models is that they are not limited to causal inpainting.
