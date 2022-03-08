@@ -167,6 +167,27 @@ adjustments later in the sampling process.
 % dataset dependent..
 % we also stop early if nothing has changed.
 
+\begin{figure}[t]
+    \centering
+    %\includegraphics[width=0.9\linewidth]{figures/sampling/sampling.pdf}
+    \begin{overpic}[percent,grid=false,tics=20,width=0.9\linewidth]{figures/sampling/sampling.pdf}
+        \put(1, 3){\tiny$\latent_0 \sim U(1, v)$}
+        \put(9, 30.5){$\vqganDecoder$}
+        \put(30, 30.5){$\vqganDecoder$}
+        \put(66, 30.5){$\vqganDecoder$}
+        \put(87, 30.5){$\vqganDecoder$}
+        \put(47, 16){$\dots$}
+        \put(9, 60){\tiny$\sample_0$}
+        \put(30, 60){\tiny$\sample_1$}
+        \put(66, 60){\tiny$\sample_{\markovSteps - 1}$}
+        \put(87, 60){\tiny$\sample_\markovSteps$}
+    \end{overpic}
+
+    \caption{The sampling process. SUNDAE gradually denoises from $\latent_0$ to
+    the final sample $\latent_\markovSteps$. At each step, it is possible to
+    decode with $\vqganDecoder$ to produce a final image.}
+\end{figure}
+
 During sampling, we simply sample sequentially $\latent_t \sim \sundae(\latent_t
 \vert \latent_{t-1})$ for a constant number of steps $\markovSteps$, beginning
 randomly from $\latent_0$~\cite{savinov2022stepunrolled}. The original work
