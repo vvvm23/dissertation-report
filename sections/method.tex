@@ -151,7 +151,8 @@ dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
 token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
 token. Additionally, the model is able to ``change its mind'' about generated
 positions during the sampling process, allowing it to make fine-grained
-adjustments later in the sampling process.
+adjustments later in the sampling process such as correcting accumulated errors,
+or adjusting certain features.
 
 % TODO: a figure could be really nice too.
 
@@ -214,7 +215,7 @@ in these cases, we do not follow this strategy.
 Additionally, if a individual sample does not change between step $t-1$ and $t$,
 we freeze it, preventing any further change. If all samples are frozen, sampling
 may terminate early, further improving sampling speed with little cost to
-sample quality.
+sample quality. This is significant when performing large-batch sampling.
 
 Once sampling has terminated, the sampled latent code $\latent_T$ can be given
 to the VQGAN decoder $\vqganDecoder$ to produce a final sample $\sample$.

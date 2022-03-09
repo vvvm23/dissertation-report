@@ -1,19 +1,20 @@
 % Context + Problem (1-2 sentences), Solution (1 salient idea), Key
 % findings/surprise/discovery (1 sentence), State-of-the-art-results 
 
+% TODO: add some scores
+
 Recent research has pushed sample resolutions higher whilst reducing
 computational requirements and sampling speeds. One approach is to utilize
-powerful vector-quantization models in order to reduce computational
-requirements whilst maintaining high fidelity samples. In our work, we push this
-further through the use of non-autoregressive denoising autoencoders and
-modifications hierarchical transformers only used previously in language
-modelling. We found this approach to allow for very fast sampling of codebook
-latents from pre-trained VQ-GAN models. Furthermore, we found the
-non-autoregressive nature of the model made it suitable for complex inpainting
-using arbitrary masking. Finally, we trained a VQ-GAN model on a dataset of
-humans faces at resolutions exceeding one million pixels, ultimately allowing us
-to use our fast sampler to generate megapixel images in seconds -- without
-relying on sliding windows.
+powerful vector-quantization (VQ) models to reduce computational requirements
+whilst still producing high quality samples. In this work, we push this further
+through the use of non-autoregressive (NAR) denoising autoencoders (SUNDAE) and
+modifications to hierarchical transformers that have found recent success in
+language modelling. This approach to allows for very fast sampling and training
+(4-6 days) of VQ latents from pre-trained VQ-GAN models. Furthermore, we found
+the NAR nature of the model made it suitable for complex
+inpainting with arbitrary masks. Finally, we trained a new VQ-GAN model on a
+dataset of faces at resolutions exceeding one million pixels, ultimately
+allowing allowing for megapixel image generation in only two seconds.
 
 %Advancements in deep generative modelling has pushed sample resolution higher
 %whilst reducing computational requirements and sampling speeds. One approach
