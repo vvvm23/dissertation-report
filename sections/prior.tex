@@ -77,12 +77,11 @@ sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
 chain to start from corrupted data produced by a \textit{corruption
 distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$ rather than from the prior $p_0$ so the model
 encounters samples more akin to those seen during the full unroll at sample
-time~\cite{savinov2022stepunrolled}. The original work defaults to $\markovSteps
-= 2$ during training, noting also that a single step would be similar to the
+time~\cite{savinov2022stepunrolled}. Typically, $\markovSteps
+= 2$ during training, as a single step would be similar to the
 training strategy of BERT~\cite{devlin2019bert} but would lead to worse
 performance as seen in earlier work using BERT as a random field language
-model~\cite{wang2019bert}. A good default of $\markovSteps = 2$ held true in our
-experiments on codebook latents.
+model~\cite{wang2019bert}.
 
 The training objective of SUNDAE is simply the average of all reconstruction
 losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
@@ -92,20 +91,28 @@ log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
 leads to a minor improvement in performance, but considerably slows down
 training time~\cite{savinov2022stepunrolled} and increases memory usage.
 
-We follow the original choice of corruption
-distribution~\cite{savinov2022stepunrolled}: sample some
-proportion $r \sim U[0, 1]$, randomly selecting positions according to this
-proportion, and then sampling at these selected positions tokens random tokens
-from $\{1, \dots, \vqganNbLatents\}$.
+%We follow the original choice of corruption
+%distribution~\cite{savinov2022stepunrolled}: sample some
+%proportion $r \sim U[0, 1]$, randomly selecting positions according to this
+%proportion, and then sampling at these selected positions tokens random tokens
+%from $\{1, \dots, \vqganNbLatents\}$.
 
-A key advantage of this approach on discrete latents over other
-non-autoregressive methods is that we start from random tokens, rather than a
-dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
-token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
-token. Additionally, the model is able to ``change its mind'' about generated
-positions during the sampling process, allowing it to make fine-grained
-adjustments later in the sampling process such as correcting accumulated errors,
-or adjusting certain features.
+One advantage of this approach is that sampling starts from random tokens,
+rather than a dedicated ``masking''
+token~\cite{bondtaylor2021unleashing,austin2021structured}. Unmasking approaches
+means that $\markovSteps \leq N$ as at minimum, one token is unmasked per step.
+Additionally, it allows the model to be able to ``change its mind'' about
+previously predicted positions during sampling, allowing it to make fine-grained
+adjustments or fix accumulated errors.
+
+%A key advantage of this approach on discrete latents over other
+%non-autoregressive methods is that we start from random tokens, rather than a
+%dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
+%token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
+%token. Additionally, the model is able to ``change its mind'' about generated
+%positions during the sampling process, allowing it to make fine-grained
+%adjustments later in the sampling process such as correcting accumulated errors,
+%or adjusting certain features.
 
 
 \subsection{Hourglass Transformers}
