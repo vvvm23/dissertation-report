@@ -1,1 +1,11 @@
-FUBAR
+In this work, we proposed using denoising autoencoders for the
+non-autoregressive prediction of VQ latents. This enables fast sampling
+times and flexible inpainting. In addition, we made changes to the hourglass
+transformer architecture to make it more suited for two-dimensional signals.
+Additionally, we demonstrate the scalability of our approach by training a
+VQ-GAN at extremely high resolutions and training our model on the resulting
+latent dataset. Ultimately, this allows for the sampling of high quality and
+diverse $1024 \times 1024$ images in mere seconds. Further work is required to
+improve sampling time further -- closing the gap with single-step methods like
+GANs -- and to improve the reconstruction quality of VQ-GAN when operating at
+high downsampling factors.
