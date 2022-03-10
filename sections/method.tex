@@ -102,57 +102,57 @@ considerations to avoid information leaking into the future.
 \subsection{Non-Autoregressive Generator Training}
 % TODO: perhaps should move this to the prior work part?
 
-We follow the same process for training the discrete prior model step-unrolled
-denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}. Given a uniform
-prior $p_0$ over our latent space $\latentSpace = \{1, \dots,
-\vqganNbLatents\}^N$ where $N=h\cdot w$, consider the Markov process
-$\latent_t \sim \sundae(\cdot \vert \latent_{t-1})$ where $\sundae$ is a neural
-network
-parameterised by $\sundaeParameters$, then $\{\latent_t\}_t$ forms a Markov
-chain. This gives a $t$-step transition function:
-\begin{equation}\label{eq:markov}
-    p_t(\latent_t \vert \latent_0) = \sum\limits_{\latent_1, \dots,
-    \latent_{t-1} \in \latentSpace} \prod\limits^t_{s=1} \sundae(\latent_s | \latent_{s-1})
-\end{equation}\cite{savinov2022stepunrolled}
-and, given a constant number of steps $\markovSteps$, our model distribution
-$p_\markovSteps(\latent_\markovSteps \vert \latent_0)p_0(\latent_0)$ -- which is
-clearly intractable.
+%We follow the same process for training the discrete prior model step-unrolled
+%denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}. Given a uniform
+%prior $p_0$ over our latent space $\latentSpace = \{1, \dots,
+%\vqganNbLatents\}^N$ where $N=h\cdot w$, consider the Markov process
+%$\latent_t \sim \sundae(\cdot \vert \latent_{t-1})$ where $\sundae$ is a neural
+%network
+%parameterised by $\sundaeParameters$, then $\{\latent_t\}_t$ forms a Markov
+%chain. This gives a $t$-step transition function:
+%\begin{equation}\label{eq:markov}
+    %p_t(\latent_t \vert \latent_0) = \sum\limits_{\latent_1, \dots,
+    %\latent_{t-1} \in \latentSpace} \prod\limits^t_{s=1} \sundae(\latent_s | \latent_{s-1})
+%\end{equation}\cite{savinov2022stepunrolled}
+%and, given a constant number of steps $\markovSteps$, our model distribution
+%$p_\markovSteps(\latent_\markovSteps \vert \latent_0)p_0(\latent_0)$ -- which is
+%clearly intractable.
 
-Instead, they propose an \textit{unrolled denoising} training method that uses a
-far lower $\markovSteps$ than is used for
-sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
-chain to start from corrupted data produced by a \textit{corruption
-distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$ rather than from the prior $p_0$ so the model
-encounters samples more akin to those seen during the full unroll at sample
-time~\cite{savinov2022stepunrolled}. The original work defaults to $\markovSteps
-= 2$ during training, noting also that a single step would be similar to the
-training strategy of BERT~\cite{devlin2019bert} but would lead to worse
-performance as seen in earlier work using BERT as a random field language
-model~\cite{wang2019bert}. A good default of $\markovSteps = 2$ held true in our
-experiments on codebook latents.
+%Instead, they propose an \textit{unrolled denoising} training method that uses a
+%far lower $\markovSteps$ than is used for
+%sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
+%chain to start from corrupted data produced by a \textit{corruption
+%distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$ rather than from the prior $p_0$ so the model
+%encounters samples more akin to those seen during the full unroll at sample
+%time~\cite{savinov2022stepunrolled}. The original work defaults to $\markovSteps
+%= 2$ during training, noting also that a single step would be similar to the
+%training strategy of BERT~\cite{devlin2019bert} but would lead to worse
+%performance as seen in earlier work using BERT as a random field language
+%model~\cite{wang2019bert}. A good default of $\markovSteps = 2$ held true in our
+%experiments on codebook latents.
 
-The training objective of SUNDAE is simply the average of all reconstruction
-losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
-\lossFunction{T} \right)$ of the chain after $t$ steps, which is shown to form
-an upper bound on the actual negative
-log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
-leads to a minor improvement in performance, but considerably slows down
-training time~\cite{savinov2022stepunrolled} and memory usage.
+%The training objective of SUNDAE is simply the average of all reconstruction
+%losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
+%\lossFunction{T} \right)$ of the chain after $t$ steps, which is shown to form
+%an upper bound on the actual negative
+%log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
+%leads to a minor improvement in performance, but considerably slows down
+%training time~\cite{savinov2022stepunrolled} and increases memory usage.
 
-We follow the original choice of corruption
-distribution~\cite{savinov2022stepunrolled}: sample some
-proportion $r \sim U[0, 1]$, randomly selecting positions according to this
-proportion, and then sampling at these selected positions tokens random tokens
-from $\{1, \dots, \vqganNbLatents\}$.
+%We follow the original choice of corruption
+%distribution~\cite{savinov2022stepunrolled}: sample some
+%proportion $r \sim U[0, 1]$, randomly selecting positions according to this
+%proportion, and then sampling at these selected positions tokens random tokens
+%from $\{1, \dots, \vqganNbLatents\}$.
 
-A key advantage of this approach on discrete latents over other
-non-autoregressive methods is that we start from random tokens, rather than a
-dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
-token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
-token. Additionally, the model is able to ``change its mind'' about generated
-positions during the sampling process, allowing it to make fine-grained
-adjustments later in the sampling process such as correcting accumulated errors,
-or adjusting certain features.
+%A key advantage of this approach on discrete latents over other
+%non-autoregressive methods is that we start from random tokens, rather than a
+%dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
+%token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
+%token. Additionally, the model is able to ``change its mind'' about generated
+%positions during the sampling process, allowing it to make fine-grained
+%adjustments later in the sampling process such as correcting accumulated errors,
+%or adjusting certain features.
 
 % TODO: a figure could be really nice too.
 
