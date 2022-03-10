@@ -99,8 +99,36 @@ non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive method
 which is therefore not causal. Hence, in our approach we do not make any special
 considerations to avoid information leaking into the future.
 
+
+\subsection{Training a megapixel VQ-GAN}
+\label{sec:megagan}
+% TODO: details about FFHQ1024 VQGAN.
+% this kind of stuff might be better in "evaluation" though
+
+Training at higher resolutions usually means greater computational requirements
+and sampling speeds. With an autoregressive model, the sampling speed can be
+especially immense, even with an auxiliary vector-quantized image
+model~\cite{esser2021taming}. With a non-autoregressive model however, one
+question to explore is whether sampling at very high resolutions becomes
+feasible.
+
+To answer this question, we train a larger variant of VQGAN with
+$\vqganNbLatents = 8192$ operating on $1024 \times 1024$ RGB images. To our
+knowledge, this is the highest resolution VQGAN has been applied
+to~\cite{esser2021taming}. Once trained, can generate a latent datasets as
+before, the only difference being an increased sequence length -- greater than
+was ever tested in the original work~\cite{savinov2022stepunrolled}.
+
 \subsection{Non-Autoregressive Generator Training}
-% TODO: perhaps should move this to the prior work part?
+
+% TODO: more details on generator training
+
+We train a SUNDAE model on the flattened extracted VQ latents $\latent =
+\{\latent_1, \dots, \latent_N\}$ where $N = \latentHeight
+\cdot \latentWidth$. The function $\sundae$ is implemented using our 2D-aware
+hourglass transformer. Though the default $\markovSteps = 2$ performed well, we
+found $\markovSteps = 3$ to result in more diverse results during unconditional
+generation.
 
 %We follow the same process for training the discrete prior model step-unrolled
 %denoising autoencoders (SUNDAE)~\cite{savinov2022stepunrolled}. Given a uniform
@@ -250,24 +278,3 @@ mask $\vqMask \in \{0,1\}^{h \times w}$. We then sample as normal from the
 latents, allowing the model full context, but only update regions that were
 masked according to $\vqMask$. Like with sampling, we then use $\vqganDecoder$
 to decode the sampled latent code, producing the output $\sample$.
-
-\subsection{Training a megapixel VQ-GAN}
-% TODO: details about FFHQ1024 VQGAN.
-% this kind of stuff might be better in "evaluation" though
-
-Training at higher resolutions usually means greater computational requirements
-and sampling speeds. With an autoregressive model, the sampling speed can be
-especially immense, even with an auxiliary vector-quantized image
-model~\cite{esser2021taming}. With a non-autoregressive model however, one
-question to explore is whether sampling at very high resolutions becomes
-feasible.
-
-To answer this question, we train a larger variant of VQGAN with
-$\vqganNbLatents = 8192$ operating on $1024 \times 1024$ RGB images. To our
-knowledge, this is the highest resolution VQGAN has been applied
-to~\cite{esser2021taming}. Once trained, we can train SUNDAE samplers on the
-latents as before, the only difference being an increased sequence length --
-greater than was ever tested in the original
-work~\cite{savinov2022stepunrolled}.
-
-\label{sec:megagan}
