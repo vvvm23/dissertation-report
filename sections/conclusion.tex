@@ -8,4 +8,7 @@ latent dataset. Ultimately, this allows for the sampling of high quality and
 diverse $1024 \times 1024$ images in mere seconds. Further work is required to
 improve sampling time further -- closing the gap with single-step methods like
 GANs -- and to improve the reconstruction quality of VQ-GAN when operating at
-high downsampling factors.
+high downsampling factors. Additionally, we note that the adversarial component
+of the VQ-GAN image model may still lead to issues such as mode collapse, which
+can only be resolved with research into more powerful VQ representation models
+that do not rely on a adversarial component.
