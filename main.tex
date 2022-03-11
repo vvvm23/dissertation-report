@@ -29,7 +29,10 @@
 % (Or just hit 'q' on the first LaTeX run, let it finish, and you
 %  should be clear).
 \usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
+\usepackage[acronym]{glossaries}
+\glsdisablehyper
 
+\input{acronym.tex}
 
 % Support for easy cross-referencing
 \usepackage[capitalize]{cleveref}
@@ -93,6 +96,7 @@ Durham University, UK\\
 %%%%%%%%% ABSTRACT
 \begin{abstract}
     \input{sections/abstract.tex}
+    \acrshort{vqgan}
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
