@@ -1,125 +1,88 @@
-% CVPR 2022 Paper Template
-% based on the CVPR template provided by Ming-Ming Cheng (https://github.com/MCG-NKU/CVPR_Template)
-% modified and extended by Stefan Roth (stefan.roth@NOSPAMtu-darmstadt.de)
 
-\documentclass[10pt,twocolumn,letterpaper]{article}
+\documentclass{article} % For LaTeX2e
+\usepackage{iclr2022_conference,times}
 
-%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
-%\usepackage[review]{cvpr}      % To produce the REVIEW version
-\usepackage{cvpr}              % To produce the CAMERA-READY version
-%\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
-
-% Include other packages here, before hyperref.
-%\input{math_commands.tex}
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
 \input{notation.tex}
 
+\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
+\usepackage{url}
+
+\usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{booktabs}
 \usepackage{overpic}
 
-% It is strongly recommended to use hyperref, especially for the review version.
-% hyperref with option pagebackref eases the reviewers' job.
-% Please disable hyperref *only* if you encounter grave issues, e.g. with the
-% file validation for the camera-ready version.
-%
-% If you comment hyperref and then uncomment it, you should delete
-% ReviewTempalte.aux before re-running LaTeX.
-% (Or just hit 'q' on the first LaTeX run, let it finish, and you
-%  should be clear).
-\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
-
-
-% Support for easy cross-referencing
 \usepackage[capitalize]{cleveref}
 \crefname{section}{Sec.}{Secs.}
 \Crefname{section}{Section}{Sections}
 \Crefname{table}{Table}{Tables}
 \crefname{table}{Tab.}{Tabs.}
 
-
-%%%%%%%%% PAPER ID  - PLEASE UPDATE
-\def\cvprPaperID{*****} % *** Enter the CVPR Paper ID here
-\def\confName{CVPR}
-\def\confYear{2022}
-
-\begin{document}
-
-%%%%%%%%% TITLE - PLEASE UPDATE
-%\title{Step-unrolled Denoising Autoencoders for Fast Image Generation}
 \title{Megapixel Image Generation with Step-unrolled Denoising Autoencoders}
 
-% \author{Alex F. McKinney\\
-% Durham University\\
-% Durham, UK\\
-% {\tt\small alexander.f.mckinney@durham.ac.uk}
-% % For a paper whose authors are all at the same institution,
-% % omit the following lines up until the closing ``}''.
-% % Additional authors and addresses can be added with ``\and'',
-% % just like the second author.
-% % To save space, use either the email address or home page, not both
-% \and
-% Chris G. Willcocks\\
-% Durham University\\
-% Durham, UK\\
-% {\tt\small christopher.g.willcocks@durham.ac.uk}
-% }
+% Authors must not appear in the submitted version. They should be hidden
+% as long as the \iclrfinalcopy macro remains commented out below.
+% Non-anonymous submissions will be rejected without review.
 
-\author{Alex F. McKinney\thanks{Corresponding author: alexander.f.mckinney@durham.ac.uk} \hspace{4px} Chris G. Willcocks\\
+\author{Alex F. McKinney \& Chris G. Willcocks \\
 Department of Computer Science\\
-Durham University, UK\\
+Durham University\\
+Durham, UK \\
+\texttt{\{alexander.f.mckinney,christopher.g.willcocks\}@durham.ac.uk} \\
 }
 
-%\maketitle
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
 
-\twocolumn[{%
-\renewcommand\twocolumn[1][]{#1}%
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
+\begin{document}
+
 \maketitle
-\begin{center}
+
+\begin{abstract}
+    \input{sections/abstract.tex}
+\end{abstract}
+
+\begin{figure}[ht]
     \centering
-    \captionsetup{type=figure}
     \includegraphics[width=1.0\linewidth]{figures/sample1024.png}
-    \captionof{figure}{
+    \caption{
         High-resolution samples produced using our non-autoregressive approach.
         Each $1024 \times 1024$ sample was generated in $\approx 2$ seconds on a
         GTX 1080Ti -- including both discrete latent sampling and subsequent
         decoding. The SUNDAE sampler was trained in 4 days on a single V100
         32GB.
     }
-\end{center}%
-}]
+\end{figure}
 
-%%%%%%%%% ABSTRACT
-\begin{abstract}
-    \input{sections/abstract.tex}
-\end{abstract}
-
-%%%%%%%%% BODY TEXT
-\section{Introduction}
-\label{sec:intro}
+\section{Introduction}\label{sec:intro}
 \input{sections/introduction.tex}
 
-\section{Related Work}
-\label{sec:related}
+\section{Related Work}\label{sec:related}
 \input{sections/prior.tex}
 
-\section{Methodology}
-\label{sec:method}
+\section{Methodology}\label{sec:method}
 \input{sections/method.tex}
 
-\section{Evaluation}
-\label{sec:evaluation}
+\section{Evaluation}\label{sec:evaluation}
 \input{sections/evaluation.tex}
 
-\section{Conclusion}
-\label{sec:conclusion}
+\section{Conclusion}\label{sec:conclusion}
 \input{sections/conclusion.tex}
 
-%%%%%%%%% REFERENCES
-{\small
-\bibliographystyle{ieee_fullname}
-\bibliography{egbib}
-}
+\bibliographystyle{iclr2022_conference}
+{\small \bibliography{references}}
 
 \end{document}

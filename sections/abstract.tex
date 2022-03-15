@@ -1,8 +1,3 @@
-% Context + Problem (1-2 sentences), Solution (1 salient idea), Key
-% findings/surprise/discovery (1 sentence), State-of-the-art-results 
-
-% TODO: add some scores
-
 Recent research has pushed sample resolutions higher whilst reducing
 computational requirements and sampling speeds. One approach is to utilize
 powerful vector-quantization (VQ) models to reduce computational requirements
@@ -17,23 +12,3 @@ dataset of faces at resolutions exceeding one million pixels, ultimately
 allowing allowing for megapixel image generation in only two seconds on
 consumer-grade GPUs.
 
-%Advancements in deep generative modelling has pushed sample resolution higher
-%whilst reducing computational requirements and sampling speeds. One approach
-%works in two stages: training a powerful vector-quantization image model and
-%then training a second discrete prior to predict discrete tokens corresponding
-%to image patches. Early work produced high fidelity and diverse samples, but
-%were prohibitively slow to sample from as they were autoregressive in nature.
-%Later work exploited discrete diffusion models in order to allow for parallel
-%token prediction, dramatically speeding up the sampling process. In this work,
-%we push the sampling speed and computational requirements further by replacing
-%discrete diffusion models with denoising autoencoders, as well as modifications
-%to the Transformer backbone including axial embeddings, an hourglass structure,
-%and resampling layers more suited to image tasks. Furthermore, the
-%non-autoregressive nature of the model allows for arbitrary inpainting patterns.
-%Finally, we train new vector-quantization models to allow for the sampling of
-%upwards of a megapixel images in seconds, and without relying on sliding window
-%mechanisms.
-
-
-% Reference FYI from our recent submission that's similar to you (it's not the best abstract, a bit too wordy, but not too bad):
-% Whilst diffusion probabilistic models can generate high quality image content, key limitations remain in terms of both generating high-resolution imagery and their associated high computational requirements. Recent Vector-Quantized image models have overcome this limitation of image resolution but are prohibitively slow and unidirectional as they generate tokens via element-wise autoregressive sampling from the prior. By contrast, in this paper we propose a novel discrete diffusion probabilistic model prior which enables parallel prediction of Vector-Quantized tokens by using an unconstrained Transformer architecture as the backbone. During training, tokens are randomly masked in an order-agnostic manner and the Transformer learns to predict the original tokens. This parallelism of Vector-Quantized token prediction in turn facilitates unconditional generation of globally consistent high-resolution and diverse imagery at a fraction of the computational expense. In this manner, we can generate image resolutions exceeding that of the original training set samples whilst additionally provisioning per-image likelihood estimates (in a departure from generative adversarial approaches). Our approach achieves state-of-the-art results in terms of Density (LSUN Bedroom: 1.51; LSUN Churches: 1.12; FFHQ: 1.20) and Coverage (LSUN Bedroom: 0.83; LSUN Churches: 0.73; FFHQ: 0.80), and performs competitively on FID (LSUN Bedroom: 3.64; LSUN Churches: 4.07; FFHQ: 6.11) whilst offering advantages in terms of both computation and reduced training set requirements.
