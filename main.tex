@@ -16,6 +16,22 @@
 \usepackage{booktabs}
 \usepackage{overpic}
 
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, e.g. with the
+% file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete
+% ReviewTempalte.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you
+%  should be clear).
+\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
+\usepackage[acronym]{glossaries}
+\glsdisablehyper
+
+\input{acronym.tex}
+
+% Support for easy cross-referencing
 \usepackage[capitalize]{cleveref}
 \crefname{section}{Sec.}{Secs.}
 \Crefname{section}{Section}{Sections}

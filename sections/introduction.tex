@@ -1,1 +1,67 @@
-foobar
+An ideal deep generative model would satisfy three key requirements:
+high-quality samples, sample diversity via mode coverage, and computational
+inexpensive sampling. Arguably, there are other desirable properties such as a
+meaningful latent space and exact likelihood calculation, however no current
+generative model can satisfy all three requirements, forming the so-called
+generative modelling trilemma~\cite{xiao2021trilemma}. 
+
+Models such as generative adversarial networks (GANs) excel at high-quality and
+fast sampling, but fail to represent the entire data distribution due to not
+directly optimising for likelihood -- using an adversarial loss as a proxy.
+Variational autoencoders~\cite{kingma2013vae} offer excellent mode coverage and
+fast sampling speeds, but the resulting samples are often blurry even at small
+resolutions, and have little hope of scaling to greater resolutions like GANs.
+
+Autoregressive models such as PixelSnail~\cite{chen2017snail}, Image
+Transformer~\cite{parmar2018image}, and DALL-E~\cite{parmar2018image} have
+demonstrated respectable sample quality and mode coverage, even including
+zero-shot image generation~\cite{parmar2018image}. However, they are
+computationally expensive to sample from, requiring many network iterations,
+making them infeasible for interactive applications. Diffusion and score-based
+models produce samples that rival or even exceed the quality of GANs whilst
+still providing good mode coverage, but are still plagued by potentially
+requiring thousands of network evaluations.
+
+Vector-quantized image
+modelling~\cite{oord2017vqvae,razavi2019generating,esser2021taming} alleviates
+sampling speed issues in autoregressive methods by reducing the spatial
+dimension at which autoregressive sampling occurs. This results in excellent
+quality samples whilst improving sampling speeds, but often requires a two-stage
+approach and still does not match the speed of GANs. Recent work has applied VQ
+methods to diffusion models~\cite{bondtaylor2021unleashing} allowing for fast
+parallel decoding. Other work does not use vector-quantized spaces, but latent
+spaces nonetheless, to accelerate
+sampling~\cite{xiao2021trilemma,vahdat2021sbmlatent}. 
+
+In this work, we aim to move towards satisfying all three key requirements for
+an ideal generative model. Like previous work, we use a vector-quantized image
+model to reduce the spatial dimension of the signal we wish to sample. We then
+apply new language models to instead model the distribution of discrete latents,
+ultimately obtaining a powerful prior over the discrete latents. With this and a
+discrete latent decoder, we obtain the final generative model, allowing sampling
+of images in a very low number of steps. We go further, and train our own
+VQ-GAN~\cite{esser2021taming} at resolutions higher than ever trained before to
+our knowledge, ultimately allowing for the sampling of $1024 \times 1024$ RGB
+images in only two seconds on a consumer-grade GPU.
+
+Our main contribution are as follows:
+\begin{itemize}
+    \item A new approach to generating vector-quantized representations of
+        images, allowing for significantly faster generation that previous
+        auto-regressive and non-autoregressive solutions ($\approx 2$ seconds).
+    \item Sampling from a uniform prior rather than dedicated masking
+        latents~\cite{bondtaylor2021unleashing,austin2021structured},
+        allowing for self-correction during sampling and an unbounded number of
+        sampling steps.
+    \item Improvements to hourglass transformer~\cite{nawrot2021hierarchical}
+        architecture to make it more suited for two-dimensional signals, which
+        we postulate could improve performance when applied directly on pixels
+        also.
+    \item Training of a VQ-GAN~\cite{esser2021taming} vector-quantization model
+        on higher resolutions than trained on in the original work ($1024 \times
+        1024$ RGB images) and, to our knowledge, any other research.
+\end{itemize}
+
+In general, we find our approach to allow for highly customisable sampling,
+allowing a user to adjust the trade-off between sample quality, diversity and
+sampling speed at will.
