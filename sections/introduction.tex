@@ -2,24 +2,27 @@ An ideal deep generative model would satisfy three key requirements:
 high-quality samples, sample diversity via mode coverage, and computational
 inexpensive sampling. Arguably, there are other desirable properties such as a
 meaningful latent space and exact likelihood calculation, however no current
-generative model can satisfy all three requirements, forming the so-called
-generative modelling trilemma~\cite{xiao2021trilemma}. 
+generative model can satisfy all three requirements -- let alone additional
+attractive properties -- thus forming the so-called generative modelling
+trilemma~\cite{xiao2021trilemma}.
 
-Models such as generative adversarial networks (GANs) excel at high-quality and
-fast sampling, but fail to represent the entire data distribution due to not
-directly optimising for likelihood -- using an adversarial loss as a proxy.
-Variational autoencoders~\cite{kingma2013vae} offer excellent mode coverage and
-fast sampling speeds, but the resulting samples are often blurry even at small
-resolutions, and have little hope of scaling to greater resolutions like GANs.
+Models such as generative adversarial networks (GANs)~\cite{goodfellow2014gan}
+excel at high-quality and fast sampling, but often fail to model the entire data
+distribution due to not directly optimising for likelihood -- using an
+adversarial loss as a proxy. Variational autoencoders~\cite{kingma2013vae} offer
+excellent mode coverage and fast sampling speeds, but the resulting samples are
+often blurry even at small resolutions, and have little hope of scaling to
+greater resolutions like GANs.
 
 Autoregressive models such as PixelSnail~\cite{chen2017snail}, Image
 Transformer~\cite{parmar2018image}, and DALL-E~\cite{parmar2018image} have
 demonstrated respectable sample quality and mode coverage, even including
-zero-shot image generation~\cite{parmar2018image}. However, they are
+zero-shot image generation~\cite{ramesh2021dalle}. However, they are
 computationally expensive to sample from, requiring many network iterations,
-making them infeasible for interactive applications. Diffusion and score-based
-models produce samples that rival or even exceed the quality of GANs whilst
-still providing good mode coverage, but are still plagued by potentially
+making them infeasible for interactive applications. Diffusion~\cite{ho2020ddpm}
+and score-based models~\cite{song2019sbm,song2020sde,song2021mlt} produce
+samples that rival or even exceed the quality of GANs~\cite{dhariwal2021ddpm}
+whilst still providing good mode coverage, but are still plagued by potentially
 requiring thousands of network evaluations.
 
 Vector-quantized image
@@ -31,37 +34,72 @@ approach and still does not match the speed of GANs. Recent work has applied VQ
 methods to diffusion models~\cite{bondtaylor2021unleashing} allowing for fast
 parallel decoding. Other work does not use vector-quantized spaces, but latent
 spaces nonetheless, to accelerate
-sampling~\cite{xiao2021trilemma,vahdat2021sbmlatent}. 
+sampling~\cite{xiao2021trilemma,vahdat2021sbmlatent}.
 
-In this work, we aim to move towards satisfying all three key requirements for
-an ideal generative model. Like previous work, we use a vector-quantized image
-model to reduce the spatial dimension of the signal we wish to sample. We then
-apply new language models to instead model the distribution of discrete latents,
-ultimately obtaining a powerful prior over the discrete latents. With this and a
-discrete latent decoder, we obtain the final generative model, allowing sampling
-of images in a very low number of steps. We go further, and train our own
-VQ-GAN~\cite{esser2021taming} at resolutions higher than ever trained before to
-our knowledge, ultimately allowing for the sampling of $1024 \times 1024$ RGB
-images in only two seconds on a consumer-grade GPU.
+From this brief overview of generative modelling literature, it is clear that
+indeed no single model satisfies all three conditions. This therefore motivates
+research into explicitly addressing this trilemma. In this work, we move towards
+such a solution, beginning from existing work applying generative models to
+discrete latents. This provides an excellent starting point in terms of sample
+quality and a respectable amount of mode coverage, but an unacceptably slow
+sampling speed despite the reduced spatial dimension of the discrete latent
+space. We directly address this issue by instead sampling discrete latents using
+modern non-autoregressive generative models in an effort to close the gap,
+sampling speed wise, with constant iteration complexity models such as GANs.
+Specifically, we use discrete denoising
+autoencoders~\cite{savinov2022stepunrolled} to gradually denoise samples from a
+uniform prior into one that matches the prior over the discrete latent space
+defined by a pre-trained VQ-GAN model. This forms our first research question,
+whether discrete denoising autoencoders are a suitable paradigm for sampling
+discrete latent codes. As a result of our studies, we find that indeed they are
+highly suited for this task.
 
-Our main contribution are as follows:
+These discrete denoising autoencoders have only previously be applied to
+language modelling tasks~\cite{savinov2022stepunrolled}. In their work, they
+used transformer~\cite{vaswani2017attention} architectures to form their
+autoencoder. In parallel, a noticeably more efficient variant of transformers --
+the Hourglass Transformer~\cite{nawrot2021hierarchical} -- was released, which
+has a hierarchical architecture aimed at language and image modelling tasks,
+though potentially flawed on the latter. This raises a second research question,
+whether the approach introduced in~\citet{savinov2022stepunrolled} is also
+suited for latent modelling, and whether the hierarchical approach introduced
+in~\citet{nawrot2021hierarchical} can be further improved upon. As a result of
+our studies, we find that although they are suited for latent modelling, there
+are many modifications we can make to improve their performance further.
+
+Given a fast sampling and an efficient transformer architecture, we are
+potentially left with a highly scaleable (with respect to spatial resolution)
+model. This raises a third and final research question, whether our new approach
+allows for the generation of extremely high resolution images in a time frame
+that would permit fully-, or near-interactive use. Again, as a result of our
+studies, we find that this is indeed the case, proven by the synthesis of $1024
+\times 1024$ images in as few as 2 seconds on a consumer GPU. To our knowledge,
+this is the fastest sampling model at this resolution, with the exception of
+pure GAN-based approaches. This required the training of our own VQ-GAN model,
+which was, also to our knowledge, the largest VQ-GAN model trained in terms of
+input size.
+
+%In this work, we aim to move towards satisfying all three key requirements for
+%an ideal generative model. Like previous work, we use a vector-quantized image
+%model to reduce the spatial dimension of the signal we wish to sample. We then
+%apply new language models to instead model the distribution of discrete latents,
+%ultimately obtaining a powerful prior over the discrete latents. With this and a
+%discrete latent decoder, we obtain the final generative model, allowing sampling
+%of images in a very low number of steps. We go further, and train our own
+%VQ-GAN~\cite{esser2021taming} at resolutions higher than ever trained before to
+%our knowledge, ultimately allowing for the sampling of $1024 \times 1024$ RGB
+%images in only two seconds on a consumer-grade GPU.
+
+Our project objectives were as follows:
 \begin{itemize}
-    \item A new approach to generating vector-quantized representations of
-        images, allowing for significantly faster generation that previous
-        auto-regressive and non-autoregressive solutions ($\approx 2$ seconds).
-    \item Sampling from a uniform prior rather than dedicated masking
-        latents~\cite{bondtaylor2021unleashing,austin2021structured},
-        allowing for self-correction during sampling and an unbounded number of
-        sampling steps.
-    \item Improvements to hourglass transformer~\cite{nawrot2021hierarchical}
-        architecture to make it more suited for two-dimensional signals, which
-        we postulate could improve performance when applied directly on pixels
-        also.
-    \item Training of a VQ-GAN~\cite{esser2021taming} vector-quantization model
-        on higher resolutions than trained on in the original work ($1024 \times
-        1024$ RGB images) and, to our knowledge, any other research.
+    \item Apply discrete step-unrolled discrete autoencoders to the task of
+        discrete latent generation and ultimately image generation, and perform
+        analysis into their advantages of being used for this task over existing
+        approaches, including both autoregressive and non-autoregressive
+        solutions.
+    \item Analyse the methods used in \citet{savinov2022stepunrolled} and
+        \citet{nawrot2021hierarchical} and design modifications that make these
+        approaches more suitable for discrete latent modelling.
+    \item Attempt to scale our model to extremely high resolution images and
+        analyse successes and failures when operating at such resolutions. 
 \end{itemize}
-
-In general, we find our approach to allow for highly customisable sampling,
-allowing a user to adjust the trade-off between sample quality, diversity and
-sampling speed at will.
