@@ -1,14 +1,15 @@
 In this work, we proposed using denoising autoencoders for the
-non-autoregressive prediction of VQ latents. This enables fast sampling
-times and flexible inpainting. In addition, we made changes to the hourglass
-transformer architecture to make it more suited for two-dimensional signals.
-Additionally, we demonstrate the scalability of our approach by training a
-VQ-GAN at extremely high resolutions and training our model on the resulting
-latent dataset. Ultimately, this allows for the sampling of high quality and
-diverse $1024 \times 1024$ images in mere seconds. Further work is required to
-improve sampling time further -- closing the gap with single-step methods like
-GANs -- and to improve the reconstruction quality of VQ-GAN when operating at
-high downsampling factors. Additionally, we note that the adversarial component
-of the VQ-GAN image model may still lead to issues such as mode collapse, which
-can only be resolved with research into more powerful VQ representation models
-that do not rely on a adversarial component.
+non-autoregressive prediction of \acrshort{vq} latents. This enables fast
+sampling times and flexible inpainting. In addition, we made changes to the
+hourglass transformer architecture to make it more suited for two-dimensional
+signals. Additionally, we demonstrate the scalability of our approach by
+training a \gls{vqgan} at extremely high resolutions and training our model on
+the resulting latent dataset. Ultimately, this allows for the sampling of high
+quality and diverse $1024 \times 1024$ images in mere seconds. Further work is
+required to improve sampling time further -- closing the gap with single-step
+methods like GANs -- and to improve the reconstruction quality of \gls{vqgan}
+when operating at high downsampling factors. Additionally, we note that the
+adversarial component of the \gls{vqgan} image model may still lead to issues
+such as mode collapse, which can only be resolved with research into more
+powerful \acrshort{vq} representation models that do not rely on a adversarial
+component.
