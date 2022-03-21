@@ -1,9 +1,10 @@
 This work builds upon much prior research into powerful deep generative
 models~\cite{bondtaylor2021review}, self-supervised methods, and efficient
 transformer architectures. We briefly cover relevant prior work into deep
-generative models in \S\ref{subsec:agm}-\ref{subsec:sundae} and a recent and
-highly effective development into a efficient transformer architecture in
-\S\ref{subsec:hourglass}.
+generative models in general in \S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a
+particular non-autoregressive generative model we wish to build upon in
+\S\ref{subsec:sundae}, and a recent and highly effective development into a
+efficient transformer architecture in \S\ref{subsec:hourglass}.
 
 \subsection{Autoregressive Generative Models}
 \label{subsec:agm}
@@ -33,6 +34,9 @@ example on text or speech. For images this is less obvious, however typically a
 raster scan ordering is used. Certain autoregressive models are order-agnostic,
 allow for arbitrary ordering to be used during training and inference.
 
+% TODO: discuss some specific autoregressive models, perhaps moving from simple
+% RNN, LSTM/GRU, PixelRNN, PixelCNN, PixelSnail, Image Transformer, DALLE, etc.
+
 \subsection{Non-autoregressive Generative Models}
 \label{subsec:nagm}
 Non-autoregressive generative models include generative adversarial networks
@@ -42,9 +46,23 @@ independent of the data dimensionality (as we no longer need to use the chain
 rule) the actual number of steps varies greatly: from single-step generation in
 GANs to potentially many thousands in the original diffusion model literature.
 
+% TODO: discuss briefly each from of NAR model and its strengths/weaknesses
+% - [] GAN
+% - [] SBM / DDPM
+% - [] EBM
+% - [] Implicit
+
 Removing the causal constraints also allows for bidirectional context during
 sampling and flexible inpainting patterns, rather than being limited to
 left-to-right inpainting in autoregressive models.
+
+\subsection{Vector Quantized Image Modelling}
+\label{subsec:vqmodelling}
+
+% TODO: discuss VQ modelling in general, starting from VQ-VAE, to VQ-VAE-2,
+% VQ-GAN and Gumbel/kmeans/etc variants. Instabilities with them and such.
+% TODO discuss: VQ modelling in connection with generative modelling. 
+foobar
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
