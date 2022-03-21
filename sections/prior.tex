@@ -2,13 +2,13 @@ This work builds upon much prior research into powerful deep generative
 models~\cite{bondtaylor2021review}, self-supervised methods, and efficient
 transformer architectures. We briefly cover relevant prior work into deep
 generative models in general in \S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a
-particular non-autoregressive generative model we wish to build upon in
+particular \acrshort{nar} generative model we wish to build upon in
 \S\ref{subsec:sundae}, and a recent and highly effective development into a
 efficient transformer architecture in \S\ref{subsec:hourglass}.
 
 \subsection{Autoregressive Generative Models}
 \label{subsec:agm}
-One major deep generative model family is autoregressive models, characterised
+One major deep generative model family is \acrfull{ar} models, characterised
 by a training and inference process based on the probabilistic chain rule.
 During training, they directly aim to maximise the likelihood of the data they
 are trained on. Prior work using these methods resulted in impressive results in
@@ -20,7 +20,7 @@ in real world applications due to their slow sampling speed.
 % exist)
 The slow sampling speed is due to their sequential nature, defined by the chain
 rule of probability. Given an input $\image = \{ \pixel{1}, \pixel{2}, \dots,
-\pixel{n} \}$, an autoregressive model $p_\theta(\cdot)$ can generates new
+\pixel{n} \}$, an \gls{ar} model $p_\theta(\cdot)$ can generates new
 samples sequentially:
 \begin{equation}\label{eq:ar}
     p_\theta(\image) = p_\theta(\pixel{1}, \dots, \pixel{n}) =
@@ -31,7 +31,7 @@ decomposition of $\image$, making this slow for large inputs.
 
 For certain tasks, the ordering of the decomposition of $\image$ is obvious, for
 example on text or speech. For images this is less obvious, however typically a
-raster scan ordering is used. Certain autoregressive models are order-agnostic,
+raster scan ordering is used. Certain \gls{ar} models are order-agnostic,
 allow for arbitrary ordering to be used during training and inference.
 
 % TODO: discuss some specific autoregressive models, perhaps moving from simple
@@ -39,12 +39,12 @@ allow for arbitrary ordering to be used during training and inference.
 
 \subsection{Non-autoregressive Generative Models}
 \label{subsec:nagm}
-Non-autoregressive generative models include generative adversarial networks
-(GANs), score-based (SBMs) and diffusion models, flow-based models, energy-based
-models (EBMs), and implicit models. Though the number of sampling steps is now
-independent of the data dimensionality (as we no longer need to use the chain
-rule) the actual number of steps varies greatly: from single-step generation in
-GANs to potentially many thousands in the original diffusion model literature.
+\acrfull{nar} generative models include \glspl{gan}, \glspl{sbm} and
+\glspl{ddpm}, flow-based models, \glspl{ebm}, and implicit models. Though the
+number of sampling steps is now independent of the data dimensionality (as we no
+longer use the chain rule of probability to sample) the actual number of steps
+varies greatly: from single-step generation in \glspl{gan} to potentially many
+thousands in the original diffusion model literature.
 
 % TODO: discuss briefly each from of NAR model and its strengths/weaknesses
 % - [] GAN
@@ -66,16 +66,15 @@ foobar
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
-One recent non-autoregressive model is step-unrolled denoising autoencoders
-(SUNDAE)~\cite{savinov2022stepunrolled} which was evaluated on three language
-modelling tasks: unconditional text-generation, inpainting of Python code, and
-machine translation -- setting a new state-of-the-art among NAR models for the
-machine translation task~\cite{savinov2022stepunrolled}. It also demonstrates
-exceptionally fast sampling, producing high quality samples in as few as 10
-steps.
+One recent \gls{nar} model is \gls{sundae}~\cite{savinov2022stepunrolled} which
+was evaluated on three language modelling tasks: unconditional text-generation,
+inpainting of Python code, and machine translation -- setting a new
+state-of-the-art among \gls{nar} models for the machine translation
+task~\cite{savinov2022stepunrolled}. It also demonstrates exceptionally fast
+sampling, producing high quality samples in as few as 10 steps.
 
-SUNDAE is trained using a denoising objective, akin to the
-BERT~\cite{wang2019bert} denoising objective but with multiple denoising steps.
+\gls{sundae} is trained using a denoising objective, akin to the
+BERT denoising objective~\cite{wang2019bert} but with multiple denoising steps.
 Given a uniform prior $p_0$ over some space $\latentSpace = \{1, \dots,
 \vqganNbLatents\}^N$ where $N$ is the size of the space and $v$ is the
 vocabulary size, consider the Markov process $\latent_t \sim \sundae(\cdot \vert
@@ -93,15 +92,15 @@ Instead, they propose an \textit{unrolled denoising} training method that uses a
 far lower $\markovSteps$ than is used for
 sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
 chain to start from corrupted data produced by a \textit{corruption
-distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$ rather than from the prior $p_0$ so the model
-encounters samples more akin to those seen during the full unroll at sample
-time~\cite{savinov2022stepunrolled}. Typically, $\markovSteps
-= 2$ during training, as a single step would be similar to the
-training strategy of BERT~\cite{devlin2019bert} but would lead to worse
+distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$
+rather than from the prior $p_0$ so the model encounters samples more akin to
+those seen during the full unroll at sample time~\cite{savinov2022stepunrolled}.
+Typically, $\markovSteps = 2$ during training, as a single step would be similar
+to the training strategy of BERT~\cite{devlin2019bert} but would lead to worse
 performance as seen in earlier work using BERT as a random field language
 model~\cite{wang2019bert}.
 
-The training objective of SUNDAE is simply the average of all reconstruction
+The training objective of \gls{sundae} is simply the average of all reconstruction
 losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
 \lossFunction{T} \right)$ of the chain after $t$ steps, which is shown to form
 an upper bound on the actual negative
@@ -146,7 +145,7 @@ approximations of attention.
 Recent work however, is now focusing on making the overall architecture more
 efficient. Funnel-Transformer~\cite{dai2020funneltransformer} progressively
 downsamples the input sequence and hence reduces the computational cost of the
-model. The saved FLOPs can then be reassigned to create deeper or wider models
+model. The saved \glspl{flop} can then be reassigned to create deeper or wider models
 and thus outperform vanilla transformers given the same computational
 budget~\cite{dai2020funneltransformer}. However, the final layer does not
 operate at the same granularity as the input, making it unusable for tasks that
