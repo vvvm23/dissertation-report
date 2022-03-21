@@ -6,31 +6,31 @@ generative model can satisfy all three requirements -- let alone additional
 attractive properties -- thus forming the so-called generative modelling
 trilemma~\cite{xiao2021trilemma}.
 
-Models such as generative adversarial networks (GANs)~\cite{goodfellow2014gan}
+Models such as \glspl{gan}~\cite{goodfellow2014gan}
 excel at high-quality and fast sampling, but often fail to model the entire data
 distribution due to not directly optimising for likelihood -- using an
-adversarial loss as a proxy. Variational autoencoders~\cite{kingma2013vae} offer
+adversarial loss as a proxy. \Glspl{vae}~\cite{kingma2013vae} offer
 excellent mode coverage and fast sampling speeds, but the resulting samples are
 often blurry even at small resolutions, and have little hope of scaling to
-greater resolutions like GANs.
+greater resolutions like \glspl{gan}.
 
-Autoregressive models such as PixelSnail~\cite{chen2017snail}, Image
+\Gls{ar} models such as PixelSnail~\cite{chen2017snail}, Image
 Transformer~\cite{parmar2018image}, and DALL-E~\cite{parmar2018image} have
 demonstrated respectable sample quality and mode coverage, even including
 zero-shot image generation~\cite{ramesh2021dalle}. However, they are
 computationally expensive to sample from, requiring many network iterations,
-making them infeasible for interactive applications. Diffusion~\cite{ho2020ddpm}
-and score-based models~\cite{song2019sbm,song2020sde,song2021mlt} produce
-samples that rival or even exceed the quality of GANs~\cite{dhariwal2021ddpm}
+making them infeasible for interactive applications. \Glspl{ddpm}~\cite{ho2020ddpm}
+and \glspl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt} produce
+samples that rival or even exceed the quality of \glspl{gan}~\cite{dhariwal2021ddpm}
 whilst still providing good mode coverage, but are still plagued by potentially
 requiring thousands of network evaluations.
 
 Vector-quantized image
 modelling~\cite{oord2017vqvae,razavi2019generating,esser2021taming} alleviates
-sampling speed issues in autoregressive methods by reducing the spatial
-dimension at which autoregressive sampling occurs. This results in excellent
-quality samples whilst improving sampling speeds, but often requires a two-stage
-approach and still does not match the speed of GANs. Recent work has applied VQ
+sampling speed issues in \gls{ar} methods by reducing the spatial dimension at
+which \gls{ar} sampling occurs. This results in excellent quality samples whilst
+improving sampling speeds, but often requires a two-stage approach and still
+does not match the speed of \glspl{gan}. Recent work has applied \gls{vq}
 methods to diffusion models~\cite{bondtaylor2021unleashing} allowing for fast
 parallel decoding. Other work does not use vector-quantized spaces, but latent
 spaces nonetheless, to accelerate
@@ -44,17 +44,16 @@ discrete latents. This provides an excellent starting point in terms of sample
 quality and a respectable amount of mode coverage, but an unacceptably slow
 sampling speed despite the reduced spatial dimension of the discrete latent
 space. We directly address this issue by instead sampling discrete latents using
-modern non-autoregressive generative models in an effort to close the gap,
-sampling speed wise, with constant iteration complexity models such as GANs.
-Specifically, we use discrete denoising
-autoencoders~\cite{savinov2022stepunrolled} to gradually denoise samples from a
-uniform prior into one that matches the prior over the discrete latent space
-defined by a pre-trained VQ-GAN model. This forms our first research question,
-whether discrete denoising autoencoders are a suitable paradigm for sampling
-discrete latent codes. As a result of our studies, we find that indeed they are
-highly suited for this task.
+modern \gls{nar} generative models in an effort to close the gap, sampling speed
+wise, with constant iteration complexity models such as \glspl{gan}.
+Specifically, we use discrete \gls{sundae}~\cite{savinov2022stepunrolled} to
+gradually denoise samples from a uniform prior into one that matches the prior
+over the discrete latent space defined by a pre-trained \gls{vqgan} model. This
+forms our first research question, whether \gls{sundae} models is suitable
+paradigm for sampling discrete latent codes. As a result of our studies, we find
+that indeed they are highly suited for this task.
 
-These discrete denoising autoencoders have only previously be applied to
+These discrete \gls{sundae} models have only previously be applied to
 language modelling tasks~\cite{savinov2022stepunrolled}. In their work, they
 used transformer~\cite{vaswani2017attention} architectures to form their
 autoencoder. In parallel, a noticeably more efficient variant of transformers --
@@ -73,11 +72,11 @@ model. This raises a third and final research question, whether our new approach
 allows for the generation of extremely high resolution images in a time frame
 that would permit fully-, or near-interactive use. Again, as a result of our
 studies, we find that this is indeed the case, proven by the synthesis of $1024
-\times 1024$ images in as few as 2 seconds on a consumer GPU. To our knowledge,
-this is the fastest sampling model at this resolution, with the exception of
-pure GAN-based approaches. This required the training of our own VQ-GAN model,
-which was, also to our knowledge, the largest VQ-GAN model trained in terms of
-input size.
+\times 1024$ images in as few as 2 seconds on a consumer-grade GPU. To our
+knowledge, this is the fastest sampling model at this resolution, with the
+exception of pure \gls{gan}-based approaches. This required the training of our
+own \gls{vqgan} model, which was, also to our knowledge, the largest \gls{vqgan} model
+trained in terms of input size.
 
 %In this work, we aim to move towards satisfying all three key requirements for
 %an ideal generative model. Like previous work, we use a vector-quantized image
@@ -92,14 +91,16 @@ input size.
 
 Our project objectives were as follows:
 \begin{itemize}
-    \item Apply discrete step-unrolled discrete autoencoders to the task of
-        discrete latent generation and ultimately image generation, and perform
-        analysis into their advantages of being used for this task over existing
-        approaches, including both autoregressive and non-autoregressive
-        solutions.
+    \item Apply \gls{sundae} to the task of \acrshort{vq} latent generation and
+        ultimately image generation, and perform analysis into their advantages
+        of being used for this task over existing approaches, including both
+        \gls{ar} and \gls{nar} solutions.
+
     \item Analyse the methods used in \citet{savinov2022stepunrolled} and
         \citet{nawrot2021hierarchical} and design modifications that make these
-        approaches more suitable for discrete latent modelling.
+        approaches more suitable for \acrshort{vq} latent modelling.
+
     \item Attempt to scale our model to extremely high resolution images and
         analyse successes and failures when operating at such resolutions. 
+
 \end{itemize}
