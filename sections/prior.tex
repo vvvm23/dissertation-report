@@ -32,8 +32,6 @@ example on text or speech. For images this is less obvious, however typically a
 raster scan ordering is used. Certain \gls{ar} models are order-agnostic,
 allow for arbitrary ordering to be used during training and inference.
 
-% TODO: discuss some specific autoregressive models, perhaps moving from simple
-% RNN, LSTM/GRU, PixelRNN, PixelCNN, PixelSnail, Image Transformer.
 One class of \gls{ar} models are \glspl{rnn} which are an early example of using
 neural networks to model sequential data, such as text, audio, time-series data,
 or even vector handwriting strokes. Though they can be used as purely
@@ -86,7 +84,87 @@ left-to-right inpainting in autoregressive models.
 % TODO: discuss VQ modelling in general, starting from VQ-VAE, to VQ-VAE-2,
 % VQ-GAN and Gumbel/kmeans/etc variants. Instabilities with them and such.
 % TODO discuss: VQ modelling in connection with generative modelling. 
-foobar
+Learning useful representations, also known as latent codes, in an unsupervised
+manner is a key challenge in machine learning. Historically, these
+representations have been in a continuous form, but in more recent literature
+they are often discrete. An early example of this is
+\gls{vqvae}~\cite{oord2017vqvae}, a variant on \gls{vae} representation models.
+A \gls{vqvae} has three main components: an encoder network, a codebook, and a
+decoder. The encoder network outputs a compressed representation of the input,
+and the codebook $\vqganCodebook$ quantizes these representations, outputting a
+discretized representation of indices from $1$ to the codebook size
+$\vqganNbLatents$. Each index $i$ maps to one of the codebook embeddings $e_i$.
+The decoder then maps the quantized embeddings back to the original signal,
+training it in tandem to reconstruct the input signal and to minimize additional
+codebook loss terms~\cite{oord2017vqvae}. Once a trained \gls{vqvae} model has
+been produced, a powerful auxiliary generative model can be trained to generate
+these discrete latent representations and then the decoder can produce the final
+sample. In the original work on \gls{vqvae}, they use a PixelCNN model to
+generate the discrete latent codes~\cite{oord2017vqvae}, though any generative
+model on discrete data can be used.
+
+Later approaches extended \gls{vqvae} to multiple distinct codebooks in
+\acrshort{vqvae}-2~\cite{razavi2019generating}. Though theoretically it can be
+extended to any number of codebooks, they performed experiments on a two-level
+and three-level model, applying the latter to $1024 \times 1024$ images. They
+then sampled the resulting combined discrete codes use
+PixelSnail~\cite{chen2017snail}, each code conditioned on all previous levels in
+the hierarchy. Though faster to sample than applying a generative directly to
+pixels, at such a resolution and with multiple levels to sample, sampling times
+were still slow.
+
+Aside from sampling autoregressively, a reason for the slow sampling speed was
+the large spatial resolution of the discrete codes. Albeit smaller than the
+original signal, \gls{vqvae} is limited in how much it can compress the signal
+via a simple reconstruction objective before it loses too much perceptual
+quality due to the rate-distortion trade-off. For example, the original
+\gls{vqvae} only has a downsampling rate of
+$\vqganDownsample=4$~\cite{oord2017vqvae} and \gls{vqvae}-2 has a rate of
+top-level rate of $\vqganDownsample=32$ but requires a total of three discrete
+latent codes in order to achieve this~\cite{razavi2019generating}. By
+introducing perceptual and adversarial loss terms,
+\gls{vqgan}~\cite{esser2021taming} is able to achieve compression rates of
+$\vqganDownsample=16 \sim 32$ with only a single discrete latent representation
+whilst retaining high quality reconstructions~\cite{esser2021taming}. The
+greater weighting on perceptual and adversarial loss does mean, however, that
+\gls{vqgan} does sometimes edit its reconstructions, rather than attempt to
+preserve all details perfectly like when using a simple reconstruction loss
+alone. Later, improvements such as differential data
+augmentation~\cite{bondtaylor2021unleashing}, codebook improvements, and a
+transformer-based architecture~\cite{yu2021vqgan} improved reconstruction
+quality further.
+
+Originally designed for audio compression~\cite{zeghidour2021soundstream},
+Residual \gls{vq} proposes the use of multiple codebooks to recursively quantize
+and refine the residual of an input signal. This produces multiple discrete
+representations, which can later be reconstructed by the decoder to decompress
+the waveform. Additionally, individual codebooks can be dropped out, allowing
+for variable bit-rates~\cite{zeghidour2021soundstream}. Concurrently to this
+work, \citet{lee2022rqvae} used residual \gls{vq} to represent images with a
+compression ratio of $\vqganDownsample=32$ and then trained a transformer model
+to autoregressively predict the stack of discrete tokens at a given spatial
+location, allowing for fast sampling despite actually having multiple levels of
+discrete latent representations\cite{lee2022rqvae}.
+
+A typical strategy for selecting which codebook vector $e_i$ to map to a
+particular input is to compute the Euclidean distance between a given continuous
+input and the codebook centroid, and then pick the
+$\arg\min$~\cite{oord2017vqvae}. This is denoted the $k$-means strategy. This
+strategy does result in a phenomena known as codebook collapse, where certain
+codebook vectors never get used, harming the downstream reconstruction quality.
+An alternative method is to use the Gumbel-Softmax~\cite{jang2016gumbel} to
+select codebook vectors, which typically increases codebook utilisation but
+often leads to worse reconstruction quality~\cite{bondtaylor2021unleashing}.
+
+The issue of codebook collapse is quite significant and there have been a number
+of attempts to remediate it. \cite{yu2021vqgan} found that a lower codeword
+dimension and codeword normalization improved utilisation.
+\cite{zeghidour2021soundstream} proposed setting a threshold for ``stale'' codes,
+and reinitialisating them to a random vector from the current batch when they
+fall below this threshold. \cite{lee2022rqvae} proposed the sharing of a single
+codebook across many quantizers and additionally stochastically sampled the
+codes as a function of their distance to the centroid, rather than always taking
+the $\arg\min$.
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
@@ -132,12 +210,6 @@ log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
 leads to a minor improvement in performance, but considerably slows down
 training time~\cite{savinov2022stepunrolled} and increases memory usage.
 
-%We follow the original choice of corruption
-%distribution~\cite{savinov2022stepunrolled}: sample some
-%proportion $r \sim U[0, 1]$, randomly selecting positions according to this
-%proportion, and then sampling at these selected positions tokens random tokens
-%from $\{1, \dots, \vqganNbLatents\}$.
-
 One advantage of this approach is that sampling starts from random tokens,
 rather than a dedicated ``masking''
 token~\cite{bondtaylor2021unleashing,austin2021structured}. Unmasking approaches
@@ -145,16 +217,6 @@ means that $\markovSteps \leq N$ as at minimum, one token is unmasked per step.
 Additionally, it allows the model to be able to ``change its mind'' about
 previously predicted positions during sampling, allowing it to make fine-grained
 adjustments or fix accumulated errors.
-
-%A key advantage of this approach on discrete latents over other
-%non-autoregressive methods is that we start from random tokens, rather than a
-%dedicated ``masking'' token~\cite{bondtaylor2021unleashing}. Using a masking
-%token means that $\markovSteps \leq h\cdot w$ as we must at minimum unmask a single
-%token. Additionally, the model is able to ``change its mind'' about generated
-%positions during the sampling process, allowing it to make fine-grained
-%adjustments later in the sampling process such as correcting accumulated errors,
-%or adjusting certain features.
-
 
 \subsection{Hourglass Transformers}
 \label{subsec:hourglass}
