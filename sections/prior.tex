@@ -80,9 +80,7 @@ left-to-right inpainting in autoregressive models.
 
 \subsection{Vector Quantized Image Modelling}
 \label{subsec:vqmodelling}
-
-% TODO: discuss VQ modelling in general, starting from VQ-VAE, to VQ-VAE-2,
-% VQ-GAN and Gumbel/kmeans/etc variants. Instabilities with them and such.
+% TODO: maybe add a nice table comparing all the methods
 % TODO discuss: VQ modelling in connection with generative modelling. 
 Learning useful representations, also known as latent codes, in an unsupervised
 manner is a key challenge in machine learning. Historically, these
@@ -165,6 +163,15 @@ fall below this threshold. \cite{lee2022rqvae} proposed the sharing of a single
 codebook across many quantizers and additionally stochastically sampled the
 codes as a function of their distance to the centroid, rather than always taking
 the $\arg\min$.
+
+All these previous approaches use \gls{vq} models to enhance existing
+\gls{ar} models, primarily to improve their sampling speed by reducing the
+spatial dimension we are operating over. Few work directly addresses the
+discrete prior model itself. Discrete diffusion
+models~\cite{austin2021structured} are \gls{nar} approach to generate discrete
+data. This was applied to \gls{vqgan} latents in
+\citet{bondtaylor2021unleashing}, allowing for fast sampling, flexible
+inpainting, and high fidelity outputs.
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
