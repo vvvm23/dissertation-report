@@ -8,16 +8,14 @@ efficient transformer architecture in \S\ref{subsec:hourglass}.
 
 \subsection{Autoregressive Generative Models}
 \label{subsec:agm}
-One major deep generative model family is \acrfull{ar} models, characterised
-by a training and inference process based on the probabilistic chain rule.
-During training, they directly aim to maximise the likelihood of the data they
-are trained on. Prior work using these methods resulted in impressive results in
-terms of both sample quality and diversity, but are ultimately unwieldy for use
-in real world applications due to their slow sampling speed.
+One major deep generative model family is \acrfull{ar} models, characterised by
+a training and inference process based on the probabilistic chain rule. During
+training, they directly aim to maximise the likelihood of the data they are
+trained on, which leads to excellent mode coverage. Prior work using these
+methods resulted in impressive results in terms of both sample quality and
+diversity, but are ultimately unwieldy for use in real world applications due to
+their slow sampling speed.
 
-% TODO: discuss why it is slow, and the choice of ordering in AR models (i.e
-% text it is obvious, less obvious with images, but also order agnostic models
-% exist)
 The slow sampling speed is due to their sequential nature, defined by the chain
 rule of probability. Given an input $\image = \{ \pixel{1}, \pixel{2}, \dots,
 \pixel{n} \}$, an \gls{ar} model $p_\theta(\cdot)$ can generates new
@@ -35,11 +33,37 @@ raster scan ordering is used. Certain \gls{ar} models are order-agnostic,
 allow for arbitrary ordering to be used during training and inference.
 
 % TODO: discuss some specific autoregressive models, perhaps moving from simple
-% RNN, LSTM/GRU, PixelRNN, PixelCNN, PixelSnail, Image Transformer, DALLE, etc.
+% RNN, LSTM/GRU, PixelRNN, PixelCNN, PixelSnail, Image Transformer.
+One class of \gls{ar} models are \glspl{rnn} which are an early example of using
+neural networks to model sequential data, such as text, audio, time-series data,
+or even vector handwriting strokes. Though they can be used as purely
+classification or regression models, they are also suited for use as generative
+models by modelling the relationship shown in Equation~\ref{eq:ar}. They do
+suffer from a number of issues, most notably vanishing
+gradients~\cite{pascanu2012rnn} and inability to model long-range relationships
+between items in the input. \Glspl{lstm}~\cite{hoch1997lstm} improved upon them
+further by introducing dedicated memory units, allowing for the modelling of
+longer range relationships. Later \glspl{gru}~\cite{cho2014gru} simplified the
+architecture whilst still retaining good performance. With the advent of
+transformer architectures~\cite{vaswani2017attention}, modelling even longer
+relationships became possible, even at a full-document level. It also intro cued
+the capability to train on all sequence elements in parallel through the use of
+causal masking, therefore not violating the autoregressive property.
+
+Applying \gls{ar} models to images followed a similar trend.
+PixelRNN~\cite{oord2016pixelrnn} used two-dimensional recurrent layers and
+residual connections to model the distribution of raw pixel values. The same
+paper also introduced PixelCNN, which it claims had worse performance but were
+faster to train. These were extended to allow for conditional generation
+in~\cite{oord2016pixelcnn}. Later work augmented PixelCNN with self-attention
+mechanism, forming PixelSnail~\cite{chen2017snail}, which can therefore model
+longer relationships than a fully convolutional or recurrent architecture. Image
+Transformer~\cite{parmar2018image} later applied transformer architectures to
+the same task through an effective but altogether conceptually simple approach.
 
 \subsection{Non-autoregressive Generative Models}
 \label{subsec:nagm}
-\acrfull{nar} generative models include \glspl{gan}, \glspl{sbm} and
+\Acrfull{nar} generative models include \glspl{gan}, \glspl{sbm} and
 \glspl{ddpm}, flow-based models, \glspl{ebm}, and implicit models. Though the
 number of sampling steps is now independent of the data dimensionality (as we no
 longer use the chain rule of probability to sample) the actual number of steps
