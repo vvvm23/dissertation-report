@@ -4,7 +4,11 @@ transformer architectures. We briefly cover relevant prior work into deep
 generative models in general in \S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a
 particular \acrshort{nar} generative model we wish to build upon in
 \S\ref{subsec:sundae}, and a recent and highly effective development into a
-efficient transformer architecture in \S\ref{subsec:hourglass}.
+efficient transformer architecture in \S\ref{subsec:hourglass}. For a full
+review on generative modelling we direct the reader to
+\citet{bondtaylor2021review}, and for further details on \gls{sundae} and
+hourglass transformers we direct the reader to \citet{savinov2022stepunrolled}
+and \citet{nawrot2021hierarchical} respectively.
 
 \subsection{Autoregressive Generative Models}
 \label{subsec:agm}
@@ -71,9 +75,8 @@ thousands in the original diffusion model literature.
 % TODO: discuss briefly each from of NAR model and its strengths/weaknesses
 % - [X] GAN
 % - [X] Variational autoencoders
-% - [ ] SBM / DDPM
-% - [ ] Normalizing flows
-% - [ ] Implicit
+% - [X] SBM / DDPM
+% - [X] Normalizing flows
 
 Perhaps the most infamous class of \gls{nar} generative model -- or perhaps
 generative model overall -- are \acrfullpl{gan}~\cite{goodfellow2014gan}. These
@@ -113,9 +116,28 @@ architecture quite restrictive, making them less parameter efficient. They also
 typically must operate at the same dimensionality for each layer, making the
 training of deep networks difficult.
 
-Removing the causal constraints also allows for bidirectional context during
-sampling and flexible inpainting patterns, rather than being limited to
-left-to-right inpainting in autoregressive models.
+Two paradigms that are gaining a lot of interest in recent times are
+\acrfullpl{ddpm}~\cite{ho2020ddpm} and \acrfullpl{sbm}~\cite{song2019sbm}. Both
+are variants of \glspl{ebm}, with the former learning to estimate the noise at
+various levels (which can be used to gradually move from noise to data), and the
+latter trained to remove noise, given corrupted samples from a gradually
+corrupting forward process. Again, this can be used to move from pure noise back
+to data. Both are slow to sample from, but produce high quality samples that
+rival those of \glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering from
+mode collapse. The slow sampling speed can be remedied using a variety of
+techniques, such as operating on a smaller latent
+space~\cite{vahdat2021sbmlatent}, devising more
+efficient SDE solvers~\cite{martineau2021fast}, or by diffusing the
+``velocities'', thus simplifying the denoising task~\cite{dockhorn2021langevin}.
+Unlike GANs, both models can also operate on discrete data, such as by first
+projecting discrete data into a continuous latent
+space~\cite{vahdat2021sbmlatent} or with a dedicated discrete diffusion
+framework~\cite{austin2021structured}, the latter of which bridges the gap
+between diffusion, autoregressive, and mask-based representation models.
+
+%Removing the causal constraints also allows for bidirectional context during
+%sampling and flexible inpainting patterns, rather than being limited to
+%left-to-right inpainting in autoregressive models.
 
 \subsection{Vector Quantized Image Modelling}
 \label{subsec:vqmodelling}
