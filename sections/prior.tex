@@ -104,6 +104,15 @@ distribution. Later work extended \glspl{vae} to be hierarchical, having
 multiple Gaussian priors~\cite{arash2020nvae,child2020vqvae} which were found to
 outperform purely autoregressive models.
 
+Normalizing flows are another class of generative model that allows for exact
+likelihood calculation. They consist of many invertible layers that gradually
+transform samples from a known prior distribution into samples from the data
+distribution. Each transformation must satisfy two properties: being invertible
+and having an easy to compute Jacobian (allowing easy rescaling). This makes the
+architecture quite restrictive, making them less parameter efficient. They also
+typically must operate at the same dimensionality for each layer, making the
+training of deep networks difficult.
+
 Removing the causal constraints also allows for bidirectional context during
 sampling and flexible inpainting patterns, rather than being limited to
 left-to-right inpainting in autoregressive models.
