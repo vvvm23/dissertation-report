@@ -1,5 +1,5 @@
 This work builds upon much prior research into powerful deep generative
-models~\cite{bondtaylor2021review}, self-supervised methods, and efficient
+models, self-supervised methods, and efficient
 transformer architectures. We briefly cover relevant prior work into deep
 generative models in general in \S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a
 particular \acrshort{nar} generative model we wish to build upon in
@@ -70,7 +70,7 @@ thousands in the original diffusion model literature.
 
 % TODO: discuss briefly each from of NAR model and its strengths/weaknesses
 % - [X] GAN
-% - [ ] Variational autoencoders
+% - [X] Variational autoencoders
 % - [ ] SBM / DDPM
 % - [ ] Normalizing flows
 % - [ ] Implicit
@@ -90,6 +90,19 @@ generation~\cite{tero2018stylegan,andrew2018biggan} image, audio
 synthesis~\cite{liu2020audiogan}, style transfer~\cite{zhu2017cyclegan}. They
 can even be applied to discrete data~\cite{autume2019scratchgan}, but are less
 effective on such domains due to the non-differentiability of discrete samples.
+
+Another class of generative model are \acrfullpl{vae}~\cite{kingma2013vae} which
+allow for sampling in a single forward pass like \glspl{gan}, but are trained to
+directly maximise likelihood. Specifically, \glspl{vae} map inputs to latent
+variables that follow some easy to sample from, but still sufficiently complex,
+prior distribution. A common choice is a multivariate Gaussian with diagonal
+covariance~\cite{kingma2013vae}. A decoder network maps these latent codes back
+to the data distribution. Although this approach is successful on small
+datasets, on more complex datasets the samples and reconstructions tend to
+become blurry, suggesting a simple prior is unable to perfectly fit the
+distribution. Later work extended \glspl{vae} to be hierarchical, having
+multiple Gaussian priors~\cite{arash2020nvae,child2020vqvae} which were found to
+outperform purely autoregressive models.
 
 Removing the causal constraints also allows for bidirectional context during
 sampling and flexible inpainting patterns, rather than being limited to
