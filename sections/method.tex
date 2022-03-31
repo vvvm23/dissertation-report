@@ -21,11 +21,12 @@ pretrained models are not available and so training our own VQ-GAN was necessary
 
 The second stage is to learn a discrete prior model over these latent variables.
 To enable this, we must first build a latent dataset using our trained VQ-GAN.
-Formally, given a dataset of images $\imageDataset$, a VQ-GAN encoder
-$\vqganEncoder$ with downsample factor $\vqganDownsample$, and
-vector-quantization codebook $\vqganCodebook$ with number of codewords
-$\vqganNbLatents$, trained on $\imageDataset$, we define our latent dataset
-$\latentDataset$ as:
+This allows for faster training of our second-stage model as the discrete latent
+representations have been precomputed. Formally, given a dataset of images
+$\imageDataset$, a VQ-GAN encoder $\vqganEncoder$ with downsample factor
+$\vqganDownsample$, and vector-quantization codebook $\vqganCodebook$ with
+number of codewords $\vqganNbLatents$, trained on $\imageDataset$, we define our
+latent dataset $\latentDataset$ as:
 \begin{equation}
     \latentDataset = \{\vqganCodebook(\vqganEncoder(\image)) \mid \image \in \imageDataset \}
 \end{equation}
@@ -40,65 +41,71 @@ resulting in a latent representation of shape $\frac{H}{f} \times \frac{W}{f} =
 h \times w$.
 
 We then use $\latentDataset$ to train a discrete prior over the latents. Coupled
-with the VQ-GAN decoder $\vqganDecoder$, we obtain a powerful generative model. 
+with the VQ-GAN decoder $\vqganDecoder$, we obtain a powerful generative model
+by first sampling from a discrete uniform prior distribution, denoising using
+\gls{sundae}, and then decoding the final latents using the \gls{vqgan} decoder.
 
 \subsection{2D-Aware Hourglass Transformer}
 Inspired by successes in hierarchical transformers for generative language
 modelling~\cite{nawrot2021hierarchical}, we modify their architecture for use
 with discrete latent representations of image data. We will later use this
-architecture as the discrete prior over the VQ-GAN latents. 
+architecture to implement a discrete prior over the \gls{vqgan} latents. 
 
-Hourglass transformers have been seen to efficiently handle long-sequences,
+Hourglass transformers have been shown to efficiently handle long-sequences,
 outperform existing models using the same computational budget, and meet the
 same performance as existing models more efficiently by using an explicit
 hierarchical structure~\cite{nawrot2021hierarchical}. The same benefits should
-also apply to vector-quantized image modelling.
+also apply to vector-quantized image modelling. 
 
-%Our modifications are 2D-aware downsampling, axial rotary embeddings, and
-%removal of causal modelling constraints.
-
-%\subsubsection{2D-Aware Downsampling}
+However, the design and parameters chosen by the original authors were tailored
+for language modelling. They also experimented with pixel length image
+generation, though we believe that we can improve upon their architectural
+choices for the task of discrete latent modelling. Some changes may also be
+applicable to direct image modelling. We outline modifications to the
+architecture in this subsection.
 
 % TODO: add a figure demonstrating this
 \textbf{2D-Aware Downsampling} -- The original formulation of hourglass
 transformers~\cite{nawrot2021hierarchical} introduced both upsampling and
 downsampling layers, allowing the use of hierarchical transformers in tasks that
-have output sequence length equal to the input sequence length. However,
+have output sequence lengths equal to the input sequence lengths. However,
 applying their proposed resampling strategies directly on the vector-quantized
-image may not be the best strategy. Resampling is applied to flattened token
-sequence, meaning that the corresponding two-dimensional vector-quantized image
-is actually resampled more in one axis compared to the other. In their work they
+image may not be the best strategy. 
+
+In their work, resampling is applied to the flattened embedding sequences,
+meaning that the corresponding two-dimensional vector-quantized image is
+actually resampled more in one axis compared to the other. In their work they
 did not address this, except for experiments on
 ImageNet32~\cite{russakovsky2015imagenet} where they resampled with a rate of
-$\hourglassRate=3$, corresponding to three colour channels.
+$\hourglassRate=3$, corresponding to three colour channels. However, if they
+were to nest the hourglass transformers further, they would run into this issue
+of one spatial dimension being downsampled more than others.
 
 In our formulation, we instead reshape the flattened sequence back into a
 two-dimensional form and then apply resampling equally in the last two axes.
-With a resampling rate of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in each axis. We found this to
-significantly improve the performance of the discrete prior model, and suspect a
-similar approach could improve performance if applied to pixels directly, which
-we leave for future work.
-
-%\subsubsection{Axial Rotary Embeddings}
+With a resampling rate of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in
+each axis -- evenly distributing the resampling among the axes. In our
+preliminary experiments, we found this to significantly improve the performance
+of the discrete prior model, and suspect a similar approach could improve
+performance if applied to pixels directly, which we leave for future work to
+confirm.
 
 \textbf{Rotary Positional Embeddings}~\cite{su2021roformer} are a good default
 choice for injecting positional information into transformer models, requiring
 no additional parameters. Additionally, they can be easily extended to the
 multi-dimensional case~\cite{rope-eleutherai} which we do here. Though
 transformers are clearly capable of learning that elements far apart in a
-flattened sequence may be close in a multi-dimensional final output, we find
+flattened sequence may be close in a multi-dimensional final output, we found
 that explicitly extending positional embeddings to the multi-dimensional case to
 provide a modest boost in performance.
-
-%\subsubsection{Removal of Causal Constraints}
 
 \textbf{Removal of Causal Constraints} -- In the original autoregressive
 formulation of hourglass transformers, great care was taken to avoid information
 leaking during resampling, and hence making the model
 non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive method
 which is therefore not causal. Hence, in our approach we do not make any special
-considerations to avoid information leaking into the future.
-
+considerations to avoid information leaking into the future. This simplifies the
+model by avoiding the ``shifting'' operation required in the original work.
 
 \subsection{Training a megapixel VQ-GAN}
 \label{sec:megagan}
@@ -118,6 +125,30 @@ knowledge, this is the highest resolution VQGAN has been applied
 to~\cite{esser2021taming}. Once trained, can generate a latent datasets as
 before, the only difference being an increased sequence length -- greater than
 was ever tested in the original work~\cite{savinov2022stepunrolled}.
+Specifically, we obtain a downsampling rate of $\vqganDownsample=32$, resulting
+in discrete latent size of $32 \times 32 = 1024$.
+
+% TODO: add figure showing some artifacts in reconstructions
+The resulting reconstructions are overall of good quality given the relatively
+extreme compression ratio we are using. However, certain artifacts in the
+reconstructions still remain, particularly with certain hair types, facial
+features, and uncommon accessories. Examples of such artifacts are shown in
+Figure~$i$.
+
+% TODO: add gpu specification
+Using vector quantized image modelling to compress images further whilst
+retaining high quality and faithful reconstructions remains an open and
+challenging area of research. In our case at very high resolutions, this is
+especially true. In our preliminary experiments, we found a higher
+$\vqganDownsample$ led to the average reconstruction being of very poor quality.
+Conversely, decreasing $\vqganDownsample$ led to latent representations of sizes
+that led to large memory requirements in the downstream \gls{sundae} prior.
+Furthermore, training \gls{vqgan} at this resolution is extremely
+computationally expensive -- in our configuration being limited to a total batch
+size of 4 across four GPUs. This made a full hyperparameter sweep of the other
+parameters of the model not possible. Therefore, we decided to compromise with
+good reconstructions on average, and accept occasional artifacts which would no
+doubt also appear in the final samples.
 
 \subsection{Non-Autoregressive Generator Training}
 

@@ -1,5 +1,33 @@
 \subsection{Unconditional Image Generation}
-foobar
+
+We evaluate our method on the task of unconditional image generation on datasets
+FFHQ256, FFHQ1024, CelebA, LSUN Churches, and LSUN Bedrooms. For LSUN we use
+pretrained \gls{vqgan} checkpoints provided by~\cite{bondtaylor2021unleashing},
+and for all other unconditional experiments we use checkpoints from the original
+work~\cite{esser2021taming}. We evaluate in terms of raw perceptual quality and
+coverage, as well as how these metrics are affected by the various
+hyperparameters of our model and parameters of the sampling process -- the
+latter of which we found to be highly configurable.
+
+\subsection{Conditional Image Generation}
+
+Another critical component of an ideal generative model is the ability to
+control its generation. We explore class-conditioned image generation of
+ImageNet at $256 \times 256$ resolution, using the pretrained ImageNet
+\gls{vqgan} checkpoints provided by the original work~\cite{esser2021taming}. To
+introduce class information to the model, we add an additional embedding layer
+(one embedding for each of the 1000 classes) and add this to all input token
+embeddings, as done in Image Transformer~\cite{parmar2018image}. We again,
+perform our evaluation using metrics of perceptual quality and distribution
+coverage.
 
 \subsection{Arbitrary Image Inpainting}
-foobar
+
+As outlined earlier, \acrlong{nar} generative models have a number of advantages
+on inpainting tasks, including supporting arbitrary masks and being able to use
+the full context available to them. We provide a number of examples of
+inpainting on FFHQ1024 and ImageNet, showcasing different patterns and different
+results given the same starting image. As our method utilises a vector quantized
+image model, it is incapable of doing fine-grained inpainting at a pixel level.
+Nonetheless, the results show consistently good inpainting results when
+operating at a \gls{vq} latent level.
