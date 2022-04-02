@@ -51,17 +51,26 @@ latter of which we found to be highly configurable.
         }
     \end{subfigure}
     \caption{Testing conditional generation using MNIST-style datasets.}
+    \label{fig:mnist}
 \end{figure}
 
 Another critical component of an ideal generative model is the ability to
 control its generation. We explore class-conditioned image generation of
 ImageNet at $256 \times 256$ resolution, using the pretrained ImageNet
-\gls{vqgan} checkpoints provided by the original work~\cite{esser2021taming}. To
-introduce class information to the model, we add an additional embedding layer
-(one embedding for each of the 1000 classes) and add this to all input token
-embeddings, as done in Image Transformer~\cite{parmar2018image}. We again,
-perform our evaluation using metrics of perceptual quality and distribution
-coverage.
+\gls{vqgan} checkpoints provided by the original work~\cite{esser2021taming}. 
+
+There are many ways to integrate class conditioning to a generative model. One
+solution is to pass a one-hot or embedding vector of the classes as an auxiliary
+input to the model. We use another simple solution, to add an additional
+embedding layer containing one embedding for each of the 1000 classes present in
+ImageNet. This approach was done in Image Transformer~\cite{parmar2018image} and
+was found to be effective. It was not immediately apparent whether this method
+would also work for \gls{sundae}, so before running expensive ImageNet
+experiments we first did some preliminary experiments on class-conditioned,
+pixel-wise, \gls{nar} generation on three MNIST-style datasets: MNIST,
+Kuzushiji-MNIST, and Fashion-MNIST. These preliminary experiments showed us that
+\gls{sundae} can successfully use class information using this simple approach,
+seen in Figure~\ref{fig:mnist}.
 
 \subsection{Arbitrary Image Inpainting}
 
