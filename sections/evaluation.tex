@@ -9,7 +9,49 @@ coverage, as well as how these metrics are affected by the various
 hyperparameters of our model and parameters of the sampling process -- the
 latter of which we found to be highly configurable.
 
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
+        \caption{
+            Multiple outputs of inpainting on the same block mask. Multiple
+            realistic results are produced at a very high resolution.
+        }
+    \end{subfigure}
+    %\hfill
+    %\begin{subfigure}[b]{0.47\textwidth}
+        %\centering
+        %\includegraphics[width=1.0\textwidth]{figures/inpaint-rand/inpaint-variation-small.png}
+        %\caption{
+            %Multiple outputs of inpainting on the same random mask. Multiple
+            %realistic results are produced at a very high resolution.
+        %}
+    %\end{subfigure}
+    %\caption{Inpainting results on FFHQ-1024.}
+\end{figure}
+
 \subsection{Conditional Image Generation}
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/mnist-samples.png}
+        \caption{
+            Conditional, pixel-wise generation on MNIST.
+        }
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/fashionmnist-samples.png}
+        \caption{
+            Conditional, pixel-wise generation on Fashion-MNIST.
+        }
+    \end{subfigure}
+    \caption{Testing conditional generation using MNIST-style datasets.}
+\end{figure}
 
 Another critical component of an ideal generative model is the ability to
 control its generation. We explore class-conditioned image generation of
