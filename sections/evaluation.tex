@@ -31,3 +31,34 @@ results given the same starting image. As our method utilises a vector quantized
 image model, it is incapable of doing fine-grained inpainting at a pixel level.
 Nonetheless, the results show consistently good inpainting results when
 operating at a \gls{vq} latent level.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \label{fig:inpaintExample}
+        \includegraphics[width=1.0\linewidth]{figures/inpaint.png}
+        \caption{A large example of inpainting on a $1024 \times 1024$ image using our
+        model.}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/inpaint-block/inpaint-variation-small.png}
+        \caption{
+            Multiple outputs of inpainting on the same block mask. Multiple
+            realistic results are produced at a very high resolution.
+        }
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/inpaint-rand/inpaint-variation-small.png}
+        \caption{
+            Multiple outputs of inpainting on the same random mask. Multiple
+            realistic results are produced at a very high resolution.
+        }
+    \end{subfigure}
+    \caption{Inpainting results on FFHQ-1024.}
+\end{figure}
+

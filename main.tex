@@ -15,6 +15,8 @@
 \usepackage{amssymb}
 \usepackage{booktabs}
 \usepackage{overpic}
+\usepackage{caption}
+\usepackage{subcaption}
 
 % It is strongly recommended to use hyperref, especially for the review version.
 % hyperref with option pagebackref eases the reviewers' job.
@@ -73,7 +75,9 @@ Durham, UK \\
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/sample1024.png}
+    \makebox[\textwidth]{
+        \includegraphics[width=1.0\textwidth]{figures/sample1024.png}
+    }
     \caption{
         High-resolution samples produced using our non-autoregressive approach.
         Each $1024 \times 1024$ sample was generated in $\approx 2$ seconds on a
