@@ -11,23 +11,22 @@ latter of which we found to be highly configurable.
 
 \begin{figure}[ht]
     \centering
-    \begin{subfigure}[b]{\textwidth}
+    \begin{subfigure}[b]{0.47\textwidth}
         \centering
         \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
         \caption{
             Non-cherry picked batch of samples from model trained on FFHQ256.
         }
     \end{subfigure}
-    %\hfill
-    %\begin{subfigure}[b]{0.47\textwidth}
-        %\centering
-        %\includegraphics[width=1.0\textwidth]{figures/inpaint-rand/inpaint-variation-small.png}
-        %\caption{
-            %Multiple outputs of inpainting on the same random mask. Multiple
-            %realistic results are produced at a very high resolution.
-        %}
-    %\end{subfigure}
-    %\caption{Inpainting results on FFHQ-1024.}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/ffhq1024-samples-small.png}
+        \caption{
+            Placeholder batch of samples from model trained on FFHQ1024
+        }
+    \end{subfigure}
+    \caption{Unconditional generation on FFHQ.}
 \end{figure}
 
 \begin{figure}[ht]
@@ -93,6 +92,43 @@ pixel-wise, \gls{nar} generation on three MNIST-style datasets: MNIST and
 Fashion-MNIST. These preliminary experiments showed us that \gls{sundae} can
 successfully use class information using this simple approach, seen in
 Figure~\ref{fig:mnist}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
+        \caption{
+            Class 1.
+        }
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
+        \caption{
+            Class 2.
+        }
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
+        \caption{
+            Class 3.
+        }
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
+        \caption{
+            Class 4.
+        }
+    \end{subfigure}
+    \caption{Examples of class-conditioned generation on ImageNet.}
+    \label{fig:imagenet}
+\end{figure}
 
 A relatively new method of providing a conditioning signal is to instead provide
 natural language prompts, and learn the joint distribution of prompts and
