@@ -15,8 +15,7 @@ latter of which we found to be highly configurable.
         \centering
         \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples.png}
         \caption{
-            Multiple outputs of inpainting on the same block mask. Multiple
-            realistic results are produced at a very high resolution.
+            Non-cherry picked batch of samples from model trained on FFHQ256.
         }
     \end{subfigure}
     %\hfill
@@ -90,10 +89,26 @@ ImageNet. This approach was done in Image Transformer~\cite{parmar2018image} and
 was found to be effective. It was not immediately apparent whether this method
 would also work for \gls{sundae}, so before running expensive ImageNet
 experiments we first did some preliminary experiments on class-conditioned,
-pixel-wise, \gls{nar} generation on three MNIST-style datasets: MNIST,
-Kuzushiji-MNIST, and Fashion-MNIST. These preliminary experiments showed us that
-\gls{sundae} can successfully use class information using this simple approach,
-seen in Figure~\ref{fig:mnist}.
+pixel-wise, \gls{nar} generation on three MNIST-style datasets: MNIST and
+Fashion-MNIST. These preliminary experiments showed us that \gls{sundae} can
+successfully use class information using this simple approach, seen in
+Figure~\ref{fig:mnist}.
+
+A relatively new method of providing a conditioning signal is to instead provide
+natural language prompts, and learn the joint distribution of prompts and
+images. At inference time, this allows for text-to-image generation which in
+turn allows for zero-shot image generation given a sufficiently sized training
+dataset. Most notably, DALL·E~\cite{ramesh2021dalle} and recently
+DALL·E-2~\cite{ramesh2022dalle2}, with the former generating VQ-VAE discrete
+latents and the latter generating continuous \textit{``CLIP Image embeddings''}.
+DALL·E-2 was able to produce high fidelity samples at $1024 \times 1024$
+resolution. Concurrently, Latent Diffusion
+Models~\cite{rombach2021highresolution} used text embeddings to condition
+sampling, again allowing for zero-shot generation. Our model is also capable of
+using such methods, turning our model from an unconditional or class-conditioned
+generative model to a text-to-image generative model. However, due to
+time-constraints we did not experiment with this approach, leaving this for
+future work.
 
 \subsection{Arbitrary Image Inpainting}
 
