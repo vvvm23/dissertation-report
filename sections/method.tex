@@ -154,12 +154,50 @@ potentially manifest in the final samples.
 
 % TODO: more details on generator training
 
-We train a SUNDAE model on the flattened extracted VQ latents $\latent =
-\{\latent_1, \dots, \latent_N\}$ where $N = \latentHeight
-\cdot \latentWidth$. The function $\sundae$ is implemented using our 2D-aware
-hourglass transformer. Though the default $\markovSteps = 2$ performed well, we
-found $\markovSteps = 3$ to result in more diverse results during unconditional
-generation.
+We train a SUNDAE model on the flattened extracted \gls{vq} latents $\latent =
+\{\latent^{(0)}, \dots, \latent^{(N)}\}$ where $N = \latentHeight \cdot \latentWidth$.
+The function $\sundae(\cdot)$ is implemented using our proposed 2D-aware
+hourglass transformer. The \gls{vq} are flattened in a raster-scan format and
+did not experiment with other flattening techniques.
+
+Given a latent $\latent$, we first apply our corruption distribution. This is
+done by first sampling a corruption threshold vector $\corruptionThreshold$ with
+$\corruptionThreshold_i \sim U[0, 1]$ and a random matrix $\mathbf{R}$ of the
+same shape as $\latent$ where $R_{i,j} \sim U[0,1]$. Using this, we construct a
+mask matrix $\mathbf{M}$ with $M_{i,j} = 1$ when $R_{i,j} < t_i$ and $0$
+otherwise. This results in $\mathbf{M}_i$ having approximately
+$\corruptionThreshold_i$ of its entries be $1$.
+
+Then, given $\latent_0 \sim p_0$, we compute a new $\latent_0$ to start unrolled
+denoising from:
+\begin{equation}
+    \latent_0 \leftarrow \mathbf{M} \cdot \latent_0 + (\mathbf{1} - \mathbf{M})
+    \cdot \latent \text{.}
+\end{equation}
+
+We then iteratively unroll the current sample $\latent_{t-1}$ to obtain
+$\latent_t$ for steps $t\in \{1, \dots, \markovSteps\}$. To perform one unroll
+step, simply compute logits $\sundae(\latent_t \vert \latent_{t-1})$ and then
+sample from the resulting distribution to obtain $\latent_t$, storing the logits
+at each step. Then, compute the cross entropy loss between all logits at each
+$t$ and the target $\latent$. This differs from some other \gls{nar} solutions
+which predict the corruption noise $\epsilon$~\cite{ho2020ddpm} rather than the
+target itself. The mean of the cross entropy losses is then to produce the final
+loss as shown in \S~\ref{subsec:sundae}, which then allows for backpropagation
+of gradients.
+
+Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
+3$ to result in more diverse samples in certain experiments.
+
+An alternative corruption distribution would be to instead use a deterministic
+method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with
+$M_{i,j} = 1$ with a special masking token. This bears some similarity to
+``progressive unmasking'' of latents as shown in prior
+work~\cite{bondtaylor2021unleashing,austin2021structured}. We did not test this
+strategy as the use of a masking token places an upper bound on the number of
+inference time sampling steps (updating at most one token per step) as well as
+not allowing for self-correction, as once unmasked a token is now
+fixed~\cite{bondtaylor2021unleashing,austin2021structured}. 
 
 % TODO: a figure could be really nice too.
 
