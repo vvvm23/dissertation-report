@@ -85,12 +85,17 @@ solution is to pass a one-hot or embedding vector of the classes as an auxiliary
 input to the model. We use another simple solution, to add an additional
 embedding layer containing one embedding for each of the 1000 classes present in
 ImageNet. This approach was done in Image Transformer~\cite{parmar2018image} and
-was found to be effective. It was not immediately apparent whether this method
-would also work for \gls{sundae}, so before running expensive ImageNet
-experiments we first did some preliminary experiments on class-conditioned,
-pixel-wise, \gls{nar} generation on three MNIST-style datasets: MNIST and
-Fashion-MNIST. These preliminary experiments showed us that \gls{sundae} can
-successfully use class information using this simple approach, seen in
+was found to be effective. 
+
+It was not immediately apparent whether this method would also work for
+\gls{sundae}, so before running expensive ImageNet experiments we first did some
+preliminary experiments on class-conditioned, pixel-wise, \gls{nar} generation
+on two MNIST-style datasets: MNIST and Fashion-MNIST. These experiments can be
+done, despite not having an associated \gls{vqgan} model, by treating each
+possible 8-bit greyscale colour as if it were an index into a discrete codebook
+of size $2^8$. Once sampled, we simply output the discrete values directly to
+produce a final image. These preliminary experiments showed us that \gls{sundae}
+can successfully use class information using this simple approach, seen in
 Figure~\ref{fig:mnist}.
 
 \begin{figure}[ht]
