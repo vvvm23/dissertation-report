@@ -10,6 +10,25 @@ review on generative modelling we direct the reader to
 hourglass transformers we direct the reader to \citet{savinov2022stepunrolled}
 and \citet{nawrot2021hierarchical} respectively.
 
+\begin{figure}
+    \centering
+    \includesvg[width=\textwidth]{figures/AR-NAR.svg}
+    \caption{
+        \textbf{Left:} Visualization of \acrfull{ar} sampling. \gls{ar} sampling
+        proceeds one item at a time, resulting in the number of sampling steps
+        being equal to the dimensionality of the input. For each prediction, a
+        probability distribution over possible tokens is predicted and then
+        sampled from. Each prediction can only make use of past context --
+        indicated as a green position -- so not to violate the autoregressive
+        property.
+        \textbf{Right:} Visualization of \acrfull{nar} sampling. \gls{nar}
+        sampling can sample an arbitrary number of items in parallel, including
+        ones previously sampled, allowing for self-correction. It can freely use
+        all context available to it, allowing for flexible inpainting and
+        potentially better predictions.
+    }
+\end{figure}
+
 \subsection{Autoregressive Generative Models}
 \label{subsec:agm}
 One major deep generative model family is \acrfull{ar} models, characterised by
@@ -162,6 +181,18 @@ sample. In the original work on \gls{vqvae}, they use a PixelCNN model to
 generate the discrete latent codes~\cite{oord2017vqvae}, though any generative
 model on discrete data can be used.
 
+\begin{figure}
+    \centering
+    \includesvg[width=\textwidth]{figures/vq.svg}
+    \caption{
+        Visualisation of a vector-quantization image model. An encoder model
+        first extracts continuous embeddings from the source image. Vector
+        quantization is then used to map each continuous embedding to the
+        closest entry in the codebook. A decoder model takes the discretized
+        embeddings and attempts to reconstruct the original image.
+    }
+\end{figure}
+
 Later approaches extended \gls{vqvae} to multiple distinct codebooks in
 \acrshort{vqvae}-2~\cite{razavi2019generating}. Though theoretically it can be
 extended to any number of codebooks, they performed experiments on a two-level
@@ -204,6 +235,27 @@ compression ratio of $\vqganDownsample=32$ and then trained a transformer model
 to autoregressively predict the stack of discrete tokens at a given spatial
 location, allowing for fast sampling despite actually having multiple levels of
 discrete latent representations\cite{lee2022rqvae}.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{Model} & \textbf{Maximum Tested Input} & \textbf{Latent Shape} & \textbf{Codebook Size} & \textbf{FID/val} & \textbf{FID/train} \\
+        \hline
+        VQ-VAE & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        \hline
+        VQ-VAE-2 & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        \hline
+        DALLE & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        \hline
+        VQ-GAN & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        \hline
+        RVQ-VAE & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        \hline
+    \end{tabular}
+    \caption[Table]{Summary of various \acrfull{vq} methods. Latent shapes
+    calculated from largest tested input.}
+\end{table}
 
 A typical strategy for selecting which codebook vector $e_i$ to map to a
 particular input is to compute the Euclidean distance between a given continuous
