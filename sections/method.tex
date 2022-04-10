@@ -198,6 +198,33 @@ of gradients.
 Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
 3$ to result in more diverse samples in certain experiments.
 
+\begin{table}
+    \centering
+    \begin{tabular}{|c||c c||c||c c||c||}
+    \hline
+    \textbf{Dataset} & \textbf{FFHQ-256} & \textbf{FFHQ-1024} & \textbf{CelebA}
+                     & \textbf{MNIST} & \textbf{FashionMNIST} &
+                     \textbf{ImageNet} \\
+    \hline
+    Dataset Size & & & & & & \\
+    Codebook Size & & & & & & \\
+    Latent Shape & & & & & & \\
+    Batch Size & & & & & & \\
+    Unroll Steps & & & & & & \\
+    \hline
+    Depth & & & & & & \\
+    Dimension & & & & & & \\
+    Shorten Factor & & & & & & \\
+    Attention Heads & & & & & & \\
+    Attention Type & & & & & & \\
+    Resample Type & & & & & & \\
+    \hline
+    Classes & & & & & & \\
+    Class Dimension & & & & & & \\
+    \hline
+    \end{tabular}
+    \caption{Table of parameters for all training experiments.}
+\end{table}
 An alternative corruption distribution would be to instead use a deterministic
 method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with
 $M_{i,j} = 1$ with a special masking token. This bears some similarity to
