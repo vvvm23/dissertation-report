@@ -85,7 +85,13 @@ of one spatial dimension being downsampled more than others.
     \centering
     \includesvg[width=\textwidth]{figures/resample.svg}
     \caption{
-        Test
+        \textbf{Top:} Showing effect of resampling sequence embeddings using
+        original formulation. Resampling rate will be applied to only one axis,
+        resulting in resampling more in only one axis of the decoded image.
+        \textbf{Bottom:} Our corrected method of resampling, extracting first
+        two-dimensional patches of size $\sqrt{\hourglassRate}$, then applying
+        resampling. The sequence can then again be flattened and passed to
+        subsequent transformer layers.
     }
 \end{figure}
 
