@@ -81,6 +81,15 @@ $\hourglassRate=3$, corresponding to three colour channels. However, if they
 were to nest the hourglass transformers further, they would run into this issue
 of one spatial dimension being downsampled more than others.
 
+\begin{figure}
+    \centering
+    \includesvg[width=\textwidth]{figures/resample.svg}
+    \caption{
+        Test
+    }
+\end{figure}
+
+
 In our formulation, we instead reshape the flattened sequence back into a
 two-dimensional form and then apply resampling equally in the last two axes.
 With a resampling rate of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in
