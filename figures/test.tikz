@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+\begin{axis}[
+title={Test title},
+xlabel={x},
+ylabel={y},
+xmin=0, xmax=256,
+ymin=0, ymax=100,
+xtick={10,20,50,100,256},
+ytick={0,20,40,60,80,100},
+legend pos=north east,
+ymajorgrids=true,
+grid style=dashed,
+]
+\addplot[color=black, mark=square]
+coordinates {(10, 100)(20, 60)(50, 20)(100, 10)(200, 8)(500, 6)(1000, 5)};
+\addlegendentry{dataset 1}
+
+\addplot[color=black, mark=diamond]
+coordinates {(10, 90)(20, 50)(50, 30)(100, 20)(200, 10)(500, 7)(1000, 7)};
+\addlegendentry{dataset 2}
+
+\addplot[color=black, mark=circle]
+coordinates {(10, 120)(20, 40)(50, 30)(100, 20)(200, 20)(500, 18)(1000, 15)};
+\addlegendentry{dataset 3}
+
+\end{axis}
+\end{tikzpicture}
+

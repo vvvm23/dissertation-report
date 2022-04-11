@@ -1,4 +1,3 @@
-
 \documentclass{article} % For LaTeX2e
 \usepackage{iclr2022_conference,times}
 
@@ -9,6 +8,11 @@
 \usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
 \usepackage{url}
 \usepackage{svg}
+\usepackage{pgfplots}
+
+\pgfplotsset{width=10cm,compat=1.9}
+%\usepgfplotslibrary{external}
+%\tikzexternalize
 
 % uncomment below for smaller margins
 \usepackage[margin=1in]{geometry}
@@ -92,6 +96,26 @@ Durham, UK \\
 
 \section{Introduction}\label{sec:intro}
 \input{sections/introduction.tex}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/test.tikz}
+        }
+        \caption{tikz caption A}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/test.tikz}
+        }
+        \caption{tikz caption B}
+    \end{subfigure}
+\caption{Test tikz plot}
+\end{figure}
 
 \section{Related Work}\label{sec:related}
 \input{sections/prior.tex}
