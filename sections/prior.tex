@@ -240,21 +240,28 @@ discrete latent representations\cite{lee2022rqvae}.
     \centering
     \begin{tabular}{|c|c|c|c|c|c|}
         \hline
-        \textbf{Model} & \textbf{Maximum Tested Input} & \textbf{Latent Shape} & \textbf{Codebook Size} & \textbf{FID/val} & \textbf{FID/train} \\
+        \textbf{Model} & \textbf{Input Size} & \textbf{Latent Shape} & \textbf{Codebook Size} & \textbf{FID/val} & \textbf{FID/train} \\
         \hline
-        VQ-VAE & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        VQ-VAE & $128 \times 128$ & $32 \times 32$ & $512$ & -- & -- \\
         \hline
-        VQ-VAE-2 & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        VQ-VAE-2 & $256 \times 256$ & $64 \times 64$ \& $32 \times 32$ & $512$ & --& $\sim 10$ \\
+                 & $1024 \times 1024$ & $128 \times 128$ \& $64 \times 64$ \& $32 \times 32$ & $512$ & -- & -- \\
         \hline
-        DALLE & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        DALLE & $256 \times 256$ & $32 \times 32$ & $8192$ & $32.01$ & $33.88$ \\
+        %DALLE-2 & $256 \times 256$ & $32 \times 32$ & $8192$ & $32.01$ & $33.88$ \\
         \hline
-        VQ-GAN & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        VQ-GAN & $256 \times 256$ & $16 \times 16$ & $1024$ & $7.94$ & $10.54$ \\
+        & $256 \times 256$ & $16 \times 16$ & $16384$ & $4.98$ & $7.41$ \\
+        & $256 \times 256$ & $32 \times 32$ & $8192$ & $1.49$ & $3.24$ \\
+        & $256 \times 256$ & $64 \times 64$ \& $32 \times 32$ & $8192$ & $1.45$ & $2.78$ \\
         \hline
-        RVQ-VAE & $128 \times 128$ & $32 \times 32 \times 1$ & $1024$ & $100.0$ & $100.0$ \\
+        RVQ-VAE & $256 \times 256$ & $8 \times 8 \times 2$ & $16384$ & -- & $10.77$ \\
+        & $256 \times 256$ & $8 \times 8 \times 4$ & $16384$ & -- & $3.20$ \\
+        & $256 \times 256$ & $8 \times 8 \times 8$ & $16384$ & -- & $2.69$ \\
+        & $256 \times 256$ & $8 \times 8 \times 16$ & $16384$ & -- & $1.83$ \\
         \hline
     \end{tabular}
-    \caption[Table]{Summary of various \acrfull{vq} methods. Latent shapes
-    calculated from largest tested input.}
+    \caption[Table]{Summary of various \acrfull{vq} methods.}
 \end{table}
 
 A typical strategy for selecting which codebook vector $e_i$ to map to a
