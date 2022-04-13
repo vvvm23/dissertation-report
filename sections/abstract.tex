@@ -1,14 +1,16 @@
-Recent research has pushed sample resolutions higher whilst reducing
-computational requirements and sampling speeds. One approach is to utilize
-powerful vector-quantization (VQ) models to reduce computational requirements
-whilst still producing high quality samples. In this work, we push this further
-through the use of non-autoregressive (NAR) denoising autoencoders (SUNDAE) and
-modifications to hierarchical transformers that have found recent success in
-language modelling. This approach to allows for very fast sampling and training
-(4-6 days) of VQ latents from pre-trained VQ-GAN models. Furthermore, we found
-the NAR nature of the model made it suitable for complex
-inpainting with arbitrary masks. Finally, we trained a new VQ-GAN model on a
-dataset of faces at resolutions exceeding one million pixels, ultimately
-allowing allowing for megapixel image generation in only two seconds on
-consumer-grade GPUs.
+% TODO: what's the contribution in a single salient idea? avoid "just taking
+% some existing approach and stuck it on without much thought."
+The recent trend in generative modelling research has been to push sample
+resolutions higher whilst simultaneously reducing computational requirements for
+training and sampling. One approach is to utilize powerful vector-quantization
+(VQ) models to reduce computational requirements whilst still producing high
+quality samples. In this work, we push this further through the use of
+non-autoregressive (NAR) denoising autoencoders (SUNDAE) and modifications to
+hierarchical transformers that have found recent success in language modelling.
+This approach to allows for very fast sampling ($\approx 2$ seconds) and
+training (4-6 days) of VQ latents from pre-trained VQ-GAN models. Furthermore,
+we found the NAR nature of the model made it suitable for complex inpainting
+with arbitrary masks. Finally, we trained a new VQ-GAN model on a dataset of
+faces at resolutions exceeding one million pixels, ultimately allowing allowing
+for megapixel image generation in only two seconds on consumer-grade GPUs.
 

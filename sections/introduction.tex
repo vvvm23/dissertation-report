@@ -1,3 +1,9 @@
+% TODO: distill high level trends rather than honing in on particular papers.
+% What makes specific methods work with characteristics / limitations? Where is
+% the research gap?
+
+% TODO: research questions are a bit fragmented -- lacking a united and salient
+% narrative.
 An ideal deep generative model would satisfy three key requirements:
 high-quality samples, sample diversity via mode coverage, and computational
 inexpensive sampling. Arguably, there are other desirable properties such as a
@@ -53,30 +59,40 @@ forms our first research question, whether \gls{sundae} models is suitable
 paradigm for sampling discrete latent codes. As a result of our studies, we find
 that indeed they are highly suited for this task.
 
-These discrete \gls{sundae} models have only previously be applied to
-language modelling tasks~\cite{savinov2022stepunrolled}. In their work, they
-used transformer~\cite{vaswani2017attention} architectures to form their
-autoencoder. In parallel, a noticeably more efficient variant of transformers --
-the Hourglass Transformer~\cite{nawrot2021hierarchical} -- was released, which
-has a hierarchical architecture aimed at language and image modelling tasks,
-though potentially flawed on the latter. This raises a second research question,
+These discrete \gls{sundae} models have only previously be applied to language
+modelling tasks~\cite{savinov2022stepunrolled}. In their work, they used
+transformer~\cite{vaswani2017attention} architectures to form their autoencoder.
+In parallel, a noticeably more efficient variant of transformers -- the
+Hourglass Transformer~\cite{nawrot2021hierarchical} -- was released, which has a
+hierarchical architecture aimed at language and image modelling tasks, though
+potentially flawed on the latter. This raises a second research question,
 whether the approach introduced in~\citet{savinov2022stepunrolled} is also
 suited for latent modelling, and whether the hierarchical approach introduced
 in~\citet{nawrot2021hierarchical} can be further improved upon. As a result of
 our studies, we find that although they are suited for latent modelling, there
-are many modifications we can make to improve their performance further.
+are modifications that can improve performance further. These include
+modifications to the down- and up-sampling operations, as well as axial
+positional embeddings in hourglass architectures~\cite{nawrot2021hierarchical}
+when operating on multi-dimensional sequences; removal of causal masking, and
+differences in parameters for \gls{sundae} training and sampling when applied to
+discrete latents rather than natural language.
 
-Given a fast sampling and an efficient transformer architecture, we are
-potentially left with a highly scaleable (with respect to spatial resolution)
-model. This raises a third and final research question, whether our new approach
-allows for the generation of extremely high resolution images in a time frame
-that would permit fully- or near-interactive use. Again, as a result of our
-studies, we find that this is indeed the case, proven by the synthesis of $1024
-\times 1024$ images in as few as 2 seconds on a consumer-grade GPU. To our
-knowledge, this is the fastest sampling model at this resolution, with the
-exception of pure \gls{gan}-based approaches. This required the training of our
-own \gls{vqgan} model, which was, also to our knowledge, the largest \gls{vqgan} model
-trained in terms of input size.
+Given a fast sampling and an efficient transformer architecture, we are left
+with a highly scaleable generative model, with respect to number of layers and
+spatial resolution of the input. Specifically, only a minority of the layer are
+operating at the same resolution as the input, reducing the cost of expensive
+self-attention across the input. Conversely, we can scale the number of layers
+more cheaply by adding layers only at the downsampled resolution, allowing for
+considerably larger models with only a minor computational cost. This
+raises a third and final research question, whether our new approach allows for
+the generation of extremely high resolution images in a time frame that would
+permit fully- or near-interactive use. Again, as a result of our studies, we
+find that this is indeed the case, proven by the synthesis of $1024 \times 1024$
+images in as few as 2 seconds on a consumer-grade GPU. To our knowledge, this is
+the fastest sampling model at this resolution, with the exception of pure
+\gls{gan}-based approaches. This required the training of our own \gls{vqgan}
+model, which was, also to our knowledge, the largest \gls{vqgan} model trained
+in terms of input size.
 
 %In this work, we aim to move towards satisfying all three key requirements for
 %an ideal generative model. Like previous work, we use a vector-quantized image

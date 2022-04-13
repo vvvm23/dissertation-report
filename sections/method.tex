@@ -1,14 +1,19 @@
 % TODO: figures for the following:
-% - Latent dataset generation
+% - Latent dataset generation X
 % - High level overview of hourglass
-% - 2d aware modifications: 2d rotary embeddings and downsampling in two
+% - 2d aware modifications: 2d rotary embeddings and downsampling in two X
 %   directions (showing failings of previous)
 % - show training procedure (original z, corruption function, unrolled
 %   training). show samples at each step? or save for eval
-% - show sampling procedure (random z_0, unrolled steps, show samples, binary
+% - show sampling procedure (random z_0, unrolled steps, show samples, binary X
 %   mask)
 % - show inpainting procedure (modification to binary mask)
-% - show some nice samples!
+% - show some nice samples! X
+
+% TODO: could use some high level diagram of the method at the start of the
+% section (acting as a bit of a map)?
+% TODO: also some more figures and equations to break up the walls of text.
+% TODO: in general, more assertive language would be good.
 
 \subsection{Latent Dataset Generation}
 We use the standard two-stage scheme for vector-quantized image
@@ -235,10 +240,10 @@ An alternative corruption distribution would be to instead use a deterministic
 method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with
 $M_{i,j} = 1$ with a special masking token. This bears some similarity to
 ``progressive unmasking'' of latents as shown in prior
-work~\cite{bondtaylor2021unleashing,austin2021structured}. We did not test this
-strategy as the use of a masking token places an upper bound on the number of
+work~\cite{bondtaylor2021unleashing,austin2021structured}. This strategy was not
+considered due to the use of a masking token places an upper bound on the number of
 inference time sampling steps (updating at most one token per step) as well as
-not allowing for self-correction, as once unmasked a token is now
+not allowing for self-correction, as once a token is unmasked it is now
 fixed~\cite{bondtaylor2021unleashing,austin2021structured}. 
 
 % TODO: a figure could be really nice too.
