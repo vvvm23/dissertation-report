@@ -144,36 +144,38 @@ Figure~\ref{fig:mnist}.
     \centering
     \begin{subfigure}[b]{0.47\textwidth}
         \centering
-        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples-small.png}
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-valley-small.png}
         \caption{
-            Class 1.
+            $256 \times 256$ successful samples from the class ``Valley''.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-lakeside-small.png}
+        \caption{
+            $256 \times 256$ successful samples from the class ``Lakeside''.
+        }
+    \end{subfigure}\\
+    \vspace{0.5cm}
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-penguin-small.png}
+        \caption{
+            $256 \times 256$ failed samples from the class ``King Penguin''.
         }
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.47\textwidth}
         \centering
-        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples-small.png}
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-panda-small.png}
         \caption{
-            Class 2.
+            $256 \times 256$ failed samples from the class ``Giant Panda''.
         }
     \end{subfigure}
-    \\
-    \begin{subfigure}[b]{0.47\textwidth}
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples-small.png}
-        \caption{
-            Class 3.
-        }
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.47\textwidth}
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/ffhq256-samples-small.png}
-        \caption{
-            Class 4.
-        }
-    \end{subfigure}
-    \caption{Examples of class-conditioned generation on ImageNet.}
+    \caption{Examples of class-conditioned generation on ImageNet using
+        $\markovSteps = 50$ sampling steps. Top row contains examples of
+    successful samples whereas bottom row showed failed samples. The contents of
+    the failed samples nonetheless do resemble the target class.}
     \label{fig:imagenet}
 \end{figure}
 
