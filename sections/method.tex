@@ -217,23 +217,26 @@ Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
                      & \textbf{MNIST} & \textbf{FashionMNIST} &
                      \textbf{ImageNet} \\
     \hline
-    Dataset Size & $60,000$ & $60,000$ & & $60,000$ & $60,000$ & $1.28$M \\
+    Dataset Size & $60,000$ & $60,000$ & $190,000$ & $60,000$ & $60,000$ & $1.28$M \\
     Codebook Size & $1024$ & $8192$ & $1024$ & $256$ & $256$ & $1024$ \\
     Latent Shape & $16 \times 16$ & $32 \times 32$ & $16 \times 16$ & $28 \times
                  28$ & $28 \times 28$ & $16 \times 16$ \\
     Unroll Steps & 3 & 3 & 3 & 2 & 2 & 3 \\
     \hline
-    Depth & & & & & & \\
+    Depth* & $3-10-3$ & $2-12-2$ & $2-12-2$ & $2-8-2$ & $2-8-2$ & $3-14-3$\\
     Dimension & 1024 & 1024 & 1024 & 1024 & 1024 & 1024 \\
     Shorten Factor & 4 & 4 & 4 & 4 & 4 & 4 \\
     Attention Heads & 8 & 8 & 8 & 8 & 8 & 12 \\
     Resample Type & Linear & Linear & Linear & Linear & Linear & Linear \\
     \hline
     Classes & -- & -- & -- & 10 & 10 & 1000 \\
-    Class Dimension & -- & -- & -- & & 1024 & 1024 \\
+    Class Dimension & -- & -- & -- & 1024 & 1024 & 1024 \\
     \hline
     \end{tabular}
-    \caption{Table of parameters for all training experiments.}
+    \caption{Table of parameters for all training experiments. *Depth is
+    represented as three numbers corresponding to number of layers before
+    downsampling, number of downsampled layers, and number of layers after
+    upsampling.}
 \end{table}
 An alternative corruption distribution would be to instead use a deterministic
 method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with
