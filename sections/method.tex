@@ -217,21 +217,20 @@ Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
                      & \textbf{MNIST} & \textbf{FashionMNIST} &
                      \textbf{ImageNet} \\
     \hline
-    Dataset Size & & & & & & \\
-    Codebook Size & & & & & & \\
-    Latent Shape & & & & & & \\
-    Batch Size & & & & & & \\
-    Unroll Steps & & & & & & \\
+    Dataset Size & $60,000$ & $60,000$ & & $60,000$ & $60,000$ & $1.28$M \\
+    Codebook Size & $1024$ & $8192$ & $1024$ & $256$ & $256$ & $1024$ \\
+    Latent Shape & $16 \times 16$ & $32 \times 32$ & $16 \times 16$ & $28 \times
+                 28$ & $28 \times 28$ & $16 \times 16$ \\
+    Unroll Steps & 3 & 3 & 3 & 2 & 2 & 3 \\
     \hline
     Depth & & & & & & \\
-    Dimension & & & & & & \\
-    Shorten Factor & & & & & & \\
-    Attention Heads & & & & & & \\
-    Attention Type & & & & & & \\
-    Resample Type & & & & & & \\
+    Dimension & 1024 & 1024 & 1024 & 1024 & 1024 & 1024 \\
+    Shorten Factor & 4 & 4 & 4 & 4 & 4 & 4 \\
+    Attention Heads & 8 & 8 & 8 & 8 & 8 & 12 \\
+    Resample Type & Linear & Linear & Linear & Linear & Linear & Linear \\
     \hline
-    Classes & & & & & & \\
-    Class Dimension & & & & & & \\
+    Classes & -- & -- & -- & 10 & 10 & 1000 \\
+    Class Dimension & -- & -- & -- & & 1024 & 1024 \\
     \hline
     \end{tabular}
     \caption{Table of parameters for all training experiments.}
