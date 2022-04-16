@@ -203,7 +203,7 @@ at each step. Then, compute the cross entropy loss between all logits at each
 $t$ and the target $\latent$. This differs from some other \gls{nar} solutions
 which predict the corruption noise $\epsilon$~\cite{ho2020ddpm} rather than the
 target itself. The mean of the cross entropy losses is then to produce the final
-loss as shown in \S~\ref{subsec:sundae}, which then allows for backpropagation
+loss as shown in \S\ref{subsec:sundae}, which then allows for backpropagation
 of gradients.
 
 Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
@@ -266,20 +266,20 @@ fixed~\cite{bondtaylor2021unleashing,austin2021structured}.
     \label{fig:sampling}
     \centering
     %\includegraphics[width=0.9\linewidth]{figures/sampling/sampling.pdf}
-    \begin{overpic}[percent,grid=false,tics=10,width=0.9\linewidth]{figures/sampling/sampling.pdf}
-        \put(1, 3){\tiny$\latent_0 \sim U(1, v)$}
-        \put(30, 3){\tiny$\latent_1$}
+    \begin{overpic}[percent,grid=false,tics=2,width=0.9\linewidth]{figures/sampling/sampling.pdf}
+        \put(6, 3){\tiny$\latent_0 \sim U(1, v)$}
+        \put(31, 3){\tiny$\latent_1$}
         \put(66, 3){\tiny$\latent_{T-1}$}
-        \put(87, 3){\tiny$\latent_T$}
-        \put(9, 30.5){$\vqganDecoder$}
-        \put(30, 30.5){$\vqganDecoder$}
-        \put(66, 30.5){$\vqganDecoder$}
-        \put(87, 30.5){$\vqganDecoder$}
-        \put(47, 16){$\dots$}
+        \put(88, 3){\tiny$\latent_T$}
+        \put(10, 31){$\vqganDecoder$}
+        \put(31, 31){$\vqganDecoder$}
+        \put(67, 31){$\vqganDecoder$}
+        \put(88, 31){$\vqganDecoder$}
+        \put(48, 16){$\dots$}
         \put(9, 60){\tiny$\sample_0$}
-        \put(30, 60){\tiny$\sample_1$}
-        \put(66, 60){\tiny$\sample_{\markovSteps - 1}$}
-        \put(87, 60){\tiny$\sample_\markovSteps$}
+        \put(31, 60){\tiny$\sample_1$}
+        \put(67, 60){\tiny$\sample_{\markovSteps - 1}$}
+        \put(88, 60){\tiny$\sample_\markovSteps$}
     \end{overpic}
 
     \caption{The sampling process. SUNDAE gradually denoises from $\latent_0$ to

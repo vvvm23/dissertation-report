@@ -188,13 +188,17 @@ model on discrete data can be used.
 
 \begin{figure}
     \centering
-    \includesvg[width=\textwidth]{figures/vq.svg}
+    %\includesvg[width=\textwidth]{figures/vq.svg}
+    \includegraphics[width=\textwidth]{figures/vq.pdf}
     \caption{
         Visualisation of a vector-quantization image model. An encoder model
         first extracts continuous embeddings from the source image. Vector
         quantization is then used to map each continuous embedding to the
         closest entry in the codebook. A decoder model takes the discretized
-        embeddings and attempts to reconstruct the original image.
+        embeddings and attempts to reconstruct the original image. We can
+        produce a dataset of latent embeddings from a source image dataset 
+        by sampling $\image \sim \imageDataset$ and appending the resulting
+        discretized embeddings $\latent$ to a dataset $\latentDataset$.
     }
 \end{figure}
 
