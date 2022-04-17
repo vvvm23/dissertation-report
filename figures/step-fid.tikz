@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+\begin{axis}[
+y label style={at={(axis description cs:-0.15,1.0)},rotate=-90,anchor=south},
+title={},
+xlabel={Sampling steps $T$},
+ylabel={FID $\downarrow$},
+xmin=0, xmax=500,
+ymin=0, ymax=120,
+xtick={0,50,100,150,200,250,300,350,400,450,500},
+ytick={0,20,40,60,80,100,120},
+legend pos=north east,
+ymajorgrids=true,
+grid style=dashed,
+]\addplot[color=black, mark=square]
+coordinates {(10.0, 16.933240853331633)(20.0, 16.968015496794585)(50.0, 20.269439432847413)(100.0, 23.214299375538577)(256.0, 27.189009006094718)(512.0, 31.435942790814245)};
+\addlegendentry{FFHQ256}
+\addplot[color=red, mark=*]
+coordinates {(20.0, 50.79169256114352)(50.0, 54.30311107720983)(100.0, 63.90726480083863)(200.0, 69.5533429056805)(512.0, 84.80617604620527)(1024.0, 100.93734948403663)};
+\addlegendentry{FFHQ1024}
+\addplot[color=blue, mark=diamond]
+coordinates {(10.0, 27.79389706651663)(20.0, 23.397719254573232)(50.0, 23.845846223411986)(100.0, 27.26720576724899)(256.0, 37.0436486740923)(512.0, 46.99500404006332)};
+\addlegendentry{CelebA}
+\end{axis}
+\end{tikzpicture}

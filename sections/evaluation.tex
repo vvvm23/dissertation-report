@@ -16,36 +16,76 @@ latter of which we found to be highly configurable.
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
-            \input{figures/test.tikz}
+            \input{figures/step-fid.tikz}
         }
-        \caption{Caption A}
+        \caption{Steps vs. FID}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
-            \input{figures/test.tikz}
+            \input{figures/step-coverage.tikz}
         }
-        \caption{Caption B}
+        \caption{Steps vs. Coverage}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.33\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/step-density.tikz}
+        }
+        \caption{Steps vs. Density}
     \end{subfigure}
     \\
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
-            \input{figures/test.tikz}
+            \input{figures/temp-fid.tikz}
         }
-        \caption{Caption C}
+        \caption{Temperature vs. FID}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
-            \input{figures/test.tikz}
+            \input{figures/temp-coverage.tikz}
         }
-        \caption{Caption D}
+        \caption{Temperature vs. Coverage}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.33\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/temp-density.tikz}
+        }
+        \caption{Temperature vs. Density}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.33\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/prop-fid.tikz}
+        }
+        \caption{Sample Proportion vs. FID}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.33\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/prop-coverage.tikz}
+        }
+        \caption{Sample Proportion vs. Coverage}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.33\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{
+            \input{figures/prop-density.tikz}
+        }
+        \caption{Sample Proportion vs. Density}
     \end{subfigure}
 \caption{Plots showing results of varying various sample parameters against FID
 score.}

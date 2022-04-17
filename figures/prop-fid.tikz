@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+\begin{axis}[
+y label style={at={(axis description cs:-0.15,1.0)},rotate=-90,anchor=south},
+title={},
+xlabel={Sampling proportion},
+ylabel={FID $\downarrow$},
+xmin=0.3, xmax=0.9000000000000001,
+ymin=0, ymax=120,
+xtick={0.3,0.4,0.5,0.6000000000000001,0.7000000000000002,0.8000000000000003,0.9000000000000001},
+ytick={0,20,40,60,80,100,120},
+legend pos=north east,
+ymajorgrids=true,
+grid style=dashed,
+]\addplot[color=black, mark=square]
+coordinates {(1.0, 74.66283778948849)(0.8, 44.21927055440783)(0.6, 27.725188336835213)(0.4, 19.825740890874904)(0.2, 13.976620506685805)};
+\addlegendentry{FFHQ256}
+\addplot[color=red, mark=*]
+coordinates {(1.0, 116.81614755529716)(0.8, 85.06652266724691)(0.6, 32.65933412137353)(0.4, 24.82419203797879)(0.2, 21.979835694569083)};
+\addlegendentry{FFHQ1024}
+\addplot[color=blue, mark=diamond]
+coordinates {(1.0, 94.83723271911529)(0.8, 62.7489179950907)(0.6, 35.43514345702618)(0.4, 23.718088259439654)(0.2, 17.614758693266793)};
+\addlegendentry{CelebA}
+\end{axis}
+\end{tikzpicture}

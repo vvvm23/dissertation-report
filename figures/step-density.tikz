@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+\begin{axis}[
+y label style={at={(axis description cs:-0.15,1.0)},rotate=-90,anchor=south},
+title={},
+xlabel={Sampling steps $T$},
+ylabel={Density $\uparrow$},
+xmin=0, xmax=500,
+ymin=0.0, ymax=1.8,
+xtick={0,50,100,150,200,250,300,350,400,450,500},
+ytick={0.0,0.2,0.4,0.6000000000000001,0.8,1.0,1.2000000000000002,1.4000000000000001,1.6,1.8},
+legend pos=north east,
+ymajorgrids=true,
+grid style=dashed,
+]\addplot[color=black, mark=square]
+coordinates {(10.0, 0.155)(20.0, 0.18413333333333332)(50.0, 0.24793333333333334)(100.0, 0.23946666666666666)(256.0, 0.21406666666666666)(512.0, 0.17573333333333332)};
+\addlegendentry{FFHQ256}
+\addplot[color=red, mark=*]
+coordinates {(20.0, 0.7133333333333334)(50.0, 0.6008666666666667)(100.0, 0.44753333333333334)(200.0, 0.3249333333333333)(512.0, 0.2324)(1024.0, 0.16773333333333332)};
+\addlegendentry{FFHQ1024}
+\addplot[color=blue, mark=diamond]
+coordinates {(10.0, 0.2215333333333333)(20.0, 0.2724)(50.0, 0.2869333333333333)(100.0, 0.2332)(256.0, 0.21446666666666664)(512.0, 0.16473333333333331)};
+\addlegendentry{CelebA}
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+\begin{axis}[
+y label style={at={(axis description cs:-0.15,1.0)},rotate=-90,anchor=south},
+title={},
+xlabel={Sample temperature $\tau$},
+ylabel={FID $\downarrow$},
+xmin=0.3, xmax=0.9000000000000001,
+ymin=0, ymax=120,
+xtick={0.3,0.4,0.5,0.6000000000000001,0.7000000000000002,0.8000000000000003,0.9000000000000001},
+ytick={0,20,40,60,80,100,120},
+legend pos=north east,
+ymajorgrids=true,
+grid style=dashed,
+]\addplot[color=black, mark=square]
+coordinates {(1.0, 83.59790014438649)(0.9, 44.43439367176743)(0.7, 24.322136621661407)(0.5, 22.530204016446124)(0.3, 28.155348332963445)};
+\addlegendentry{FFHQ256}
+\addplot[color=red, mark=*]
+coordinates {(1.0, 281.35575866892975)(0.9, 72.24972119845785)(0.7, 30.030630965588852)(0.5, 41.06155796980428)(0.3, 59.61624309496067)};
+\addlegendentry{FFHQ1024}
+\addplot[color=blue, mark=diamond]
+coordinates {(1.0, 75.80203954506536)(0.9, 28.617311837121477)(0.7, 28.621503391331398)(0.5, 35.63571015802388)(0.3, 49.21726306807049)};
+\addlegendentry{CelebA}
+\end{axis}
+\end{tikzpicture}
