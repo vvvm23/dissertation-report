@@ -1,16 +1,5 @@
-% TODO: figures for the following:
-% - Latent dataset generation X
-% - 2d aware modifications: 2d rotary embeddings and downsampling in two X
-%   directions (showing failings of previous) X
-% - show training procedure (original z, corruption function, unrolled
-%   training). show samples at each step? or save for eval
-% - show sampling procedure (random z_0, unrolled steps, show samples, binary X
-%   mask) X
-% - show some nice samples! X
-
 % TODO: could use some high level diagram of the method at the start of the
 % section (acting as a bit of a map)?
-% TODO: also some more figures and equations to break up the walls of text.
 % TODO: in general, more assertive language would be good. 
 
 % TODO: kinda want to improve the sampling figure
@@ -210,20 +199,20 @@ adversarial loss~\cite{esser2021taming} in addition to a $k$-means \gls{vq}
 loss. In our implementation we minimised the following weighted loss:
 \begin{align}
 \begin{split}
-    \mathbb{L}_\text{PIX} &= \alpha_\text{PIX} \cdot |\image - \hat{\image}| \cdot \\
-    \mathbb{L}_\text{VQ} &= \alpha_\text{VQ} \cdot \left(||\hat{\latent} -
+    L_\text{PIX} &= \alpha_\text{PIX} \cdot |\image - \hat{\image}| \cdot \\
+    L_\text{VQ} &= \alpha_\text{VQ} \cdot \left(||\hat{\latent} -
     \latent||^2 + ||sg[\vqganEncoder(x)] - \latent||^2_2 + ||\vqganEncoder(x) -
     sg[\latent]||^2_2\right)\\
-    \mathbb{L}_\text{GAN} &= \alpha_\text{GAN} \cdot \left(\log D(x) + \log
+    L_\text{GAN} &= \alpha_\text{GAN} \cdot \left(\log D(x) + \log
     (1-D(\hat{x}))\right) \\
-    \lambda &= \frac{\nabla_{G_{-1}}[\mathbb{L}_\text{PIX} +
-    \mathbb{L}_\text{PER}]}{\nabla_{G_{-1}}[\mathbb{L}_\text{GAN}] + \epsilon}\\
-    \mathbb{L} &= \mathbb{L}_\text{VQ} + \lambda \cdot \mathbb{L}_\text{GAN}\\
+    \lambda &= \frac{\nabla_{G_{-1}}[L_\text{PIX} +
+    L_\text{PER}]}{\nabla_{G_{-1}}[L_\text{GAN}] + \epsilon}\\
+    L &= L_\text{VQ} + \lambda \cdot L_\text{GAN}\\
     \alpha_\text{PIX} &= 1.0,\; \alpha_\text{VQ} = 1.0,\; \alpha_\text{GAN} = 0.5,\; \alpha_\text{PER} = 1.0
 \end{split}
 \end{align}
 where our discriminator is implemented using three layers, perceptual loss
-$\mathbb{L}_\text{PER}$ implemented using a pretrained VGG16
+$L_\text{PER}$ implemented using a pretrained VGG16
 model~\cite{karen2014vg18}, and $\nabla_{G_{-1}}[\cdot]$ is the gradient with
 respect to the last layer of the \gls{vqgan} decoder.
 
@@ -417,12 +406,6 @@ produced at each step reveals the model gradually denoises the latent and does
 indeed self-correct errors accumulated during the sampling process.
 
 \subsection{Arbitrary Pattern Inpainting}
-% TODO: discuss how to inpaint with a trained model
-% TODO: add more citations in general for other NAR
-% TODO: clear advantage of NAR models against AR, as we are not limited to
-% causal inpainting
-% TODO: initial description may be more suited for prior work.
-
 As noted in the original work~\cite{savinov2022stepunrolled} and other
 non-autoregressive solutions~\cite{bondtaylor2021unleashing} one clear advantage
 of non-autoregressive models is that they are not limited to causal inpainting.
