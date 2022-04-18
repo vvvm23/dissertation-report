@@ -39,13 +39,21 @@ latter of which we found to be highly configurable.
         }
         \caption{Steps vs. Density}
     \end{subfigure}
-    \\
+    \caption{
+        Plots showing sample quality in terms of different metrics as
+        number of sampling steps $\markovSteps$ increases. Counter-intuitively, the
+        sample quality decreases with number of sampling steps, seen on
+        all metrics and datasets.
+    }
+\end{figure}
+
+\begin{figure}[ht!]
     \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
             \input{figures/temp-fid.tikz}
         }
-        \caption{Temperature vs. FID}
+        \caption{Temperature $\temperature$ vs. FID}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.33\textwidth}
@@ -53,7 +61,7 @@ latter of which we found to be highly configurable.
         \resizebox{\textwidth}{!}{
             \input{figures/temp-coverage.tikz}
         }
-        \caption{Temperature vs. Coverage}
+        \caption{Temperature $\temperature$ vs. Coverage}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.33\textwidth}
@@ -61,15 +69,23 @@ latter of which we found to be highly configurable.
         \resizebox{\textwidth}{!}{
             \input{figures/temp-density.tikz}
         }
-        \caption{Temperature vs. Density}
+        \caption{Temperature $\temperature$ vs. Density}
     \end{subfigure}
-    \\
+    \caption{
+        Plots showing sample quality in terms of different metrics as sample
+        temperature $\temperature$ is changed. Given the other parameters, a good choice
+        of $\temperature$ falls in the range $0.5-0.7$. However, this range may
+        differ depending on the other choice of parameters.
+    }
+\end{figure}
+
+\begin{figure}[ht!]
     \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
             \input{figures/prop-fid.tikz}
         }
-        \caption{Sample Proportion vs. FID}
+        \caption{Sample proportion vs. FID}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.33\textwidth}
@@ -77,7 +93,7 @@ latter of which we found to be highly configurable.
         \resizebox{\textwidth}{!}{
             \input{figures/prop-coverage.tikz}
         }
-        \caption{Sample Proportion vs. Coverage}
+        \caption{Sample proportion vs. Coverage}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.33\textwidth}
@@ -85,10 +101,14 @@ latter of which we found to be highly configurable.
         \resizebox{\textwidth}{!}{
             \input{figures/prop-density.tikz}
         }
-        \caption{Sample Proportion vs. Density}
+        \caption{Sample proportion vs. Density}
     \end{subfigure}
-\caption{Plots showing results of varying various sample parameters against FID
-score.}
+    \caption{
+        Plots showing sample quality in terms of different metrics as sample
+        proportion is changed. Lower values seem to perform better given the
+        other parameters, but again the optimal range may differ if other
+        parameters are changed.
+    }
 \end{figure}
 
 \begin{figure}[ht]
