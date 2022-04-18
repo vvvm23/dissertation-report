@@ -376,7 +376,9 @@ fixed~\cite{bondtaylor2021unleashing,austin2021structured}.
 
     \caption{The sampling process. SUNDAE gradually denoises from $\latent_0$ to
     the final sample $\latent_\markovSteps$. At each step, it is possible to
-    decode with $\vqganDecoder$ to produce a final image.}
+    decode with $\vqganDecoder$ to produce a final image. By doing so, it
+    reveals the model gradually denoises the latent $\latent$ and is capable of
+    correcting errors accumulated during sampling.}
 \end{figure}
 
 During sampling, we simply sample sequentially $\latent_t \sim \sundae(\latent_t
@@ -393,10 +395,14 @@ sampling process. We found this retained the fast sampling speed whilst also
 improving diversity.
 
 In certain latent sampling configurations, updating only a random subset of
-tokens does improve performance. However, we found that for low step scenarios
-($\markovSteps<20$) that all tokens must be able to be updated in order to
-produce meaningful samples before the maximum number of steps is reached. Hence
-in these cases, we do not follow this strategy.
+tokens also helps improve diversity. \cite{savinov2022stepunrolled} used this
+strategy when performing low-temperature sampling. However, we found that for
+low-step sampling ($\markovSteps<20$) that all tokens must be able to be updated
+in order to produce meaningful samples before the maximum number of steps is
+reached. Hence in these cases, we do not follow this strategy and instead opt
+for a high sample proportion. In scenarios where we are permitted a time-budget
+allowing for a large number of sample steps, the sample proportion can be freely
+reduced.
 
 Additionally, if a individual sample does not change between step $t-1$ and $t$,
 we freeze it, preventing any further change. If all samples are frozen, sampling
@@ -404,7 +410,11 @@ may terminate early, further improving sampling speed with little cost to
 sample quality. This is significant when performing large-batch sampling.
 
 Once sampling has terminated, the sampled latent code $\latent_T$ can be given
-to the VQGAN decoder $\vqganDecoder$ to produce a final sample $\sample$.
+to the VQGAN decoder $\vqganDecoder$ to produce a final sample $\sample$. In
+fact, any $\latent_i$ in the Markov chain is a valid input to the \gls{vqgan}
+decoder model. Decoding during this process and comparing the $\sample_i$
+produced at each step reveals the model gradually denoises the latent and does
+indeed self-correct errors accumulated during the sampling process.
 
 \subsection{Arbitrary Pattern Inpainting}
 % TODO: discuss how to inpaint with a trained model
@@ -423,8 +433,13 @@ possible with autoregressive sampling.
 Given a sampled image $\sample \in \real{H \times W \times 3}$ we can mask a
 proportion of it using a pixel-level binary mask $\pixelMask \in \{0, 1\}^{H
 \times W}$. By taking $\vqganDownsample \times \vqganDownsample$ regions of
-$\pixelMask$ and applying a logical and in them, we can obtain a latent level
+$\pixelMask$ and applying a logical \texttt{AND} in them, we can obtain a latent level
 mask $\vqMask \in \{0,1\}^{h \times w}$. We then sample as normal from the
 latents, allowing the model full context, but only update regions that were
 masked according to $\vqMask$. Like with sampling, we then use $\vqganDecoder$
 to decode the sampled latent code, producing the output $\sample$.
+
+Sampling a latent-level does mean we are unable to do fine-grained inpainting at
+a pixel level. The definition of the \gls{vq} mask $\vqMask$ means that some
+pixels outside the mask may also be altered. We found in practise this had
+little effect on the perceptual quality of the outputs.
