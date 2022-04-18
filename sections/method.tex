@@ -245,7 +245,7 @@ Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
                  28$ & $28 \times 28$ & $16 \times 16$ \\
     Unroll Steps & 3 & 3 & 3 & 2 & 2 & 3 \\
     \hline
-    Depth* & $3-10-3$ & $2-12-2$ & $2-12-2$ & $2-8-2$ & $2-8-2$ & $3-14-3$\\
+    Depth & $3-10-3$ & $2-12-2$ & $2-12-2$ & $2-8-2$ & $2-8-2$ & $3-14-3$\\
     Dimension & 1024 & 1024 & 1024 & 1024 & 1024 & 1024 \\
     Shorten Factor & 4 & 4 & 4 & 4 & 4 & 4 \\
     Attention Heads & 8 & 8 & 8 & 8 & 8 & 12 \\
@@ -255,10 +255,15 @@ Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
     Class Dimension & -- & -- & -- & 1024 & 1024 & 1024 \\
     \hline
     \end{tabular}
-    \caption{Table of parameters for all training experiments. *Depth is
-    represented as three numbers corresponding to number of layers before
-    downsampling, number of downsampled layers, and number of layers after
-    upsampling.}
+    \caption{
+        Table of parameters for all training experiments. Depth is
+        represented as three numbers corresponding to number of layers before
+        downsampling, number of downsampled layers, and number of layers after
+        upsampling. The dataset size is the size of the training split of the
+        dataset. The latent shape of MNIST experiments is exactly equal to the
+        shape of $\image$, as for these experiments we operate directly on a
+        (discretized) pixel-level.
+    }
 \end{table}
 An alternative corruption distribution would be to instead use a deterministic
 method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with

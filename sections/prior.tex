@@ -269,7 +269,10 @@ discrete latent representations\cite{lee2022rqvae}.
         & $256 \times 256$ & $8 \times 8 \times 16$ & $16384$ & -- & $1.83$ \\
         \hline
     \end{tabular}
-    \caption[Table]{Summary of various \acrfull{vq} methods.}
+    \caption[Table]{Summary of various \acrfull{vq} methods. The trend with
+    \gls{vq} image models is increasing compression rates $\vqganDownsample$ and
+    codebook sizes. However, to obtain these compression rates techniques such
+    as perceptual and adversarial losses must be used.}
 \end{table}
 
 A typical strategy for selecting which codebook vector $e_i$ to map to a
