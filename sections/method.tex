@@ -251,12 +251,10 @@ batch size of 4 across four, 32GiB Tesla V100 GPUs. This made a full
 hyperparameter sweep of the other parameters of the model not possible.
 Therefore, we decided to compromise with good reconstructions on average, and
 accept occasional artifacts which could potentially manifest in the final
-samples. Improving the \gls{vq} image model itself is not the focus of this
-research project.
+samples. Improving the effectiveness \gls{vq} image model itself is not the
+focus of this research project.
 
 \subsection{Non-Autoregressive Generator Training}
-
-% TODO: more details on generator training
 
 We train a SUNDAE model on the flattened extracted \gls{vq} latents $\latent =
 \{\latent^{(0)}, \dots, \latent^{(N)}\}$ where $N = \latentHeight \cdot \latentWidth$.
@@ -278,6 +276,7 @@ denoising from:
     \latent_0 \leftarrow \mathbf{M} \cdot \latent_0 + (\mathbf{1} - \mathbf{M})
     \cdot \latent \text{.}
 \end{equation}
+where $\latent$ is sampled from our latent dataset $\latentDataset$.
 
 We then iteratively unroll the current sample $\latent_{t-1}$ to obtain
 $\latent_t$ for steps $t\in \{1, \dots, \markovSteps\}$. To perform one unroll
@@ -287,11 +286,15 @@ at each step. Then, compute the cross entropy loss between all logits at each
 $t$ and the target $\latent$. This differs from some other \gls{nar} solutions
 which predict the corruption noise $\epsilon$~\cite{ho2020ddpm} rather than the
 target itself. The mean of the cross entropy losses is then to produce the final
-loss as shown in \S\ref{subsec:sundae}, which then allows for backpropagation
-of gradients.
-
-Though the default $\markovSteps = 2$ performed well, we found $\markovSteps =
-3$ to result in more diverse samples in certain experiments.
+loss: 
+\begin{equation} 
+    \lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} +
+    \dots + \lossFunction{T} \right) 
+\end{equation} 
+as in \S\ref{subsec:sundae}, which then allows for backpropagation of gradients
+and consequently the updating of parameters $\sundaeParameters$. Though the
+default $\markovSteps = 2$ performed well, we found $\markovSteps = 3$ to result
+in more diverse samples.
 
 \begin{table}
     \centering
