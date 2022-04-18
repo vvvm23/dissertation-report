@@ -1,13 +1,11 @@
 % TODO: figures for the following:
 % - Latent dataset generation X
-% - High level overview of hourglass
 % - 2d aware modifications: 2d rotary embeddings and downsampling in two X
-%   directions (showing failings of previous)
+%   directions (showing failings of previous) X
 % - show training procedure (original z, corruption function, unrolled
 %   training). show samples at each step? or save for eval
 % - show sampling procedure (random z_0, unrolled steps, show samples, binary X
-%   mask)
-% - show inpainting procedure (modification to binary mask)
+%   mask) X
 % - show some nice samples! X
 
 % TODO: could use some high level diagram of the method at the start of the
@@ -15,19 +13,24 @@
 % TODO: also some more figures and equations to break up the walls of text.
 % TODO: in general, more assertive language would be good. 
 
+% TODO: kinda want to improve the sampling figure
+
 \subsection{Latent Dataset Generation}
 We use the standard two-stage scheme for vector-quantized image
 modelling~\cite{oord2018neural,razavi2019generating,esser2021taming,bondtaylor2021unleashing}
 using VQ-GAN~\cite{esser2021taming} as our feature extractor. Where such models
-are available, we use pretrained VQ-GANs for our experiments. For higher
-resolution experiments (for example, FFHQ-1024~\cite{karras2019stylebased}),
+are available, we use pretrained \glspl{vqgan} for our experiments. For higher
+resolution experiments (for example, FFHQ1024~\cite{karras2019stylebased}),
 pretrained models are not available and so training our own VQ-GAN was necessary
 (see \S\ref{sec:megagan}).
 
 The second stage is to learn a discrete prior model over these latent variables.
-To enable this, we must first build a latent dataset using our trained VQ-GAN.
+To enable this, we first build a latent dataset using our trained \gls{vqgan}.
 This allows for faster training of our second-stage model as the discrete latent
-representations have been precomputed. Formally, given a dataset of images
+representations have been precomputed. A downside of this approach is that it
+limits the amount of data augmentation that can be applied to the dataset. We
+apply a simple horizontal flip to all images, effectively doubling the dataset
+size. Formally, given a dataset of images
 $\imageDataset$, a VQ-GAN encoder $\vqganEncoder$ with downsample factor
 $\vqganDownsample$, and vector-quantization codebook $\vqganCodebook$ with
 number of codewords $\vqganNbLatents$, trained on $\imageDataset$, we define our
@@ -35,12 +38,13 @@ latent dataset $\latentDataset$ as:
 \begin{equation}
     \latentDataset = \{\vqganCodebook(\vqganEncoder(\image)) \mid \image \in \imageDataset \}
 \end{equation}
-where $\image \in \real{3 \times H \times W}$ is a single element of the image
+where $\image \in \real{3 \times H \times W}$ is a single element of the
+augmented image
 dataset and $\latent = \vqganCodebook(\vqganEncoder(\image)) \in \{1, \dots,
-v\}^{h \times w}$ is the corresponding discrete latent
+\vqganNbLatents\}^{h \times w}$ is the corresponding discrete latent
 representation. In other words, each $\vqganDownsample \times \vqganDownsample$
 pixels in $\image$ is mapped to a single discrete value from $1$ to
-$|\vqganCodebook|$ (which in turn, corresponds to a vector $\codebookVector \in
+$\vqganNbLatents$ (which in turn, corresponds to a vector $\codebookVector \in
 \vqganCodebook$),
 resulting in a latent representation of shape $\frac{H}{f} \times \frac{W}{f} =
 h \times w$.
@@ -49,6 +53,7 @@ We then use $\latentDataset$ to train a discrete prior over the latents. Coupled
 with the VQ-GAN decoder $\vqganDecoder$, we obtain a powerful generative model
 by first sampling from a discrete uniform prior distribution, denoising using
 \gls{sundae}, and then decoding the final latents using the \gls{vqgan} decoder.
+Training this discrete prior model, forms the bulk of our work in this paper.
 
 \subsection{2D-Aware Hourglass Transformer}
 Inspired by successes in hierarchical transformers for generative language
@@ -63,7 +68,7 @@ hierarchical structure~\cite{nawrot2021hierarchical}. The same benefits should
 also apply to vector-quantized image modelling. 
 
 However, the design and parameters chosen by the original authors were tailored
-for language modelling. They also experimented with pixel length image
+for language modelling. They also experimented with pixel-wise image
 generation, though we believe that we can improve upon their architectural
 choices for the task of discrete latent modelling. Some changes may also be
 applicable to direct image modelling. We outline modifications to the
@@ -83,10 +88,11 @@ actually resampled more in one axis compared to the other. In their work they
 did not address this, except for experiments on
 ImageNet32~\cite{russakovsky2015imagenet} where they resampled with a rate of
 $\hourglassRate=3$, corresponding to three colour channels. However, if they
-were to nest the hourglass transformers further, they would run into this issue
+were to nest the hourglass transformers further, they would encounter this issue
 of one spatial dimension being downsampled more than others.
 
 \begin{figure}[ht!]
+    \label{fig:resample}
     \centering
     \includegraphics[width=\textwidth]{figures/resample.pdf}
     \caption{
@@ -100,7 +106,6 @@ of one spatial dimension being downsampled more than others.
     }
 \end{figure}
 
-
 In our formulation, we instead reshape the flattened sequence back into a
 two-dimensional form and then apply resampling equally in the last two axes.
 With a resampling rate of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in
@@ -110,6 +115,22 @@ of the discrete prior model, and suspect a similar approach could improve
 performance if applied to pixels directly, which we leave for future work to
 confirm.
 
+For all experiments we use the linear resampling method proposed
+in~\cite{nawrot2021hierarchical} as this was the recommended option for image
+data. In addition, attention layers are applied directly after resampling as
+this led to best results on both image and text datasets in the original
+work~\cite{nawrot2021hierarchical}. This means our adjusted resampling method is
+as follows:
+\begin{equation}
+    h' = A(\hourglassResample^{(\intercal)} \cdot R(\vh) + \vr), \;\; \hourglassResample \in
+    \mathbb{R}^{\frac{(d \cdot h \cdot w)}{\hourglassRate} \times (d \cdot h \cdot w)}
+\end{equation}
+where $A$ is the post-resampling attention layer, $\vh$ is the current hidden
+state, $\vr$ is the residual (with $\vr = \bm{0}$ when downsampling), $R$ is the
+modified reshape operation, $d$ is the hidden layer dimension, and $W$ is a
+learned projection matrix. The reshape operation $R$ can be implemented as a
+space-to-depth operation followed by combining the feature and depth dimensions.
+
 \textbf{Rotary Positional Embeddings}~\cite{su2021roformer} are a good default
 choice for injecting positional information into transformer models, requiring
 no additional parameters. Additionally, they can be easily extended to the
@@ -117,7 +138,10 @@ multi-dimensional case~\cite{rope-eleutherai} which we do here. Though
 transformers are clearly capable of learning that elements far apart in a
 flattened sequence may be close in a multi-dimensional final output, we found
 that explicitly extending positional embeddings to the multi-dimensional case to
-provide a modest boost in performance.
+provide a modest boost in performance. The original hourglass transformer on
+pixel-wise generation also opted to use rotary
+embeddings~\cite{nawrot2021hierarchical}. They note also that rotary embeddings
+have the advantage of being compatible with any self-attention mechanism.
 
 \textbf{Removal of Causal Constraints} -- In the original autoregressive
 formulation of hourglass transformers, great care was taken to avoid information
