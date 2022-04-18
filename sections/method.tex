@@ -86,7 +86,7 @@ $\hourglassRate=3$, corresponding to three colour channels. However, if they
 were to nest the hourglass transformers further, they would run into this issue
 of one spatial dimension being downsampled more than others.
 
-\begin{figure}
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=\textwidth]{figures/resample.pdf}
     \caption{
@@ -135,7 +135,23 @@ model by avoiding the ``shifting'' operation required in the original work.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/recon.pdf}
-    \caption{Test caption}
+    \caption{
+        \gls{vqgan} does not produce entirely faithful reconstructions due to
+        being optimised for perceptual quality rather than a direct error between
+        the reconstructions and inputs. The top row shows example inputs, middle row
+        shows resulting reconstructions, and the final row shows points of interest that
+        have been modified -- some perceptually valid and others clear
+        artifacts. 
+        \textbf{Left}: The eye colour has been brightened, and hair
+        shifted to conceal a piercing, rather than reconstruct it.
+        \textbf{Middle}: The most common reconstruction artifact occurs with
+        certain types of hair, where a repeating and unrealistic pattern occurs. The
+        pose of the lip is also altered. 
+        \textbf{Right}: Another common artifact where text in images is
+        corrupted. This is common across many generative models. Additionally,
+        the model removes nose and lip piercings, in addition to altering eye
+        makeup. This is again a valid image, but does not faithfully reconstruct
+        the input.}
 \end{figure}
 
 Training at higher resolutions usually means greater computational requirements
@@ -268,7 +284,7 @@ fixed~\cite{bondtaylor2021unleashing,austin2021structured}.
 % dataset dependent..
 % we also stop early if nothing has changed.
 
-\begin{figure}[t]
+\begin{figure}[ht]
     \label{fig:sampling}
     \centering
     %\includegraphics[width=0.9\linewidth]{figures/sampling/sampling.pdf}
