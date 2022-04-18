@@ -210,22 +210,22 @@ adversarial loss~\cite{esser2021taming} in addition to a $k$-means \gls{vq}
 loss. In our implementation we minimised the following weighted loss:
 \begin{align}
 \begin{split}
-    \mathcal{L}_\text{PIX} &= \alpha_\text{PIX} \cdot |\image - \hat{\image}| \cdot \\
-    \mathcal{L}_\text{VQ} &= \alpha_\text{VQ} \cdot \left(||\hat{\latent} -
+    \mathbb{L}_\text{PIX} &= \alpha_\text{PIX} \cdot |\image - \hat{\image}| \cdot \\
+    \mathbb{L}_\text{VQ} &= \alpha_\text{VQ} \cdot \left(||\hat{\latent} -
     \latent||^2 + ||sg[\vqganEncoder(x)] - \latent||^2_2 + ||\vqganEncoder(x) -
     sg[\latent]||^2_2\right)\\
-    \mathcal{L}_\text{GAN} &= \alpha_\text{GAN} \cdot \left(\log D(x) + \log
+    \mathbb{L}_\text{GAN} &= \alpha_\text{GAN} \cdot \left(\log D(x) + \log
     (1-D(\hat{x}))\right) \\
-    \lambda &= \frac{\nabla_{G_{-1}}[\mathcal{L}_\text{PIX} +
-    \mathcal{L}_\text{PER}]}{\nabla_{G_{-1}}[\mathcal{L}_\text{GAN}] + \epsilon}\\
-    \mathcal{L} &= \mathcal{L}_\text{VQ} + \lambda \cdot \mathcal{L}_\text{GAN}\\
+    \lambda &= \frac{\nabla_{G_{-1}}[\mathbb{L}_\text{PIX} +
+    \mathbb{L}_\text{PER}]}{\nabla_{G_{-1}}[\mathbb{L}_\text{GAN}] + \epsilon}\\
+    \mathbb{L} &= \mathbb{L}_\text{VQ} + \lambda \cdot \mathbb{L}_\text{GAN}\\
     \alpha_\text{PIX} &= 1.0,\; \alpha_\text{VQ} = 1.0,\; \alpha_\text{GAN} = 0.5,\; \alpha_\text{PER} = 1.0
 \end{split}
 \end{align}
 where our discriminator is implemented using three layers, perceptual loss
-implemented using a pretrained VGG16 model~\cite{karen2014vg18}, and
-$\nabla_{G_{-1}}[\cdot]$ is the gradient with respect to the last layer of the
-\gls{vqgan} decoder.
+$\mathbb{L}_\text{PER}$ implemented using a pretrained VGG16
+model~\cite{karen2014vg18}, and $\nabla_{G_{-1}}[\cdot]$ is the gradient with
+respect to the last layer of the \gls{vqgan} decoder.
 
 This means there is less weighting on
 directly minimising the pixel-wise error between the input and reconstruction.
@@ -237,19 +237,22 @@ This even more apparent in the right reconstruction where all piercings are
 flawlessly removed.
 
 % TODO: add gpu specification
-Using vector quantized image modelling to compress images further whilst
-retaining high quality and faithful reconstructions remains an open and
-challenging area of research. In our case at very high resolutions, this is
-especially true. In our preliminary experiments, we found a higher
-$\vqganDownsample$ led to the average reconstruction being of very poor quality.
-Conversely, decreasing $\vqganDownsample$ led to latent representations of sizes
-that led to large memory requirements in the downstream \gls{sundae} prior.
+Using \gls{vq} image models to compress images further whilst retaining high
+quality and faithful reconstructions remains an open and challenging area of
+research. In our case at very high resolutions, this is especially true. In our
+preliminary experiments, we found a higher $\vqganDownsample$ led to the vast
+majority of reconstructions being of untenable quality. Conversely, decreasing
+$\vqganDownsample$ led to latent representations of sizes that led to large
+memory requirements in the downstream \gls{sundae} prior. 
+
 Furthermore, training \gls{vqgan} at this resolution is extremely
-computationally expensive -- in our configuration being limited to a total batch
-size of 4 across four GPUs. This made a full hyperparameter sweep of the other
-parameters of the model not possible. Therefore, we decided to compromise with
-good reconstructions on average, and accept occasional artifacts which could 
-potentially manifest in the final samples.
+computationally expensive -- in our configuration being limited to a global
+batch size of 4 across four, 32GiB Tesla V100 GPUs. This made a full
+hyperparameter sweep of the other parameters of the model not possible.
+Therefore, we decided to compromise with good reconstructions on average, and
+accept occasional artifacts which could potentially manifest in the final
+samples. Improving the \gls{vq} image model itself is not the focus of this
+research project.
 
 \subsection{Non-Autoregressive Generator Training}
 
