@@ -301,4 +301,30 @@ operating at a \gls{vq} latent level.
 \subsection{Limitations}
 \label{subsec:evaluationLimitation}
 
-foobar
+As a result of our evaluation, some limitations of our approach arise. One
+crucial weakness is that our \gls{vq} image model still utilises adversarial
+components within it. This potentially means that each image patch
+(corresponding to each codebook entry) could still suffer from mode collapse
+issues. However, our resulting samples are still diverse, suggesting that
+patch-wise mode collapse did not have a significant effect on the final samples.
+
+We also encountered great instability during training of our own large
+\gls{vqgan} which led to many entirely failed experiments. Additionally, the
+extreme compression ratio in the large \gls{vqgan} model resulted in occasional
+unrealistic artifacts. Though most reconstructions are of good quality, the
+occasional artifacts did result in certain samples also being corrupted. Further
+research into high compression \gls{vq} models that do not use adversarial
+components remains and open and challenging area of research. In the case where
+such a \gls{vq} model is created, it can easily be substituted into our proposed
+framework.
+
+Despite our model demonstrating extremely fast sampling, in terms of perceptual
+quality metrics, it falls short of many other
+methods~\cite{bondtaylor2021unleashing}. Though measures of perceptual quality
+such as FID are known to be flawed~\cite{chong2020effectively}, other measures
+such as density and coverage also show inferior sample
+quality~\cite{ferjad2020icml}. This is especially true on ImageNet where many
+classes merely resemble the target class -- though this is likely due to lack of
+model capacity and training time. Despite this, the resulting samples on the
+FFHQ datasets are still very diverse and of a good perceptual quality. Further
+work would no doubt improve quality in terms of FID further.
