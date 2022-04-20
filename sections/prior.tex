@@ -230,8 +230,8 @@ for variable bit-rates~\cite{zeghidour2021soundstream}. Concurrently to our
 work, \citet{lee2022rqvae} used residual \gls{vq} to represent images with a
 compression ratio of $\vqganDownsample=32$ and then trained a transformer model
 to autoregressively predict the stack of discrete tokens at a given spatial
-location, allowing for fast sampling despite actually having multiple levels of
-discrete latent representations\cite{lee2022rqvae}.
+location, allowing for fast sampling despite having multiple levels of discrete
+latent representations\cite{lee2022rqvae}.
 
 \begin{table}[ht]
     \centering
@@ -267,30 +267,29 @@ A typical strategy for selecting which codebook vector $e_i$ to map to a
 particular input is to compute the Euclidean distance between a given continuous
 input and the codebook centroid, and then pick the
 $\arg\min$~\cite{oord2017vqvae}. This is denoted the $k$-means strategy. This
-strategy does result in a phenomena known as codebook collapse, where certain
-codebook vectors never get used, harming the downstream reconstruction quality.
-An alternative method is to use the Gumbel-Softmax~\cite{jang2016gumbel} to
-select codebook vectors, which typically increases codebook utilisation but
-often leads to worse reconstruction quality~\cite{bondtaylor2021unleashing}.
+strategy can result in ``codebook collapse'', where certain codebook vectors
+never get used, limiting the effective capacity of the model. An alternative
+method is to use Gumbel-Softmax~\cite{jang2016gumbel} to select codebook
+vectors, which increases codebook utilisation but leads to worse
+reconstruction quality~\cite{bondtaylor2021unleashing}.
 
-The issue of codebook collapse is quite significant and there have been a number
+The issue of codebook collapse is significant and there have been a number
 of attempts to remediate it. \cite{yu2021vqgan} found that a lower codeword
 dimension and codeword normalization improved utilisation.
 \cite{zeghidour2021soundstream} proposed setting a threshold for ``stale'' codes,
 and reinitialisating them to a random vector from the current batch when they
 fall below this threshold. \cite{lee2022rqvae} proposed the sharing of a single
 codebook across many quantizers and additionally stochastically sampled the
-codes as a function of their distance to the centroid, rather than always taking
-the $\arg\min$.
+codes as a function of their distance to the centroid, rather than
+deterministically returning the $\arg\min$.
 
-All these previous approaches use \gls{vq} models to enhance existing
-\gls{ar} models, primarily to improve their sampling speed by reducing the
-spatial dimension we are operating over. Few work directly addresses the
-discrete prior model itself. Discrete diffusion
-models~\cite{austin2021structured} are \gls{nar} approach to generate discrete
-data. This was applied to \gls{vqgan} latents in
-\citet{bondtaylor2021unleashing}, allowing for fast sampling, flexible
-inpainting, and high fidelity outputs.
+All these previous approaches use \gls{vq} models to enhance existing \gls{ar}
+models, primarily to improve their sampling speed by reducing the spatial
+dimension we are operating over. Little work directly addresses the discrete
+prior model. Discrete diffusion models~\cite{austin2021structured} are
+\gls{nar} approach to generate discrete data. This was applied to \gls{vqgan}
+latents in \citet{bondtaylor2021unleashing}, allowing for fast sampling,
+flexible inpainting, and high fidelity outputs.
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
@@ -299,23 +298,24 @@ One recent \gls{nar} model is \gls{sundae}~\cite{savinov2022stepunrolled} which
 was evaluated on three language modelling tasks: unconditional text-generation,
 inpainting of Python code, and machine translation -- setting a new
 state-of-the-art among \gls{nar} models for the machine translation
-task~\cite{savinov2022stepunrolled}. It also demonstrates exceptionally fast
-sampling, producing high quality samples in as few as 10 steps.
+task~\cite{savinov2022stepunrolled}. It demonstrated exceptionally fast
+sampling, producing high quality text samples in as few as 10 steps.
 
-\gls{sundae} is trained using a denoising objective, akin to the
+\Gls{sundae} is trained using a denoising objective, akin to the
 BERT denoising objective~\cite{wang2019bert} but with multiple denoising steps.
 Given a uniform prior $p_0$ over some space $\latentSpace = \{1, \dots,
 \vqganNbLatents\}^N$ where $N$ is the size of the space and $v$ is the
 vocabulary size, consider the Markov process $\latent_t \sim \sundae(\cdot \vert
 \latent_{t-1})$ where $\sundae$ is a neural network parameterised by
 $\sundaeParameters$, then $\{\latent_t\}_t$ forms a Markov chain. This gives a
-$t$-step transition function: \begin{equation}\label{eq:markov} p_t(\latent_t
+$t$-step transition function: 
+\begin{equation}\label{eq:markov} p_t(\latent_t
     \vert \latent_0) = \sum\limits_{\latent_1, \dots, \latent_{t-1} \in
     \latentSpace} \prod\limits^t_{s=1} \sundae(\latent_s | \latent_{s-1})
-\end{equation}\cite{savinov2022stepunrolled} and, given a constant number of
-steps $\markovSteps$, our model distribution
-$p_\markovSteps(\latent_\markovSteps \vert \latent_0)p_0(\latent_0)$ -- which is
-clearly intractable.
+\end{equation}
+\cite{savinov2022stepunrolled} and, given a constant number of steps
+$\markovSteps$, our model distribution $p_\markovSteps(\latent_\markovSteps
+\vert \latent_0)p_0(\latent_0)$ -- which is clearly intractable.
 
 Instead, they propose an \textit{unrolled denoising} training method that uses a
 far lower $\markovSteps$ than is used for
@@ -325,13 +325,12 @@ distribution} $\latent' \sim \corruptionDistribution(\cdot \vert \latent)$
 rather than from the prior $p_0$ so the model encounters samples more akin to
 those seen during the full unroll at sample time~\cite{savinov2022stepunrolled}.
 Typically, $\markovSteps = 2$ during training, as a single step would be similar
-to the training strategy of BERT~\cite{devlin2019bert} but would lead to worse
-performance as seen in earlier work using BERT as a random field language
+to the training strategy of BERT~\cite{devlin2019bert} which not be performant
+as seen in earlier work using BERT as a random field language
 model~\cite{wang2019bert}.
 
 The training objective of \gls{sundae} is simply the average of all reconstruction
-losses $\lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} + \dots +
-\lossFunction{T} \right)$ of the chain after $t$ steps, which is shown to form
+losses of the chain after $t$ steps, which is shown to form
 an upper bound on the actual negative
 log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
 leads to a minor improvement in performance, but considerably slows down

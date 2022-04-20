@@ -1,24 +1,15 @@
-% TODO: not very conclusive, more just summarising what I did
-% hard to summarise in comment, just look at supervisor comment:
-% "In conclusion, we investigated (1 sentence at high-level) following the trend
-% of X. We found that when doing Y, Z happens. This is surprising as it
-% contradicts the findings of W, which leads us to believe that Z is more
-% important in the generative modelling problem than previously understood. This
-% follows the trend outlined of A and B, where it is clear we need to see more
-% of C. In the future, we would like to investigate C by doing W to confirm X." 
-
-In this work, we proposed using denoising autoencoders for the
-non-autoregressive prediction of \acrshort{vq} latents. This enables fast
-sampling times and flexible inpainting. In addition, we made changes to the
-hourglass transformer architecture to make it more suited for two-dimensional
-signals. Additionally, we demonstrate the scalability of our approach by
-training a \gls{vqgan} at extremely high resolutions and training our model on
-the resulting latent dataset. Ultimately, this allows for the sampling of high
-quality and diverse $1024 \times 1024$ images in mere seconds. Further work is
-required to improve sampling time further -- closing the gap with single-step
-methods like GANs -- and to improve the reconstruction quality of \gls{vqgan}
-when operating at high downsampling factors. Additionally, we note that the
-adversarial component of the \gls{vqgan} image model may still lead to issues
-such as mode collapse, which can only be resolved with research into more
-powerful \acrshort{vq} representation models that do not rely on a adversarial
-component.
+In conclusion, we investigated pushing the efficiency of generative models via
+the combination of various techniques, following the general trend in generative
+modelling of simultaneously improving quality and speed of sampling using
+non-adversarial approaches. We found that the combination of these techniques
+did indeed result in a fast generative model that was scaled to very high
+resolutions, demonstrating the usefulness of denoising autoencoders as
+generative models of discrete latents. We also improved the architecture of
+hierarchical transformers to make them more suited for multi-dimensional data.
+Despite our framework supporting very fast sampling, there is much room for
+further work. For one, better \gls{vq} image models that do not rely on
+adversarial components, to avoid patch-wise mode collapse. Secondly, a more
+through parameter search to improve the sample quality further as measured by
+perceptual quality metrics, especially in ImageNet experiments. Finally, an
+investigation into conditioning the generator model on text prompts, allowing
+for very fast text-to-image generation.
