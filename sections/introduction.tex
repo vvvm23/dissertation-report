@@ -94,29 +94,50 @@ the fastest sampling model at this resolution, with the exception of pure
 model, which was, also to our knowledge, the largest \gls{vqgan} model trained
 in terms of input size.
 
-%In this work, we aim to move towards satisfying all three key requirements for
-%an ideal generative model. Like previous work, we use a vector-quantized image
-%model to reduce the spatial dimension of the signal we wish to sample. We then
-%apply new language models to instead model the distribution of discrete latents,
-%ultimately obtaining a powerful prior over the discrete latents. With this and a
-%discrete latent decoder, we obtain the final generative model, allowing sampling
-%of images in a very low number of steps. We go further, and train our own
-%VQ-GAN~\cite{esser2021taming} at resolutions higher than ever trained before to
-%our knowledge, ultimately allowing for the sampling of $1024 \times 1024$ RGB
-%images in only two seconds on a consumer-grade GPU.
-
-Our project objectives were as follows:
+Our contributions as a result of this research project are as follows:
 \begin{itemize}
-    \item Apply \gls{sundae} to the task of \acrshort{vq} latent generation and
-        ultimately image generation, and perform analysis into their advantages
-        of being used for this task over existing approaches, including both
-        \gls{ar} and \gls{nar} solutions.
+    \item
+        The development of a \acrlong{nar}, non-adversarial generative modelling
+        framework with extremely flexible sampling including self-correction and
+        arbitrary inpainting pattern capabilities. The model can be directly
+        configured for both low- and high-step sampling, resulting in high
+        quality and diverse samples in mere seconds of sampling time.
 
-    \item Analyse the methods used in \citet{savinov2022stepunrolled} and
-        \citet{nawrot2021hierarchical} and design modifications that make these
-        approaches more suitable for \acrshort{vq} latent modelling.
+    \item
+        Modifications to methods proposed in \citet{savinov2022stepunrolled} and
+        \citet{nawrot2021hierarchical} to be more suited for modelling of
+        multi-dimensional discrete data. Though applied to discrete latents in
+        our work, the modifications are also applicable in a wider context,
+        such as to pixel-level modelling. We also demonstrate the superiority of
+        hierarchical transformers -- forming a key component in the scalability
+        of our approach. 
 
-    \item Attempt to scale our model to extremely high resolution images and
-        analyse successes and failures when operating at such resolutions. 
+    \item
+        The scaling of \gls{vqgan}~\cite{esser2021taming} to extremely high
+        resolution images of human faces. $1024 \times 1024$ images far exceeds
+        the resolutions of prior works. This ultimately allowed for the
+        \textbf{generation of megapixel images in as few as two seconds} on a
+        consumer-grade GPU when combined with our fast and scalable generative
+        framework. This is in contrast to prior \gls{ar} methods and \gls{nar}
+        diffusion methods that take minutes to generate, or have not scaled to
+        such resolutions at all.
 
 \end{itemize}
+
+%Our project objectives were as follows:
+%\begin{itemize}
+    %\item Apply \gls{sundae} to the task of \acrshort{vq} latent generation and
+        %ultimately image generation, and perform analysis into their advantages
+        %of being used for this task over existing approaches, including both
+        %\gls{ar} and \gls{nar} solutions.
+
+    %\item Analyse the methods used in \citet{savinov2022stepunrolled} and
+        %\citet{nawrot2021hierarchical} and design modifications that make these
+        %approaches more suitable for \acrshort{vq} latent modelling.
+
+    %\item Attempt to scale our model to extremely high resolution images and
+        %analyse successes and failures when operating at such resolutions. 
+
+%\end{itemize}
+
+
