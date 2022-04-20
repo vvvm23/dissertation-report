@@ -1,8 +1,5 @@
 % TODO: lacks some narrative flow between sections
 
-% TODO: end would benefit from "summary section" (not sure what that means) that
-% reflects on high level trends in the literature, building into a proposed
-% strategy and thus flowing into the methodology.
 This work builds upon much prior research into powerful deep generative
 models, self-supervised methods, and efficient
 transformer architectures. We briefly cover relevant prior work into deep
@@ -96,12 +93,6 @@ longer use the chain rule of probability to sample) the actual number of steps
 varies greatly: from single-step generation in \glspl{gan} to potentially many
 thousands in the original diffusion model literature.
 
-% TODO: discuss briefly each from of NAR model and its strengths/weaknesses
-% - [X] GAN
-% - [X] Variational autoencoders
-% - [X] SBM / DDPM
-% - [X] Normalizing flows
-
 Perhaps the most infamous class of \gls{nar} generative model -- or perhaps
 generative model overall -- are \acrfullpl{gan}~\cite{goodfellow2014gan}. These
 typically consist of two components: a generator that create images from some
@@ -131,6 +122,7 @@ distribution. Later work extended \glspl{vae} to be hierarchical, having
 multiple Gaussian priors~\cite{arash2020nvae,child2020vqvae} which were found to
 outperform purely autoregressive models.
 
+% TODO: add references for normalizing flows (eg. Glow)
 Normalizing flows are another class of generative model that allows for exact
 likelihood calculation. They consist of many invertible layers that gradually
 transform samples from a known prior distribution into samples from the data
@@ -141,32 +133,28 @@ typically must operate at the same dimensionality for each layer, making the
 training of deep networks difficult.
 
 Two paradigms that are gaining a lot of interest in recent times are
-\acrfullpl{ddpm}~\cite{ho2020ddpm} and \acrfullpl{sbm}~\cite{song2019sbm}. Both
-are variants of \glspl{ebm}, with the former learning to estimate the noise at
-various levels (which can be used to gradually move from noise to data), and the
-latter trained to remove noise, given corrupted samples from a gradually
+\acrfullpl{ddpm}~\cite{ho2020ddpm,dhariwal2021ddpm} and
+\acrfullpl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt,vahdat2021sbmlatent}.
+Both are variants of \glspl{ebm}, with the former learning to estimate the noise
+at various levels (which can be used to gradually move from noise to data), and
+the latter trained to remove noise, given corrupted samples from a gradually
 corrupting forward process. Again, this can be used to move from pure noise back
 to data. Both are slow to sample from, but produce high quality samples that
 rival those of \glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering from
 mode collapse. The slow sampling speed can be remedied using a variety of
 techniques, such as operating on a smaller latent
-space~\cite{vahdat2021sbmlatent}, devising more
-efficient SDE solvers~\cite{martineau2021fast}, or by diffusing the
-``velocities'', thus simplifying the denoising task~\cite{dockhorn2021langevin}.
-Unlike GANs, both models can also operate on discrete data, such as by first
-projecting discrete data into a continuous latent
-space~\cite{vahdat2021sbmlatent} or with a dedicated discrete diffusion
-framework~\cite{austin2021structured}, the latter of which bridges the gap
-between diffusion, autoregressive, and mask-based representation models.
-
-%Removing the causal constraints also allows for bidirectional context during
-%sampling and flexible inpainting patterns, rather than being limited to
-%left-to-right inpainting in autoregressive models.
+space~\cite{vahdat2021sbmlatent}, devising more efficient SDE
+solvers~\cite{martineau2021fast}, or by diffusing the ``velocities'', thus
+simplifying the denoising task~\cite{dockhorn2021langevin}. Unlike GANs, both
+models can also operate on discrete data, such as by first projecting discrete
+data into a continuous latent space~\cite{vahdat2021sbmlatent} or with a
+dedicated discrete diffusion framework~\cite{austin2021structured}, the latter
+of which bridges the gap between diffusion, autoregressive, and mask-based
+representation models.
 
 \subsection{Vector Quantized Image Modelling}
 \label{subsec:vqmodelling}
-% TODO: maybe add a nice table comparing all the methods
-% TODO discuss: VQ modelling in connection with generative modelling. 
+
 Learning useful representations, also known as latent codes, in an unsupervised
 manner is a key challenge in machine learning. Historically, these
 representations have been in a continuous form, but in more recent literature
@@ -188,7 +176,6 @@ model on discrete data can be used.
 
 \begin{figure}[ht!]
     \centering
-    %\includesvg[width=\textwidth]{figures/vq.svg}
     \includegraphics[width=\textwidth]{figures/vq.pdf}
     \caption{
         Visualisation of a vector-quantization image model. An encoder model
@@ -238,7 +225,7 @@ Residual \gls{vq} proposes the use of multiple codebooks to recursively quantize
 and refine the residual of an input signal. This produces multiple discrete
 representations, which can later be reconstructed by the decoder to decompress
 the waveform. Additionally, individual codebooks can be dropped out, allowing
-for variable bit-rates~\cite{zeghidour2021soundstream}. Concurrently to this
+for variable bit-rates~\cite{zeghidour2021soundstream}. Concurrently to our
 work, \citet{lee2022rqvae} used residual \gls{vq} to represent images with a
 compression ratio of $\vqganDownsample=32$ and then trained a transformer model
 to autoregressively predict the stack of discrete tokens at a given spatial
@@ -306,6 +293,7 @@ inpainting, and high fidelity outputs.
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
+
 One recent \gls{nar} model is \gls{sundae}~\cite{savinov2022stepunrolled} which
 was evaluated on three language modelling tasks: unconditional text-generation,
 inpainting of Python code, and machine translation -- setting a new
