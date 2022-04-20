@@ -4,7 +4,18 @@
 
 % TODO: kinda want to improve the sampling figure
 
-TODO: add which trends we are aiming to push(?)
+Our proposed method aims to push the efficiency of generative models to the
+limit via a combination of current techniques. To do so, we first use pretrained
+\glspl{vqgan} models from~\cite{esser2021taming} to generate a dataset of
+discrete latent representations, described in \S\ref{subsec:datasetGen}. By
+operating at a latent level, we reduce the spatial resolution for our second
+stage generator. We implement our generator as a modified hourglass transformer,
+described in \S\ref{subsec:improvedHourglass} and trained using a \gls{nar}
+method described in \S\ref{subsec:sundaeTraining}. This permits extremely fast
+sampling described in \S\ref{subsec:sundaeSampling}. To thoroughly test the
+efficiency and scalability of our approach, we train a megapixel \gls{vqgan}
+(described in \S\ref{subsec:megagan}) and repeat \gls{sundae} training and
+sampling on the resulting discrete latent representations.
 
 \subsection{Latent Dataset Generation}
 \label{subsec:datasetGen}
@@ -15,7 +26,7 @@ using \gls{vqgan}~\cite{esser2021taming} as our feature extractor. Where such mo
 are available, we use pretrained \glspl{vqgan} for our experiments. For higher
 resolution experiments (for example, FFHQ1024~\cite{karras2019stylebased}),
 pretrained models are not available and so the training our own VQ-GAN was necessary
-(see \S\ref{sec:megagan}).
+(see \S\ref{subsec:megagan}).
 
 The second stage is to train a discrete prior model over the extracted latent variables.
 To enable this, we first built a latent dataset using our trained \gls{vqgan}.
@@ -148,7 +159,7 @@ considerations to avoid information leaking into the future. This simplifies the
 model by avoiding ``shifting'' and causal masking operations required in the original work.
 
 \subsection{Training a megapixel VQ-GAN}
-\label{sec:megagan}
+\label{subsec:megagan}
 
 \begin{figure}[ht]
     \label{fig:recon}
