@@ -390,6 +390,20 @@ selection of high level trends.
 \textbf{Autoregressive to non-autoregressive models} -- 
 
 \textbf{Class conditional to zero-shot conditional generative models} -- 
+One especially popular trend is the shift from specifying a set of predefined
+classes when conditioning a model, to full zero-shot generation. This is usually
+realised by jointly learning text and image embeddings, then encoding a text
+prompt at test time to condition the
+model~\cite{ramesh2021dalle,ramesh2022dalle2,rombach2021highresolution,lee2022rqvae}.
+This allows for a much higher degree of creative control -- an all too often
+overlooked property -- and can be easily integrated with existing architectures.
+However, they require large amounts of labelled images and associated text
+prompts, usually scraped from the
+internet~\cite{rombach2021highresolution,ramesh2021dalle,ramesh2022dalle2}. This
+makes bias and dangerous content introduced by the training data much harder to
+control and filter, potentially influencing the resulting
+samples~\cite{mishkin2022risks}. Nonetheless, it is clear that the natural
+language conditioning of generative models will persist.
 
 \textbf{Use of a vector-quantized discrete prior} -- 
 Though \gls{vq} models have helped produce excellent results both within
@@ -402,14 +416,14 @@ diffusion
 models~\cite{song2019sbm,song2020sde,dhariwal2021ddpm,song2021mlt,xiao2021trilemma,vahdat2021sbmlatent,martineau2021fast,dockhorn2021langevin}.
 A particularly powerful advantage of using a \gls{vq}-based approach is the
 compression of the spatial resolution that the generator model must operate
-over, aiding in scaling to higher resolutions. However, the two-stage training
-approach can be unwieldy in the absence of pretrained \gls{vq} models and
-additionally makes inpainting more involved. Additionally, they are plagued with
-issues such as codebook
+over, aiding in scaling to higher resolutions and improving sampling speeds.
+However, the two-stage training approach can be unwieldy in the absence of
+pretrained \gls{vq} models and additionally makes inpainting more involved.
+Additionally, they are plagued with issues such as codebook
 collapse~\cite{esser2021taming,bondtaylor2021unleashing,yu2021vqgan}, limiting
-the potential capacity of the model. It remains to be seen whether
-\gls{vq} models will continue being a key component in the generative modelling
-pipeline, or be rendered obsolete.
+the potential capacity of the model. It remains to be seen whether \gls{vq}
+models will continue being a key component in the generative modelling pipeline,
+or be rendered obsolete.
 
 \textbf{The Generative Modelling Trilemma} -- 
 

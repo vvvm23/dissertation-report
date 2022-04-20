@@ -217,8 +217,9 @@ loss:
 \end{align}
 \cite{esser2021taming} where our discriminator is implemented using three
 layers, perceptual loss $L_\text{PER}$ implemented using a pretrained VGG16
-model~\cite{karen2014vg18}, and $\nabla_{G_{-1}}[\cdot]$ is the gradient with
-respect to the last layer of the \gls{vqgan} decoder $\vqganDecoder$. The
+model~\cite{karen2014vg18}, $\nabla_{G_{-1}}[\cdot]$ is the gradient with
+respect to the last layer of the \gls{vqgan} decoder $\vqganDecoder$, and
+$sg[.]$ is the stop-gradient operator. The
 generator and discriminator model parameters are updated separately, as is
 standard procedure in \gls{gan}-based literature~\cite{esser2021taming}.
 
