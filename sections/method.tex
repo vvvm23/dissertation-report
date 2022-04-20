@@ -5,6 +5,8 @@
 % TODO: kinda want to improve the sampling figure
 
 \subsection{Latent Dataset Generation}
+\label{subsec:datasetGen}
+
 We use the standard two-stage scheme for vector-quantized image
 modelling~\cite{oord2018neural,razavi2019generating,esser2021taming,bondtaylor2021unleashing}
 using \gls{vqgan}~\cite{esser2021taming} as our feature extractor. Where such models
@@ -46,6 +48,8 @@ denoising using \gls{sundae}, and then decoding the final latents using the
 work in this paper.
 
 \subsection{2D-Aware Hourglass Transformer}
+\label{subsec:improvedHourglass}
+
 Inspired by successes in hierarchical transformers for generative language
 modelling~\cite{nawrot2021hierarchical}, we modify their architecture for use
 with discrete latent representations of image data. We will later use this
@@ -247,6 +251,7 @@ project. Ultimately, we found these artifacts to only appear rarely in the final
 samples, shown in \S\ref{subsec:evaluationUnconditional}.
 
 \subsection{Non-Autoregressive Generator Training}
+\label{subsec:sundaeTraining}
 
 We train a \gls{sundae} model on the flattened (in a raster-scan format)
 extracted \gls{vq} latents $\latent = \{\latent^{(0)}, \dots, \latent^{(N)}\}$
@@ -343,6 +348,7 @@ fixed~\cite{bondtaylor2021unleashing,austin2021structured}.
 % TODO: a figure could be really nice too.
 
 \subsection{Generating High-Resolution Images}
+\label{subsec:sundaeSampling}
 
 \begin{figure}[ht]
     \label{fig:sampling}
@@ -409,6 +415,8 @@ produced at each step reveals the model gradually denoises the latent and does
 indeed self-correct errors accumulated during the sampling process.
 
 \subsection{Arbitrary Pattern Inpainting}
+\label{subsec:inpainting}
+
 As noted in the original work~\cite{savinov2022stepunrolled} and other
 non-autoregressive solutions~\cite{bondtaylor2021unleashing}, one clear
 advantage of non-autoregressive models is that they are not limited to causal
