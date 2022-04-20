@@ -392,6 +392,24 @@ selection of high level trends.
 \textbf{Class conditional to zero-shot conditional generative models} -- 
 
 \textbf{Use of a vector-quantized discrete prior} -- 
+Though \gls{vq} models have helped produce excellent results both within
+generative
+modelling~\cite{razavi2019generating,esser2021taming,bondtaylor2021unleashing,rombach2021highresolution,ramesh2021dalle,yu2021vqgan,lee2022rqvae}
+and elsewhere~\cite{zeghidour2021soundstream}, excellent results can also be
+obtained without the use of
+them~\cite{child2020vqvae,arash2020nvae,hazami2022efficient}, especially with
+diffusion
+models~\cite{song2019sbm,song2020sde,dhariwal2021ddpm,song2021mlt,xiao2021trilemma,vahdat2021sbmlatent,martineau2021fast,dockhorn2021langevin}.
+A particularly powerful advantage of using a \gls{vq}-based approach is the
+compression of the spatial resolution that the generator model must operate
+over, aiding in scaling to higher resolutions. However, the two-stage training
+approach can be unwieldy in the absence of pretrained \gls{vq} models and
+additionally makes inpainting more involved. Additionally, they are plagued with
+issues such as codebook
+collapse~\cite{esser2021taming,bondtaylor2021unleashing,yu2021vqgan}, limiting
+the potential capacity of the model. It remains to be seen whether
+\gls{vq} models will continue being a key component in the generative modelling
+pipeline, or be rendered obsolete.
 
 \textbf{The Generative Modelling Trilemma} -- 
 
