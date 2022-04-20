@@ -4,110 +4,87 @@
 
 % TODO: research questions are a bit fragmented -- lacking a united and salient
 % narrative.
-An ideal deep generative model would satisfy three key requirements:
-high-quality samples, sample diversity via mode coverage, and computational
+An ideal deep generative model satisfies three key requirements: high-quality
+samples, mode coverage leading to high sample diversity, and computational
 inexpensive sampling. Arguably, there are other desirable properties such as a
-meaningful latent space and exact likelihood calculation, however no current
-generative model can satisfy all three requirements -- let alone additional
-attractive properties -- thus forming the so-called generative modelling
-trilemma~\cite{xiao2021trilemma}.
+meaningful latent space, exact likelihood calculation, and controlled
+generation. Nonetheless, no current generative model satisfies all three key
+requirements -- let alone additional attractive properties -- forming the
+so-called generative modelling trilemma~\cite{xiao2021trilemma} that dominates
+modern generative modelling research.
 
-Models such as \glspl{gan}~\cite{goodfellow2014gan}
-excel at high-quality and fast sampling, but often fail to model the entire data
-distribution due to not directly optimising for likelihood -- using an
-adversarial loss as a proxy. \Glspl{vae}~\cite{kingma2013vae} offer
-excellent mode coverage and fast sampling speeds, but the resulting samples are
-often blurry even at small resolutions, and have little hope of scaling to
-greater resolutions like \glspl{gan}.
+Models such as \glspl{gan}~\cite{goodfellow2014gan} excel at high-quality and
+fast sampling, but often fail to model the entire data distribution due to not
+directly optimising for likelihood -- using an adversarial loss as a proxy.
+\Glspl{vae}~\cite{kingma2013vae} offer excellent mode coverage and fast sampling
+speeds, but the resulting samples are blurry, even at small resolutions, and
+cannot scale to higher resolutions like a \glspl{gan}.
 
 \Gls{ar} models such as PixelSnail~\cite{chen2017snail}, Image
-Transformer~\cite{parmar2018image}, and DALL-E~\cite{parmar2018image} have
-demonstrated respectable sample quality and mode coverage, even including
+Transformer~\cite{parmar2018image}, and DALL·E~\cite{parmar2018image} have
+demonstrated respectable sample quality and mode coverage, even extending to
 zero-shot image generation~\cite{ramesh2021dalle}. However, they are
-computationally expensive to sample from, requiring many network iterations,
-making them infeasible for interactive applications. \Glspl{ddpm}~\cite{ho2020ddpm}
-and \glspl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt} produce
-samples that rival or even exceed the quality of \glspl{gan}~\cite{dhariwal2021ddpm}
-whilst still providing good mode coverage, but are still plagued by potentially
+computationally expensive to sample from, requiring many network iterations to
+produce a single sample. This makes them infeasible for interactive
+applications. \Glspl{ddpm}~\cite{ho2020ddpm} and
+\glspl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt} produce samples that
+rival or even exceed the quality of \glspl{gan}~\cite{dhariwal2021ddpm} whilst
+providing good mode coverage, but are still plagued by potentially
 requiring thousands of network evaluations.
 
 Vector-quantized image
 modelling~\cite{oord2017vqvae,razavi2019generating,esser2021taming} alleviates
 sampling speed issues in \gls{ar} methods by reducing the spatial dimension at
-which \gls{ar} sampling occurs. This results in excellent quality samples whilst
-improving sampling speeds, but often requires a two-stage approach and still
-does not match the speed of \glspl{gan}. Recent work has applied \gls{vq}
-methods to diffusion models~\cite{bondtaylor2021unleashing} allowing for fast
-parallel decoding. Other work does not use vector-quantized spaces, but latent
-spaces nonetheless, to accelerate
-sampling~\cite{xiao2021trilemma,vahdat2021sbmlatent}.
+which discrete \gls{ar} priors operate at. This results in excellent quality
+samples whilst improving sampling speeds, but mandates a two-stage training
+approach and does not match the sampling speed of \glspl{gan}. Recent work has
+applied diffusion models to \gls{vq} latents~\cite{bondtaylor2021unleashing}
+allowing for fast parallel sampling. Other recent work uses continuous latent
+spaces to accelerate sampling~\cite{xiao2021trilemma,vahdat2021sbmlatent}.
 
-From this brief overview of generative modelling literature, it is clear that
-indeed no single model satisfies all three conditions. This therefore motivates
-research into explicitly addressing this trilemma. In this work, we move towards
-such a solution, beginning from existing work applying generative models to
-discrete latents. This provides an excellent starting point in terms of sample
-quality and a respectable amount of mode coverage, but an unacceptably slow
-sampling speed despite the reduced spatial dimension of the discrete latent
-space. We directly address this issue by instead sampling discrete latents using
-modern \gls{nar} generative models in an effort to close the gap, sampling speed
-wise, with constant iteration complexity models such as \glspl{gan}.
-Specifically, we use discrete \gls{sundae}~\cite{savinov2022stepunrolled} to
-gradually denoise samples from a uniform prior into one that matches the prior
-over the discrete latent space defined by a pre-trained \gls{vqgan} model. We find
-that \gls{sundae} are an effective discrete prior over \gls{vqgan} latents.
+From this brief overview of generative modelling, it is clear that indeed no
+single model satisfies all three conditions. This motivates research into
+explicitly addressing this trilemma. In this work, we move towards such a
+solution, beginning from existing work applying generative models to discrete
+latents. This provides an excellent starting point in terms of sample quality
+and a respectable amount of mode coverage, but an unacceptably slow sampling
+speed despite the reduced spatial dimension of the discrete latent space. We
+address this issue by instead sampling discrete latents using modern \gls{nar}
+generative models in an effort to close the gap, sampling speed wise, with
+constant iteration complexity models such as \glspl{gan}. Specifically, we use
+discrete \gls{sundae}~\cite{savinov2022stepunrolled} to gradually denoise
+samples from a uniform prior into one that matches the prior over the discrete
+latent space defined by a pre-trained \gls{vqgan} model. We find that
+\gls{sundae} are an effective discrete prior over \gls{vqgan} latents.
 
-These discrete \gls{sundae} models have only previously be applied to language
-modelling tasks~\cite{savinov2022stepunrolled}. In their work, they used
-transformer~\cite{vaswani2017attention} architectures to form their autoencoder.
-In parallel, a noticeably more efficient variant of transformers -- the
-Hourglass Transformer~\cite{nawrot2021hierarchical} -- was released, which has a
-hierarchical architecture aimed at language, but also evaluated on pixel-level
-image modelling tasks. Though able to be applied to discrete latent modelling,
-we proposed a number of improvement that improve performance further on
-multi-dimensional discrete data, including modifications to resampling
-operations and axial positional embeddings. Though evaluated on discrete
-latents, these modifications are also applicable in any scenario with
-multi-dimensional inputs. In addition, we found recommended parameters proposed
-in \citet{savinov2022stepunrolled} did not always generalise to
-multi-dimensional data, and so we additionally propose new default values.
+\Gls{sundae} has only previously be applied to language modelling
+tasks~\cite{savinov2022stepunrolled} using
+transformer~\cite{vaswani2017attention} architectures to implement their
+autoencoder. Parallel work introduced a drastically more efficient variant of
+transformers -- the Hourglass Transformer~\cite{nawrot2021hierarchical} -- ,
+leveraging a hierarchical architecture aimed at language modelling. Though able
+to be applied to discrete latent modelling, we propose a number of improvement
+that improve performance on multi-dimensional discrete data, including
+modifications to resampling operations and introduction of axial positional
+embeddings. Though evaluated on discrete latents, these modifications are also
+applicable in any scenario with multi-dimensional inputs, which will be valuable
+in a wider context outside of generative modelling. We also found recommended
+parameters proposed in \citet{savinov2022stepunrolled} did not always generalise
+to multi-dimensional data, so we explore new sensible defaults in this work.
 
-%This raises a second research question,
-%whether the approach introduced in~\citet{savinov2022stepunrolled} is also
-%suited for latent modelling, and whether the hierarchical approach introduced
-%in~\citet{nawrot2021hierarchical} can be further improved upon. As a result of
-%our studies, we find that although they are suited for latent modelling, there
-%are modifications that can improve performance further. These include
-%modifications to the down- and up-sampling operations, as well as axial
-%positional embeddings in hourglass architectures~\cite{nawrot2021hierarchical}
-%when operating on multi-dimensional sequences; removal of causal masking, and
-%differences in parameters for \gls{sundae} training and sampling when applied to
-%discrete latents rather than natural language.
-
-Given a fast sampling and an efficient transformer architecture, we are left
-with a highly scaleable generative model, with respect to number of layers and
-spatial resolution of the input. Specifically, only a minority of the layer are
+Given a fast sampling and efficient transformer architecture, we now possess
+a highly scaleable generative model, with respect to number of layers and
+spatial resolution of the input. Only a minority of the layer are
 operating at the same resolution as the input, reducing the cost of expensive
 self-attention across the input. Conversely, we can scale the number of layers
 more cheaply by adding layers only at the downsampled resolution, allowing for
-considerably larger models with only a minor computational cost. To demonstrate
+considerably larger models with a minor computational cost. To demonstrate
 the scalability of our approach, we train a \gls{vqgan} operating on $1024
 \times 1024$ images and apply our framework to the resulting discrete latent
 codes. This ultimately resulted in the synthesis of megapixel images in as few
 as 2 seconds on a consumer-grade GPU. To our knowledge, this is the largest
 \gls{vqgan} trained in terms of input size, and the fastest sampling,
-non-adversarial generative framework at this sample resolution.
-
-%This
-%raises a third and final research question, whether our new approach allows for
-%the generation of extremely high resolution images in a time frame that would
-%permit fully- or near-interactive use. Again, as a result of our studies, we
-%find that this is indeed the case, proven by the synthesis of $1024 \times 1024$
-%images in as few as 2 seconds on a consumer-grade GPU. To our knowledge, this is
-%the fastest sampling model at this resolution, with the exception of pure
-%\gls{gan}-based approaches. This required the training of our own \gls{vqgan}
-%model, which was, also to our knowledge, the largest \gls{vqgan} model trained
-%in terms of input size.
+non-adversarial generative framework at this image resolution.
 
 Our contributions as a result of this research project are as follows:
 \begin{itemize}
@@ -115,8 +92,8 @@ Our contributions as a result of this research project are as follows:
         The development of a \acrlong{nar}, non-adversarial generative modelling
         framework with extremely flexible sampling including self-correction and
         arbitrary inpainting pattern capabilities. The model can be directly
-        configured for both low- and high-step sampling, resulting in high
-        quality and diverse samples in mere seconds of sampling time.
+        configured for both low- and high-step sampling scenarios, resulting in
+        high quality and diverse samples in mere seconds of sampling time.
 
     \item
         Modifications to methods proposed in \citet{savinov2022stepunrolled} and
@@ -130,11 +107,11 @@ Our contributions as a result of this research project are as follows:
     \item
         The scaling of \gls{vqgan}~\cite{esser2021taming} to extremely high
         resolution images of human faces. $1024 \times 1024$ images far exceeds
-        the resolutions of prior works. This ultimately allowed for the
+        the resolutions of prior work. This ultimately allowed for the
         \textbf{generation of megapixel images in as few as two seconds} on a
         consumer-grade GPU when combined with our fast and scalable generative
         framework. This is in contrast to prior \gls{ar} methods and \gls{nar}
         diffusion methods that take minutes to generate, or have not scaled to
-        such resolutions at all.
+        such resolutions entirely.
 
 \end{itemize}

@@ -1,16 +1,15 @@
 % TODO: lacks some narrative flow between sections
 
-This work builds upon much prior research into powerful deep generative
-models, self-supervised methods, and efficient
-transformer architectures. We briefly cover relevant prior work into deep
-generative models in general in \S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a
-particular \acrshort{nar} generative model we wish to build upon in
-\S\ref{subsec:sundae}, and a recent and highly effective development into a
-efficient transformer architecture in \S\ref{subsec:hourglass}. For a full
-review on generative modelling we direct the reader to
+This work builds upon much prior research into powerful deep generative models,
+self-supervised methods, and efficient transformer architectures. We cover
+relevant prior work into deep generative models in
+\S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a specific \acrshort{nar}
+generative model \gls{sundae} \S\ref{subsec:sundae}, and a recent development
+into a efficient transformer architecture in \S\ref{subsec:hourglass}. For a
+full review on generative modelling we direct the reader to
 \citet{bondtaylor2021review}, and for further details on \gls{sundae} and
-hourglass transformers we direct the reader to \citet{savinov2022stepunrolled}
-and \citet{nawrot2021hierarchical} respectively.
+hourglass transformers to \citet{savinov2022stepunrolled} and
+\citet{nawrot2021hierarchical} respectively.
 
 \begin{figure}[ht!]
     \centering
@@ -33,17 +32,18 @@ and \citet{nawrot2021hierarchical} respectively.
 
 \subsection{Autoregressive Generative Models}
 \label{subsec:agm}
-One major deep generative model family is \acrfull{ar} models, characterised by
+
+One major deep generative model family are \acrfull{ar} models, characterised by
 a training and inference process based on the probabilistic chain rule. During
-training, they directly aim to maximise the likelihood of the data they are
+training, they learn to maximise the likelihood of the data they are
 trained on, which leads to excellent mode coverage. Prior work using these
 methods resulted in impressive results in terms of both sample quality and
-diversity, but are ultimately unwieldy for use in real world applications due to
+diversity, but are ultimately impractical in real world applications due to
 their slow sampling speed.
 
 The slow sampling speed is due to their sequential nature, defined by the chain
 rule of probability. Given an input $\image = \{ \pixel{1}, \pixel{2}, \dots,
-\pixel{n} \}$, an \gls{ar} model $p_\theta(\cdot)$ can generates new
+\pixel{n} \}$, an \gls{ar} model $p_\theta(\cdot)$ generates new
 samples sequentially:
 \begin{equation}\label{eq:ar}
     p_\theta(\image) = p_\theta(\pixel{1}, \dots, \pixel{n}) =
@@ -52,6 +52,7 @@ samples sequentially:
 meaning that the number of sampling steps is equal to the size of the
 decomposition of $\image$, making this slow for large inputs.
 
+% TODO: add order agnostic citation
 For certain tasks, the ordering of the decomposition of $\image$ is obvious, for
 example on text or speech. For images this is less obvious, however typically a
 raster scan ordering is used. Certain \gls{ar} models are order-agnostic,
@@ -59,62 +60,64 @@ allow for arbitrary ordering to be used during training and inference.
 
 One class of \gls{ar} models are \glspl{rnn} which are an early example of using
 neural networks to model sequential data, such as text, audio, time-series data,
-or even vector handwriting strokes. Though they can be used as purely
-classification or regression models, they are also suited for use as generative
-models by modelling the relationship shown in Equation~\ref{eq:ar}. They do
-suffer from a number of issues, most notably vanishing
-gradients~\cite{pascanu2012rnn} and inability to model long-range relationships
-between items in the input. \Glspl{lstm}~\cite{hoch1997lstm} improved upon them
-further by introducing dedicated memory units, allowing for the modelling of
-longer range relationships. Later \glspl{gru}~\cite{cho2014gru} simplified the
-architecture whilst still retaining good performance. With the advent of
-transformer architectures~\cite{vaswani2017attention}, modelling even longer
-relationships became possible, even at a full-document level. It also intro cued
-the capability to train on all sequence elements in parallel through the use of
-causal masking, therefore not violating the autoregressive property.
+or even handwriting strokes. Though they can be used as classification or
+regression models, they are also suited for use as generative models by
+modelling the relationship in Equation~\ref{eq:ar}. They suffer from a number of
+issues, most infamously vanishing gradients~\cite{pascanu2012rnn} and inability
+to model long-range relationships between items in the input.
+\Glspl{lstm}~\cite{hoch1997lstm} improved upon \glspl{rnn} further by
+introducing dedicated memory units, allowing for the modelling of longer range
+relationships. \Glspl{gru}~\cite{cho2014gru} simplified \gls{lstm} architecture
+whilst retaining good performance. With the advent of transformer
+architectures~\cite{vaswani2017attention}, modelling even longer relationships
+became possible, even at a full-document level. It also introduced the
+capability to train on all sequence elements in parallel through the use of
+causal masking, therefore not violating the autoregressive property. Inference
+must still be done in a serial manner, however.
 
 Applying \gls{ar} models to images followed a similar trend.
 PixelRNN~\cite{oord2016pixelrnn} used two-dimensional recurrent layers and
 residual connections to model the distribution of raw pixel values. The same
-paper also introduced PixelCNN, which it claims had worse performance but were
-faster to train. These were extended to allow for conditional generation
+paper also introduced PixelCNN, which was claimed to have worse performance but
+were faster to train. These were extended to allow for conditional generation
 in~\cite{oord2016pixelcnn}. Later work augmented PixelCNN with self-attention
-mechanism, forming PixelSnail~\cite{chen2017snail}, which can therefore model
-longer relationships than a fully convolutional or recurrent architecture. Image
+mechanism, forming PixelSnail~\cite{chen2017snail}, which can model
+longer relationships than a convolutional or recurrent architecture. Image
 Transformer~\cite{parmar2018image} later applied transformer architectures to
-the same task through an effective but altogether conceptually simple approach.
+the same task through an effective but conceptually simple approach.
 
 \subsection{Non-autoregressive Generative Models}
 \label{subsec:nagm}
+
 \Acrfull{nar} generative models include \glspl{gan}, \glspl{sbm} and
 \glspl{ddpm}, flow-based models, \glspl{ebm}, and implicit models. Though the
 number of sampling steps is now independent of the data dimensionality (as we no
 longer use the chain rule of probability to sample) the actual number of steps
-varies greatly: from single-step generation in \glspl{gan} to potentially many
-thousands in the original diffusion model literature.
+required varies greatly: from single-step generation in \glspl{gan} to
+potentially many thousands in early diffusion models.
 
 Perhaps the most infamous class of \gls{nar} generative model -- or perhaps
-generative model overall -- are \acrfullpl{gan}~\cite{goodfellow2014gan}. These
-typically consist of two components: a generator that create images from some
-latent variable (in the most basic case just random noise), and a discriminator
-that tries to distinguish images from the dataset from images generated by the
-generator network~\cite{goodfellow2014gan}. They are known for high-fidelity
-samples, fast sampling, unstable training, and tendency to collapse onto certain
-modes of the underlying distribution due to not optimising directly for
-likelihood. This is reflected in its relatively low-diversity samples.
-Nonetheless, the quality of the samples has made them a popular choice in a
-variety of applications, including unconditional and conditional
-generation~\cite{tero2018stylegan,andrew2018biggan} image, audio
-synthesis~\cite{liu2020audiogan}, style transfer~\cite{zhu2017cyclegan}. They
-can even be applied to discrete data~\cite{autume2019scratchgan}, but are less
-effective on such domains due to the non-differentiability of discrete samples.
+generative model altogether -- are \acrfullpl{gan}~\cite{goodfellow2014gan}.
+\Glspl{gan} consist of two models: a generator that creates images from a latent
+variable, and a discriminator that attempts to distinguish images from the
+dataset from images generated by the generator network~\cite{goodfellow2014gan}.
+They are known for high-fidelity samples, fast sampling, unstable training, and
+tendency to collapse onto a subset of modes of the underlying distribution due
+to not optimising directly for likelihood. This is reflected in its relatively
+low-diversity samples. Nonetheless, the quality of the samples has made them a
+popular choice in a variety of applications, including unconditional and
+conditional generation~\cite{tero2018stylegan,andrew2018biggan} image, audio
+synthesis~\cite{liu2020audiogan}, and style transfer~\cite{zhu2017cyclegan}.
+They can even be applied to discrete data~\cite{autume2019scratchgan}, but are
+less effective on such domains due to the non-differentiability of discrete
+samples.
 
 Another class of generative model are \acrfullpl{vae}~\cite{kingma2013vae} which
-allow for sampling in a single forward pass like \glspl{gan}, but are trained to
-directly maximise likelihood. Specifically, \glspl{vae} map inputs to latent
-variables that follow some easy to sample from, but still sufficiently complex,
-prior distribution. A common choice is a multivariate Gaussian with diagonal
-covariance~\cite{kingma2013vae}. A decoder network maps these latent codes back
+permit sampling in a single forward pass like \glspl{gan}, but are trained to
+maximise likelihood. Specifically, \glspl{vae} map inputs to latent variables
+that follow some easy to sample from, but sufficiently complex, prior
+distribution. A common choice is a multivariate Gaussian with diagonal
+covariance~\cite{kingma2013vae}. A decoder network maps latent codes back
 to the data distribution. Although this approach is successful on small
 datasets, on more complex datasets the samples and reconstructions tend to
 become blurry, suggesting a simple prior is unable to perfectly fit the
@@ -127,52 +130,52 @@ Normalizing flows are another class of generative model that allows for exact
 likelihood calculation. They consist of many invertible layers that gradually
 transform samples from a known prior distribution into samples from the data
 distribution. Each transformation must satisfy two properties: being invertible
-and having an easy to compute Jacobian (allowing easy rescaling). This makes the
-architecture quite restrictive, making them less parameter efficient. They also
-typically must operate at the same dimensionality for each layer, making the
-training of deep networks difficult.
+and having an easy to compute Jacobian for the purposes of scaling. This makes
+the architectural choices restrictive, making them less parameter efficient.
+They also typically must operate at the same dimensionality for each layer,
+making the training of deep networks difficult.
 
-Two paradigms that are gaining a lot of interest in recent times are
+Two paradigms of high interest in recent work are
 \acrfullpl{ddpm}~\cite{ho2020ddpm,dhariwal2021ddpm} and
 \acrfullpl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt,vahdat2021sbmlatent}.
 Both are variants of \glspl{ebm}, with the former learning to estimate the noise
-at various levels (which can be used to gradually move from noise to data), and
-the latter trained to remove noise, given corrupted samples from a gradually
-corrupting forward process. Again, this can be used to move from pure noise back
-to data. Both are slow to sample from, but produce high quality samples that
-rival those of \glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering from
-mode collapse. The slow sampling speed can be remedied using a variety of
+at various levels (which can be used to iteratively move from noise to data),
+and the latter trained to remove noise, given corrupted samples from a gradually
+corrupting forward process. Again, this is then used to move from pure noise
+back to data. Both are slow to sample from, but produce high quality samples
+that rival those of \glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering
+from mode collapse. The slow sampling speed can be remedied using a variety of
 techniques, such as operating on a smaller latent
 space~\cite{vahdat2021sbmlatent}, devising more efficient SDE
-solvers~\cite{martineau2021fast}, or by diffusing the ``velocities'', thus
-simplifying the denoising task~\cite{dockhorn2021langevin}. Unlike GANs, both
-models can also operate on discrete data, such as by first projecting discrete
-data into a continuous latent space~\cite{vahdat2021sbmlatent} or with a
-dedicated discrete diffusion framework~\cite{austin2021structured}, the latter
+solvers~\cite{martineau2021fast}, or by diffusing ``velocities'', thus
+simplifying the denoising task~\cite{dockhorn2021langevin}. Unlike \glspl{gan},
+both models can operate on discrete data, such as by first projecting
+discrete data into a continuous latent space~\cite{vahdat2021sbmlatent} or with
+a dedicated discrete diffusion framework~\cite{austin2021structured}, the latter
 of which bridges the gap between diffusion, autoregressive, and mask-based
-representation models.
+representation models such as BERT~\cite{devlin2019bert}.
 
 \subsection{Vector Quantized Image Modelling}
 \label{subsec:vqmodelling}
 
-Learning useful representations, also known as latent codes, in an unsupervised
-manner is a key challenge in machine learning. Historically, these
-representations have been in a continuous form, but in more recent literature
-they are often discrete. An early example of this is
-\gls{vqvae}~\cite{oord2017vqvae}, a variant on \gls{vae} representation models.
-A \gls{vqvae} has three main components: an encoder network, a codebook, and a
-decoder. The encoder network outputs a compressed representation of the input,
-and the codebook $\vqganCodebook$ quantizes these representations, outputting a
-discretized representation of indices from $1$ to the codebook size
-$\vqganNbLatents$. Each index $i$ maps to one of the codebook embeddings $e_i$.
-The decoder then maps the quantized embeddings back to the original signal,
-training it in tandem to reconstruct the input signal and to minimize additional
-codebook loss terms~\cite{oord2017vqvae}. Once a trained \gls{vqvae} model has
-been produced, a powerful auxiliary generative model can be trained to generate
-these discrete latent representations and then the decoder can produce the final
-sample. In the original work on \gls{vqvae}, they use a PixelCNN model to
-generate the discrete latent codes~\cite{oord2017vqvae}, though any generative
-model on discrete data can be used.
+Learning useful latent representations, also known as latent codes, in an
+unsupervised manner is a key challenge in machine learning. Historically, these
+representations have been in a continuous form, but in recent work they are
+often discrete. An early example of this is \gls{vqvae}~\cite{oord2017vqvae}, a
+variant on \gls{vae} representation models. A \gls{vqvae} has three main
+components: an encoder network, a codebook, and a decoder. The encoder network
+outputs a compressed representation of the input, and the codebook
+$\vqganCodebook$ quantizes these representations, outputting a discretized
+representation of indices from $1$ to the codebook size $\vqganNbLatents$. Each
+index $i$ maps to one of the codebook embeddings $e_i$. The decoder then maps
+the quantized embeddings back to the original signal, training it in tandem to
+reconstruct the input signal and to minimize additional codebook loss
+terms~\cite{oord2017vqvae}. Once a trained \gls{vqvae} model has been produced,
+a powerful auxiliary generative model can be trained to generate these discrete
+latent representations. The decoder can then generate the final sample given the
+discrete latent representation. In the original work on \gls{vqvae}, they use a
+PixelCNN model to generate the discrete latent codes~\cite{oord2017vqvae},
+though any generative model on discrete data can be used.
 
 \begin{figure}[ht!]
     \centering
@@ -191,13 +194,13 @@ model on discrete data can be used.
 
 Later approaches extended \gls{vqvae} to multiple distinct codebooks in
 \acrshort{vqvae}-2~\cite{razavi2019generating}. Though theoretically it can be
-extended to any number of codebooks, they performed experiments on a two-level
-and three-level model, applying the latter to $1024 \times 1024$ images. They
-then sampled the resulting combined discrete codes use
-PixelSnail~\cite{chen2017snail}, each code conditioned on all previous levels in
-the hierarchy. Though faster to sample than applying a generative directly to
-pixels, at such a resolution and with multiple levels to sample, sampling times
-were still slow.
+extended to any number of codebooks, they experimented on two-level and
+three-level models, applying the latter to $1024 \times 1024$ images. They then
+sampled the resulting combined discrete codes using multiple
+PixelSnail~\cite{chen2017snail} models, each code conditioned on all previous
+levels in the hierarchy. Though faster to sample than applying a generative
+directly to pixels, at such a resolution and with multiple levels to sample,
+sampling times were still very slow.
 
 Aside from sampling autoregressively, a reason for the slow sampling speed was
 the large spatial resolution of the discrete codes. Albeit smaller than the
@@ -205,20 +208,18 @@ original signal, \gls{vqvae} is limited in how much it can compress the signal
 via a simple reconstruction objective before it loses too much perceptual
 quality due to the rate-distortion trade-off. For example, the original
 \gls{vqvae} only has a downsampling rate of
-$\vqganDownsample=4$~\cite{oord2017vqvae} and \gls{vqvae}-2 has a rate of
-top-level rate of $\vqganDownsample=32$ but requires a total of three discrete
-latent codes in order to achieve this~\cite{razavi2019generating}. By
-introducing perceptual and adversarial loss terms,
-\gls{vqgan}~\cite{esser2021taming} is able to achieve compression rates of
-$\vqganDownsample=16 \sim 32$ with only a single discrete latent representation
-whilst retaining high quality reconstructions~\cite{esser2021taming}. The
-greater weighting on perceptual and adversarial loss does mean, however, that
-\gls{vqgan} does sometimes edit its reconstructions, rather than attempt to
-preserve all details perfectly like when using a simple reconstruction loss
-alone. Later, improvements such as differential data
-augmentation~\cite{bondtaylor2021unleashing}, codebook improvements, and a
-transformer-based architecture~\cite{yu2021vqgan} improved reconstruction
-quality further.
+$\vqganDownsample=4$~\cite{oord2017vqvae} and \gls{vqvae}-2 has a top-level rate
+of $\vqganDownsample=32$ but requires a total of three discrete latent codes in
+order to achieve this~\cite{razavi2019generating}. By introducing perceptual and
+adversarial loss terms, \gls{vqgan}~\cite{esser2021taming} is able to achieve
+compression rates of $\vqganDownsample=16 \sim 32$ with only a single discrete
+latent representation whilst retaining high quality
+reconstructions~\cite{esser2021taming}. However, the greater weighting on
+perceptual and adversarial loss does mean that \gls{vqgan} sometimes edits its
+reconstructions, rather than reconstruct faithfully. Later, improvements such as
+differential data augmentation~\cite{bondtaylor2021unleashing}, codebook
+improvements, and a transformer-based architecture~\cite{yu2021vqgan} improved
+reconstruction quality further, but still rely on adversarial components.
 
 Originally designed for audio compression~\cite{zeghidour2021soundstream},
 Residual \gls{vq} proposes the use of multiple codebooks to recursively quantize
