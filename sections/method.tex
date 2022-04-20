@@ -15,18 +15,26 @@ method described in \S\ref{subsec:sundaeTraining}. This permits extremely fast
 sampling described in \S\ref{subsec:sundaeSampling}. To thoroughly test the
 efficiency and scalability of our approach, we train a megapixel \gls{vqgan}
 (described in \S\ref{subsec:megagan}) and repeat \gls{sundae} training and
-sampling on the resulting discrete latent representations.
+sampling on the resulting discrete latent representations. In
+\S\ref{subsec:inpainting}, we explore flexible inpainting using our framework.
+
+Each component represents the pinnacle of performance in their respective areas:
+compression ratio in \gls{vq} image models with \gls{vqgan}, fast \acrlong{nar}
+sampling of discrete data with \gls{sundae}, and transformer scalability with
+our modified hourglass transformer. Together, we obtain an extremely efficient
+generative model that permits sampling at $1024 \times 1024$ resolution in mere
+seconds.
 
 \subsection{Latent Dataset Generation}
 \label{subsec:datasetGen}
 
 We use the standard two-stage scheme for vector-quantized image
 modelling~\cite{oord2018neural,razavi2019generating,esser2021taming,bondtaylor2021unleashing}
-using \gls{vqgan}~\cite{esser2021taming} as our feature extractor. Where such models
-are available, we use pretrained \glspl{vqgan} for our experiments. For higher
-resolution experiments (for example, FFHQ1024~\cite{karras2019stylebased}),
-pretrained models are not available and so the training our own VQ-GAN was necessary
-(see \S\ref{subsec:megagan}).
+using \gls{vqgan}~\cite{esser2021taming} as our feature extractor. Where such
+models are available, we use pretrained \glspl{vqgan} for our experiments. For
+higher resolution experiments (for example,
+FFHQ1024~\cite{karras2019stylebased}), pretrained models are not available and
+so the training our own VQ-GAN was necessary (see \S\ref{subsec:megagan}). 
 
 The second stage is to train a discrete prior model over the extracted latent variables.
 To enable this, we first built a latent dataset using our trained \gls{vqgan}.
