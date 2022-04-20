@@ -399,6 +399,15 @@ quality requirements with a non-adversarial solution would in turn satisfy the
 so-called Generative Modelling Trilemma~\cite{xiao2021trilemma}.
 
 \textbf{Autoregressive to non-autoregressive models} -- 
+\Gls{nar} models offer a number of advantages over \gls{ar} models as discussed
+in earlier sections. It is clear that \gls{nar} solutions will soon be a default
+over \gls{ar} methods, seen by observing initial proposed methods and
+subsequent improvements often replace \gls{ar} components with \gls{nar}
+components. For example: sampling \gls{vqgan} latents with \gls{ar}
+transformers~\cite{esser2021taming} to discrete diffusion
+models~\cite{bondtaylor2021unleashing}; DALL·E using \gls{ar}
+sampling~\cite{ramesh2021dalle} to DALL·E 2 using diffusion
+models~\cite{ramesh2022dalle2}.
 
 \textbf{Class conditional to zero-shot conditional generative models} -- 
 One especially popular trend is the shift from specifying a set of predefined
