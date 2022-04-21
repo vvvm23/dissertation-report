@@ -1,12 +1,3 @@
-% TODO: could use some high level diagram of the method at the start of the
-% section (acting as a bit of a map)?
-% TODO: in general, more assertive language would be good. 
-
-% TODO: kinda want to improve the sampling figure
-% TODO: before eq 4 too empirical 
-% TODO: "good default choice" not scientific
-% TODO: "great care"
-% TODO: subsubsection on implementation details
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1.0\linewidth]{figures/overall.pdf}
@@ -153,12 +144,12 @@ of the discrete prior model, and suspect a similar approach could improve
 performance if applied to pixels directly, which we leave for future work to
 confirm.
 
-For all experiments, we use the linear resampling method proposed
-in~\cite{nawrot2021hierarchical} as this was the recommended option for image
-data. In addition, attention layers are applied directly after resampling as
-this led to best results on both image and text datasets in the original
-work~\cite{nawrot2021hierarchical}. This means our adjusted resampling method is
-as follows:
+For our resampling operations, we use linear resampling (following
+recommendation by \cite{nawrot2021hierarchical} to use linear resampling on
+image tasks) and a post-resampling attention layer, providing global context to
+the resampling operations and aggregating information
+globally~\cite{nawrot2021hierarchical}. This means our adjusted resampling
+method is as follows:
 \begin{equation}
     h' = A(\hourglassResample^{(\intercal)} \cdot R(\vh) + \vr), \;\; \hourglassResample \in
     \mathbb{R}^{\frac{(d \cdot h \cdot w)}{\hourglassRate} \times (d \cdot h \cdot w)}
@@ -169,26 +160,28 @@ modified reshape operation, $d$ is the hidden layer dimension, and $W$ is a
 learned projection matrix. The reshape operation $R$ was implemented as a
 space-to-depth operation followed by combining the feature and depth dimensions.
 
-\textbf{Rotary Positional Embeddings}~\cite{su2021roformer} are a good default
-choice for injecting positional information into transformer models, requiring
-no additional parameters. Additionally, they can be easily extended to the
-multi-dimensional case~\cite{rope-eleutherai} which we exploit here. Though
-transformers are clearly capable of learning that elements far apart in a
-flattened sequence may be close in a multi-dimensional final output, we found
-that explicitly extending positional embeddings to the multi-dimensional case to
-provide a modest boost in performance and improve the rate of training
-convergence. The original hourglass transformer on pixel-wise generation also
-opted to use rotary embeddings~\cite{nawrot2021hierarchical}. They note also
-that rotary embeddings have the advantage of being compatible with any
-self-attention mechanism.
+\textbf{Rotary Positional Embeddings} -- Transformers have no inductive biases
+that allow it inherently know the position of an element in the sequence.
+Embeddings that represent positions must be injected into the model in addition
+to the input itself. In our work, we choose to use rotary positional
+embeddings~\cite{su2021roformer} as they require no additional parameters, incur
+only a small runtime cost, and can be easily extended to the multi-dimensional
+case~\cite{rope-eleutherai}, which we exploit here. Though transformers are
+clearly capable of learning that elements far apart in a flattened sequence may
+be close in a multi-dimensional final output, we found that explicitly extending
+positional embeddings to the multi-dimensional case to provide a modest boost in
+performance and improve the rate of training convergence. The original hourglass
+transformer on pixel-wise generation also opted to use rotary
+embeddings~\cite{nawrot2021hierarchical}. They note also that rotary embeddings
+have the advantage of being compatible with any self-attention mechanism.
 
 \textbf{Removal of Causal Constraints} -- In the original autoregressive
-formulation of hourglass transformers, great care was taken to avoid information
-leaking during resampling, and hence making the model
-non-causal~\cite{nawrot2021hierarchical}. We use a non-autoregressive method
-which is therefore not causal. Hence, in our approach we do not make any special
-considerations to avoid information leaking into the future. This simplifies the
-model by avoiding ``shifting'' and causal masking operations required in the original work.
+formulation of hourglass transformers they noted that naively resampling could
+leak to information leakage into future sequence elements -- therefore violating
+the autoregressive property~\cite{nawrot2021hierarchical}. As our approach is
+\gls{nar} we do not make any special considerations to avoid information leaking
+into the future. This simplifies the model by avoiding ``shifting'' and causal
+masking operations required in the original work.
 
 \subsection{Training a megapixel VQ-GAN}
 \label{subsec:megagan}
@@ -338,49 +331,6 @@ and consequently the updating of parameters $\sundaeParameters$. Though the
 default $\markovSteps = 2$ performed well, we found $\markovSteps = 3$ to result
 in more diverse samples.
 
-All models are trained using the Adam optimizer~\cite{kingma2014adam} as
-realised in its AdamW implementation in PyTorch~\cite{paszke2019pytorch}.
-Similarly, all models and training scripts are implemented in PyTorch. For
-unconditional generation on $256 \times 256$ images, training was done on a
-single 24GiB Nvidia RTX TITAN GPU. For unconditional generation on $1024 \times
-1024$ images, training was done on a single 32GiB V100 GPU. Finally, for
-conditional generation on ImageNet, training was done on a single 80GiB A100
-GPU.
-
-\begin{table}
-    \centering
-    \begin{tabular}{|c||c c||c||c c||c||}
-    \hline
-    \textbf{Dataset} & \textbf{FFHQ-256} & \textbf{FFHQ-1024} & \textbf{CelebA}
-                     & \textbf{MNIST} & \textbf{FashionMNIST} &
-                     \textbf{ImageNet} \\
-    \hline
-    Dataset Size & $60,000$ & $60,000$ & $190,000$ & $60,000$ & $60,000$ & $1.28$M \\
-    Codebook Size & $1024$ & $8192$ & $1024$ & $256$ & $256$ & $1024$ \\
-    Latent Shape & $16 \times 16$ & $32 \times 32$ & $16 \times 16$ & $28 \times
-                 28$ & $28 \times 28$ & $16 \times 16$ \\
-    Unroll Steps & 3 & 3 & 3 & 2 & 2 & 3 \\
-    \hline
-    Depth & $3-10-3$ & $2-12-2$ & $2-12-2$ & $2-8-2$ & $2-8-2$ & $3-14-3$\\
-    Dimension & 1024 & 1024 & 1024 & 1024 & 1024 & 1024 \\
-    Shorten Factor & 4 & 4 & 4 & 4 & 4 & 4 \\
-    Attention Heads & 8 & 8 & 8 & 8 & 8 & 12 \\
-    Resample Type & Linear & Linear & Linear & Linear & Linear & Linear \\
-    \hline
-    Classes & -- & -- & -- & 10 & 10 & 1000 \\
-    Class Dimension & -- & -- & -- & 1024 & 1024 & 1024 \\
-    \hline
-    \end{tabular}
-    \caption{
-        Table of parameters for all training experiments. Depth is
-        represented as three numbers corresponding to number of layers before
-        downsampling, number of downsampled layers, and number of layers after
-        upsampling. The dataset size is the size of the training split of the
-        dataset. The latent shape of MNIST experiments is exactly equal to the
-        shape of $\image$, as for these experiments we operate directly on a
-        (discretized) pixel-level.
-    }
-\end{table}
 An alternative corruption distribution would be to instead use a deterministic
 method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with
 $M_{i,j} = 1$ with a special masking token. This bears some similarity to
@@ -471,3 +421,52 @@ inpainting at a pixel level. The definition of the \gls{vq} mask $\vqMask$ means
 that some pixels outside the mask may also be altered if the pixel mask is not
 perfectly aligned with the \gls{vq} mask. We found in practise this had little
 effect on the perceptual quality of the outputs.
+
+\subsubsection*{Implementation Details}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c||c c||c||c c||c||}
+    \hline
+    \textbf{Dataset} & \textbf{FFHQ-256} & \textbf{FFHQ-1024} & \textbf{CelebA}
+                     & \textbf{MNIST} & \textbf{FashionMNIST} &
+                     \textbf{ImageNet} \\
+    \hline
+    Dataset Size & $60,000$ & $60,000$ & $190,000$ & $60,000$ & $60,000$ & $1.28$M \\
+    Codebook Size & $1024$ & $8192$ & $1024$ & $256$ & $256$ & $1024$ \\
+    Latent Shape & $16 \times 16$ & $32 \times 32$ & $16 \times 16$ & $28 \times
+                 28$ & $28 \times 28$ & $16 \times 16$ \\
+    Unroll Steps & 3 & 3 & 3 & 2 & 2 & 3 \\
+    \hline
+    Depth & $3-10-3$ & $2-12-2$ & $2-12-2$ & $2-8-2$ & $2-8-2$ & $3-14-3$\\
+    Dimension & 1024 & 1024 & 1024 & 1024 & 1024 & 1024 \\
+    Shorten Factor & 4 & 4 & 4 & 4 & 4 & 4 \\
+    Attention Heads & 8 & 8 & 8 & 8 & 8 & 12 \\
+    Resample Type & Linear & Linear & Linear & Linear & Linear & Linear \\
+    \hline
+    Classes & -- & -- & -- & 10 & 10 & 1000 \\
+    Class Dimension & -- & -- & -- & 1024 & 1024 & 1024 \\
+    \hline
+    \end{tabular}
+    \caption{
+        Table of parameters for all training experiments. Depth is
+        represented as three numbers corresponding to number of layers before
+        downsampling, number of downsampled layers, and number of layers after
+        upsampling. The dataset size is the size of the training split of the
+        dataset. The latent shape of MNIST experiments is exactly equal to the
+        shape of $\image$, as for these experiments we operate directly on a
+        (discretized) pixel-level.
+    }
+    \label{tab:parameters}
+\end{table}
+
+All \gls{sundae} models are trained using the Adam optimizer~\cite{kingma2014adam} as
+realised in its AdamW implementation in PyTorch~\cite{paszke2019pytorch}.
+Similarly, all models and training scripts are implemented in PyTorch. For
+unconditional generation on $256 \times 256$ images, training was done on a
+single 24GiB Nvidia RTX TITAN GPU. For unconditional generation on $1024 \times
+1024$ images, training was done on a single 32GiB V100 GPU. Finally, for
+conditional generation on ImageNet, training was done on a single 80GiB A100
+GPU. All parameters used for training the \gls{sundae} models are shown in
+Table~\ref{tab:parameters}.
+
