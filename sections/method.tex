@@ -3,6 +3,29 @@
 % TODO: in general, more assertive language would be good. 
 
 % TODO: kinda want to improve the sampling figure
+% TODO: before eq 4 too empirical 
+% TODO: "good default choice" not scientific
+% TODO: "great care"
+% TODO: subsubsection on implementation details
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.0\linewidth]{figures/overall.pdf}
+    \caption{
+        An overview of the \gls{sundae} training and sampling of discrete latent
+        representations. Above the dashed line represents the process for
+        training, whereas below the dotted line represents the sampling process.
+        The training process begins by sampling $\latent \sim \latentDataset$
+        and then sampling from the corruption distribution $q(\latent_0 \vert
+        \latent)$. \Gls{sundae} then denoises for 2 to 3 steps, computing the
+        cross-entropy loss at each step in the chain which is subsequently
+        averaged to produce a final loss. Sampling begins by obtaining $\latent_0$
+        from a uniform prior and iteratively denoising for more steps than
+        trained with. At each step in the chain, the sample $\latent_t$ can be
+        decoded by the \gls{vqgan} decoder $\vqganDecoder$ to obtain $\sample_t$.
+    }
+    \label{fig:overall}
+\end{figure}
+
 
 Our proposed method aims to push the efficiency of generative models to the
 limit via a combination of current techniques. To do so, we first use pretrained
@@ -71,6 +94,22 @@ work in this paper.
 \subsection{2D-Aware Hourglass Transformer}
 \label{subsec:improvedHourglass}
 
+\begin{figure}[htp]
+    \label{fig:resample}
+    \centering
+    \includegraphics[width=\textwidth]{figures/resample.pdf}
+    \caption{
+        \textbf{Top:} Showing effect of resampling sequence embeddings using
+        original formulation. Resampling rate will be applied to only one axis,
+        resulting in resampling more in only one axis of the decoded image.
+        \textbf{Bottom:} Our corrected method of resampling, extracting first
+        two-dimensional patches of size $\sqrt{\hourglassRate}$, then applying
+        resampling. The sequence is then again be flattened and passed to
+        subsequent transformer layers.
+    }
+\end{figure}
+
+
 Inspired by successes in hierarchical transformers for generative language
 modelling~\cite{nawrot2021hierarchical}, we modify their architecture for use
 with discrete latent representations of image data. We will later use this
@@ -104,21 +143,6 @@ resampled with a rate of $\hourglassRate=3$, corresponding to three colour
 channels. However, if they were to resample again by nesting the hourglass
 transformers, issue of one spatial dimension being
 downsampled more than others would then occur.
-
-\begin{figure}[ht!]
-    \label{fig:resample}
-    \centering
-    \includegraphics[width=\textwidth]{figures/resample.pdf}
-    \caption{
-        \textbf{Top:} Showing effect of resampling sequence embeddings using
-        original formulation. Resampling rate will be applied to only one axis,
-        resulting in resampling more in only one axis of the decoded image.
-        \textbf{Bottom:} Our corrected method of resampling, extracting first
-        two-dimensional patches of size $\sqrt{\hourglassRate}$, then applying
-        resampling. The sequence is then again be flattened and passed to
-        subsequent transformer layers.
-    }
-\end{figure}
 
 In our formulation, we instead reshape the flattened sequence back into its a
 two-dimensional formulation and then apply resampling equally in the last two axes.
@@ -274,25 +298,6 @@ samples, shown in \S\ref{subsec:evaluationUnconditional}.
 
 \subsection{Non-Autoregressive Generator Training}
 \label{subsec:sundaeTraining}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=1.0\linewidth]{figures/overall.pdf}
-    \caption{
-        An overview of the \gls{sundae} training and sampling of discrete latent
-        representations. Above the dashed line represents the process for
-        training, whereas below the dotted line represents the sampling process.
-        The training process begins by sampling $\latent \sim \latentDataset$
-        and then sampling from the corruption distribution $q(\latent_0 \vert
-        \latent)$. \Gls{sundae} then denoises for 2 to 3 steps, computing the
-        cross-entropy loss at each step in the chain which is subsequently
-        averaged to produce a final loss. Sampling begins by obtaining $\latent_0$
-        from a uniform prior and iteratively denoising for more steps than
-        trained with. At each step in the chain, the sample $\latent_t$ can be
-        decoded by the \gls{vqgan} decoder $\vqganDecoder$ to obtain $\sample_t$.
-    }
-    \label{fig:overall}
-\end{figure}
 
 We train a \gls{sundae} model on the flattened (in a raster-scan format)
 extracted \gls{vq} latents $\latent = \{\latent^{(0)}, \dots, \latent^{(N)}\}$
