@@ -372,32 +372,26 @@ fixed~\cite{bondtaylor2021unleashing,austin2021structured}.
 \subsection{Generating High-Resolution Images}
 \label{subsec:sundaeSampling}
 
-\begin{figure}[ht]
-    \label{fig:sampling}
-    \centering
+%\begin{figure}[ht]
+    %\label{fig:sampling}
+    %\centering
     %\includegraphics[width=0.9\linewidth]{figures/sampling/sampling.pdf}
-    \begin{overpic}[percent,grid=false,tics=2,width=0.9\linewidth]{figures/sampling/sampling.pdf}
-        \put(6, 3){\tiny$\latent_0 \sim U(1, v)$}
-        \put(31, 3){\tiny$\latent_1$}
-        \put(66, 3){\tiny$\latent_{T-1}$}
-        \put(88, 3){\tiny$\latent_T$}
-        \put(10, 31){$\vqganDecoder$}
-        \put(31, 31){$\vqganDecoder$}
-        \put(67, 31){$\vqganDecoder$}
-        \put(88, 31){$\vqganDecoder$}
-        \put(48, 16){$\dots$}
-        \put(9, 60){\tiny$\sample_0$}
-        \put(31, 60){\tiny$\sample_1$}
-        \put(67, 60){\tiny$\sample_{\markovSteps - 1}$}
-        \put(88, 60){\tiny$\sample_\markovSteps$}
-    \end{overpic}
 
-    \caption{The sampling process. SUNDAE gradually denoises from $\latent_0$ to
-    the final sample $\latent_\markovSteps$. At each step, it is possible to
-    decode with $\vqganDecoder$ to produce a final image. By doing so, it
-    reveals the model gradually denoises the latent $\latent$ and is capable of
-    correcting errors accumulated during sampling.}
+    %\caption{The sampling process. SUNDAE gradually denoises from $\latent_0$ to
+    %the final sample $\latent_\markovSteps$. At each step, it is possible to
+    %decode with $\vqganDecoder$ to produce a final image. By doing so, it
+    %reveals the model gradually denoises the latent $\latent$ and is capable of
+    %correcting errors accumulated during sampling.}
+%\end{figure}
+
+\begin{figure}[ht]
+    \label{fig:overall}
+    \centering
+    \includegraphics[width=1.0\linewidth]{figures/overall.pdf}
+
+    \caption{Test caption}
 \end{figure}
+
 
 During sampling, we simply sample sequentially $\latent_t \sim \sundae(\latent_t
 \vert \latent_{t-1})$ for a constant number of steps $\markovSteps$, beginning
