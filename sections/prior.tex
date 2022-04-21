@@ -52,11 +52,11 @@ samples sequentially:
 meaning that the number of sampling steps is equal to the size of the
 decomposition of $\image$, making this slow for large inputs.
 
-% TODO: add order agnostic citation
 For certain tasks, the ordering of the decomposition of $\image$ is obvious, for
 example on text or speech. For images this is less obvious, however typically a
-raster scan ordering is used. Certain \gls{ar} models are order-agnostic,
-allow for arbitrary ordering to be used during training and inference.
+raster scan ordering is used~\cite{parmar2018image}. Certain \gls{ar} models are
+order-agnostic~\cite{hoogeboom2021autoregressive}, allow for arbitrary ordering
+to be used during training and inference.
 
 One class of \gls{ar} models are \glspl{rnn} which are an early example of using
 neural networks to model sequential data, such as text, audio, time-series data,
@@ -127,13 +127,14 @@ outperform purely autoregressive models.
 
 % TODO: add references for normalizing flows (eg. Glow)
 Normalizing flows are another class of generative model that allows for exact
-likelihood calculation. They consist of many invertible layers that gradually
-transform samples from a known prior distribution into samples from the data
-distribution. Each transformation must satisfy two properties: being invertible
-and having an easy to compute Jacobian for the purposes of scaling. This makes
-the architectural choices restrictive, making them less parameter efficient.
-They also typically must operate at the same dimensionality for each layer,
-making the training of deep networks difficult.
+likelihood calculation~\cite{dinh2014nice,dinh2016density,kingma2018glow}. They
+consist of many invertible layers that gradually transform samples from a known
+prior distribution into samples from the data distribution. Each transformation
+must satisfy two properties: being invertible and having an easy to compute
+Jacobian for the purposes of scaling~\cite{dinh2014nice,dinh2016density}. This
+makes the architectural choices restrictive, making them less parameter
+efficient. They also typically must operate at the same dimensionality for each
+layer, making the training of deep networks difficult.
 
 Two paradigms of high interest in recent work are
 \acrfullpl{ddpm}~\cite{ho2020ddpm,dhariwal2021ddpm} and
@@ -329,9 +330,9 @@ to the training strategy of BERT~\cite{devlin2019bert} which not be performant
 as seen in earlier work using BERT as a random field language
 model~\cite{wang2019bert}.
 
-The training objective of \gls{sundae} is simply the average of all reconstruction
-losses of the chain after $t$ steps, which is shown to form
-an upper bound on the actual negative
+The training objective of \gls{sundae} is simply the average of all
+reconstruction losses of the chain after $t$ steps, which is shown to form an
+upper bound on the actual negative
 log-likelihood~\cite{savinov2022stepunrolled}. Taking more steps $\markovSteps$
 leads to a minor improvement in performance, but considerably slows down
 training time~\cite{savinov2022stepunrolled} and increases memory usage.
