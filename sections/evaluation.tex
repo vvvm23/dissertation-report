@@ -3,8 +3,6 @@
 % "because of hyp Z, we tried X and found Y, shown in fig A"
 % feels a bit "aimless" of a scientific approach.
 
-% TODO: shift all figures up a bit
-
 \subsection{Unconditional Image Generation}
 \label{subsec:evaluationUnconditional}
 
@@ -154,34 +152,33 @@ $\temperature$ (Figure~\ref{fig:temp}), and sample proportion
 unconditional samples in Figures~\ref{fig:main} \& \ref{fig:face}.
 
 Figure~\ref{fig:step} demonstrates a surprising property of our model:
-additional steps during the sampling process does not improve sample quality
+additional steps during the sampling process do not improve sample quality
 further. It is important to note that this only holds if the other parameters
-remain fixed. Therefore, this does not suggest that additional sampling steps
-are always detrimental to performance, as a low number of steps will result in
-very poor quality results. Rather, it indicates that merely adding more sampling
-steps is not sufficient in our framework, and other parameters must also be
-adjusted.
+remain fixed. Therefore, the results do not suggest that additional sampling
+steps are always detrimental to performance, as a low number of steps will
+clearly result in poor quality results. Rather, it indicates that merely
+adding more sampling steps is not sufficient in our framework, and other
+parameters must also be adjusted to reflect a greater time budget.
 
 Figure~\ref{fig:step} shows that picking a temperature in the range of $0.5$ to
-$0.7$ leads to best sample quality across a large set of samples. However, this
-no doubt has an effect on sample diversity. Our model is capable of sampling
-with a higher temperature at the cost of occasionally producing corrupted
-examples. Figure~\ref{fig:prop} confirms the result in
-\citet{savinov2022stepunrolled} that sampling with a lower proportion leads to
-higher sample quality. However, it should be noted that in low-step scenarios,
-low proportions cannot be used effectively as the majority of elements in
-$\latent_t$ will not have enough opportunities to update, and so the resulting
-sample will be of low quality.
+$0.7$ leads to best sample quality across a large set of samples, at the cost of
+reduced diversity. Our model is capable of sampling with a higher temperature at
+the cost of occasionally producing corrupted examples. Figure~\ref{fig:prop}
+confirms the result in \citet{savinov2022stepunrolled} that sampling with a
+lower proportion leads to higher sample diversity. However, in low-step
+scenarios, low proportions cannot be used effectively as the majority of
+elements in $\latent_t$ will not have enough opportunities to update, resulting
+in low quality outputs.
 
 The result samples shown in Figures~\ref{fig:main} \& \ref{fig:face} demonstrate
 that our model is capable of generating high quality and diverse samples. Our
 aim was to push the efficiency of generative models to their limit, however we
 were still surprised at precisely how fast the model could generate --
-particularly on megapixel sized experiments. The samples in
-Figure~\ref{fig:main} were created in a mere 2 seconds on a GTX 1080Ti, which
-could no doubt be pushed further with more powerful hardware and further
-optimisation. This is unparalleled speed, significantly faster than prior
-non-adversarial solutions at this resolution.
+particularly on megapixel scale experiments. The samples in
+Figure~\ref{fig:main} were created in a mere 2 seconds on a GTX 1080Ti. This can
+be improved further with more powerful hardware and further optimisation. This
+kind of speed is unparalleled; significantly faster than prior non-adversarial
+solutions at this resolution.
 
 \subsection{Conditional Image Generation}
 \label{subsec:evaluationConditional}
@@ -255,35 +252,48 @@ control its generation. We explore class-conditioned image generation of
 ImageNet at $256 \times 256$ resolution, using the pretrained ImageNet
 \gls{vqgan} checkpoints provided by the original work~\cite{esser2021taming}. 
 
-There are many ways to integrate class conditioning to a generative model. One
-solution is to pass a one-hot or embedding vector of the classes as an auxiliary
-input to the model. We use another simple solution, to add an additional
-embedding layer containing one embedding for each of the 1000 classes present in
-ImageNet. This approach was done in Image Transformer~\cite{parmar2018image} and
-was found to be effective. 
+There are many valid ways of injecting a conditioning signal into generative
+models, for example passing one-hot or embedding class vectors. We use a simple
+solution proposed in~\cite{parmar2018image} to add a learned class embedding to
+every input position. To test whether their proposed method can also be applied
+to \gls{sundae}, we conducted an experiment on discretized MNIST-style
+datasets. To do so without a trained \gls{vqgan}, we treat each of the possible
+8-bit greyscale colours as if it were a codebook index, resulting in
+$\vqganNbLatents = 256$ -- generating pixels directly rather than image patches.
+The result of the experiments are shown in Figure~\ref{fig:mnist} and
+demonstrate that \gls{sundae} can indeed incorporate a conditioning signal in
+this manner.
 
-It was not immediately apparent whether this method would also work for
-\gls{sundae}, so before running expensive ImageNet experiments we first did some
-preliminary experiments on class-conditioned, pixel-wise, \gls{nar} generation
-on two MNIST-style datasets: MNIST and Fashion-MNIST. These experiments can be
-done, despite not having an associated \gls{vqgan} model, by treating each
-possible 8-bit greyscale colour as if it were an index into a discrete codebook
-of size $2^8$. Once sampled, we simply output the discrete values directly to
-produce a final image. These preliminary experiments showed us that \gls{sundae}
-can successfully use class information using this simple approach, seen in
-Figure~\ref{fig:mnist}.
+%There are many ways to integrate class conditioning to a generative model. One
+%solution is to pass a one-hot or embedding vector of the classes as an auxiliary
+%input to the model. We use another simple solution, to add an additional
+%embedding layer containing one embedding for each of the 1000 classes present in
+%ImageNet. This approach was done in Image Transformer~\cite{parmar2018image} and
+%was found to be effective. 
+
+%It was not immediately apparent whether this method would also work for
+%\gls{sundae}, so before running expensive ImageNet experiments we first did some
+%preliminary experiments on class-conditioned, pixel-wise, \gls{nar} generation
+%on two MNIST-style datasets: MNIST and Fashion-MNIST. These experiments can be
+%done, despite not having an associated \gls{vqgan} model, by treating each
+%possible 8-bit greyscale colour as if it were an index into a discrete codebook
+%of size $2^8$. Once sampled, we simply output the discrete values directly to
+%produce a final image. These preliminary experiments showed us that \gls{sundae}
+%can successfully use class information using this simple approach, seen in
+%Figure~\ref{fig:mnist}.
 
 Despite this, our model fails to produce reasonable samples for all classes
-present in the dataset. On classes representing large scenes such as landscapes,
+present in ImageNet. On classes representing large scenes such as landscapes,
 the samples are convincing and diverse, however for classes requiring
 fine-grained detail the outputs merely resemble the target class. Results of
 conditional generation with four classes are shown in Figure~\ref{fig:imagenet}.
-Due to this, we did not compute perceptual metrics as the sample quality was
-known to be insufficient via inspection alone. This could be a result of lack of
-model capacity or training time, or the conditioning signal tested on MNIST
-being insufficient for ImageNet. The training of an effective conditional model
-is left for future work, as is support for zero-shot image generation using text
-prompts~\cite{ramesh2021dalle}.
+Due to this, we chose not to compute perceptual metrics as the sample quality
+was clearly insufficient via inspection alone. This could be a result of lack of
+model capacity, lack of training time, or the conditioning strategy tested on
+MNIST being insufficient for ImageNet. The training of an effective conditional
+model is left for future work, as is support for zero-shot image generation
+using text
+prompts~\cite{ramesh2021dalle,ramesh2022dalle2,rombach2021highresolution}.
 
 %A relatively new method of providing a conditioning signal is to instead provide
 %natural language prompts, and learn the joint distribution of prompts and
