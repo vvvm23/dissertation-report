@@ -6,7 +6,7 @@
 \subsection{Unconditional Image Generation}
 \label{subsec:evaluationUnconditional}
 
-\begin{figure}[ht!]
+\begin{figure}
     \centering
     \begin{subfigure}[b]{0.33\textwidth}
         \centering
@@ -40,7 +40,7 @@
     \label{fig:step}
 \end{figure}
 
-\begin{figure}[ht!]
+\begin{figure}
     \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
@@ -73,7 +73,7 @@
     \label{fig:temp}
 \end{figure}
 
-\begin{figure}[ht!]
+\begin{figure}
     \begin{subfigure}[b]{0.33\textwidth}
         \centering
         \resizebox{\textwidth}{!}{
@@ -106,7 +106,7 @@
     \label{fig:prop}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}
     \centering
     \begin{subfigure}[b]{0.47\textwidth}
         \centering
@@ -291,9 +291,7 @@ Due to this, we chose not to compute perceptual metrics as the sample quality
 was clearly insufficient via inspection alone. This could be a result of lack of
 model capacity, lack of training time, or the conditioning strategy tested on
 MNIST being insufficient for ImageNet. The training of an effective conditional
-model is left for future work, as is support for zero-shot image generation
-using text
-prompts~\cite{ramesh2021dalle,ramesh2022dalle2,rombach2021highresolution}.
+model is left for future work.
 
 %A relatively new method of providing a conditioning signal is to instead provide
 %natural language prompts, and learn the joint distribution of prompts and
@@ -314,7 +312,7 @@ prompts~\cite{ramesh2021dalle,ramesh2022dalle2,rombach2021highresolution}.
 \subsection{Arbitrary Image Inpainting}
 \label{subsec:evaluationInpainting}
 
-\begin{figure}[ht]
+\begin{figure}[h]
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
