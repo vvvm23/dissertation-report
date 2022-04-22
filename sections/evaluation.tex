@@ -3,17 +3,10 @@
 % "because of hyp Z, we tried X and found Y, shown in fig A"
 % feels a bit "aimless" of a scientific approach.
 
+% TODO: shift all figures up a bit
+
 \subsection{Unconditional Image Generation}
 \label{subsec:evaluationUnconditional}
-
-We evaluate our method on the task of unconditional image generation on datasets
-FFHQ256, FFHQ1024, CelebA, LSUN Churches, and LSUN Bedrooms. For LSUN we use
-pretrained \gls{vqgan} checkpoints provided by~\cite{bondtaylor2021unleashing},
-and for all other unconditional experiments we use checkpoints from the original
-work~\cite{esser2021taming}. We evaluate in terms of raw perceptual quality and
-coverage, as well as how these metrics are affected by the various
-hyperparameters of our model and parameters of the sampling process -- the
-latter of which we found to be highly configurable.
 
 \begin{figure}[ht!]
     \centering
@@ -46,6 +39,7 @@ latter of which we found to be highly configurable.
         sample quality decreases with number of sampling steps, seen on
         all metrics and datasets.
     }
+    \label{fig:step}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -78,6 +72,7 @@ latter of which we found to be highly configurable.
         of $\temperature$ falls in the range $0.5-0.7$. However, this range may
         differ depending on the other choice of parameters.
     }
+    \label{fig:temp}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -110,6 +105,7 @@ latter of which we found to be highly configurable.
         other parameters, but again the optimal range may differ if other
         parameters are changed.
     }
+    \label{fig:prop}
 \end{figure}
 
 \begin{figure}[ht]
@@ -130,6 +126,7 @@ latter of which we found to be highly configurable.
         }
     \end{subfigure}
     \caption{Unconditional generation on $256 \times 256$ face datasets.}
+    \label{fig:face}
 \end{figure}
 
 \begin{figure}[ht]
@@ -137,17 +134,96 @@ latter of which we found to be highly configurable.
     \begin{subfigure}[b]{\textwidth}
         \centering
         \includegraphics[width=1.0\textwidth]{figures/nearest-ffhq256.png}
-        \caption{
-            FFHQ256 samples and nearest neighbours from the dataset, based on LPIPS
-            perceptual loss. Left-most column is a sample from our trained
-            model, followed then by nearest neighbours, increasing in distance
-            from left-to-right.
-        }
     \end{subfigure}
+    \caption{
+        FFHQ256 samples and nearest neighbours from the dataset, based on LPIPS
+        perceptual loss. Left-most column is a sample from our trained
+        model, followed then by nearest neighbours, increasing in distance
+        from left-to-right.
+    }
 \end{figure}
+
+We evaluate our method on the task of unconditional image generation on datasets
+FFHQ256, FFHQ1024, and CelebA. We use pretrained \gls{vqgan} checkpoints
+provided by the original \gls{vqgan} authors~\cite{esser2021taming}. We evaluate
+our models using FID Infinity~\cite{chong2020effectively}, Coverage, and
+Density~\cite{ferjad2020icml}, plotting how these metrics change as number of
+sampling steps $\markovSteps$ (Figure~\ref{fig:step}), sampling temperature
+$\temperature$ (Figure~\ref{fig:temp}), and sample proportion
+(Figure~\ref{fig:prop}) are varied. Additionally, we present representative
+unconditional samples in Figures~\ref{fig:main} \& \ref{fig:face}.
+
+Figure~\ref{fig:step} demonstrates a surprising property of our model:
+additional steps during the sampling process does not improve sample quality
+further. It is important to note that this only holds if the other parameters
+remain fixed. Therefore, this does not suggest that additional sampling steps
+are always detrimental to performance, as a low number of steps will result in
+very poor quality results. Rather, it indicates that merely adding more sampling
+steps is not sufficient in our framework, and other parameters must also be
+adjusted.
+
+Figure~\ref{fig:step} shows that picking a temperature in the range of $0.5$ to
+$0.7$ leads to best sample quality across a large set of samples. However, this
+no doubt has an effect on sample diversity. Our model is capable of sampling
+with a higher temperature at the cost of occasionally producing corrupted
+examples. Figure~\ref{fig:prop} confirms the result in
+\citet{savinov2022stepunrolled} that sampling with a lower proportion leads to
+higher sample quality. However, it should be noted that in low-step scenarios,
+low proportions cannot be used effectively as the majority of elements in
+$\latent_t$ will not have enough opportunities to update, and so the resulting
+sample will be of low quality.
+
+The result samples shown in Figures~\ref{fig:main} \& \ref{fig:face} demonstrate
+that our model is capable of generating high quality and diverse samples. Our
+aim was to push the efficiency of generative models to their limit, however we
+were still surprised at precisely how fast the model could generate --
+particularly on megapixel sized experiments. The samples in
+Figure~\ref{fig:main} were created in a mere 2 seconds on a GTX 1080Ti, which
+could no doubt be pushed further with more powerful hardware and further
+optimisation. This is unparalleled speed, significantly faster than prior
+non-adversarial solutions at this resolution.
 
 \subsection{Conditional Image Generation}
 \label{subsec:evaluationConditional}
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-valley-small.png}
+        \caption{
+            $256 \times 256$ successful samples from the class ``Valley''.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-lakeside-small.png}
+        \caption{
+            $256 \times 256$ successful samples from the class ``Lakeside''.
+        }
+    \end{subfigure}\\
+    \vspace{0.5cm}
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-penguin-small.png}
+        \caption{
+            $256 \times 256$ failed samples from the class ``King Penguin''.
+        }
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.47\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{figures/imagenet-panda-small.png}
+        \caption{
+            $256 \times 256$ failed samples from the class ``Giant Panda''.
+        }
+    \end{subfigure}
+    \caption{Examples of class-conditioned generation on ImageNet using
+        $\markovSteps = 50$ sampling steps. Top row contains examples of
+    successful samples whereas bottom row showed failed samples. The contents of
+    the failed samples nonetheless do resemble the target class.}
+    \label{fig:imagenet}
+\end{figure}
 
 \begin{figure}[ht]
     \centering
@@ -197,72 +273,36 @@ produce a final image. These preliminary experiments showed us that \gls{sundae}
 can successfully use class information using this simple approach, seen in
 Figure~\ref{fig:mnist}.
 
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}[b]{0.47\textwidth}
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/imagenet-valley-small.png}
-        \caption{
-            $256 \times 256$ successful samples from the class ``Valley''.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.47\textwidth}
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/imagenet-lakeside-small.png}
-        \caption{
-            $256 \times 256$ successful samples from the class ``Lakeside''.
-        }
-    \end{subfigure}\\
-    \vspace{0.5cm}
-    \begin{subfigure}[b]{0.47\textwidth}
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/imagenet-penguin-small.png}
-        \caption{
-            $256 \times 256$ failed samples from the class ``King Penguin''.
-        }
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.47\textwidth}
-        \centering
-        \includegraphics[width=1.0\textwidth]{figures/imagenet-panda-small.png}
-        \caption{
-            $256 \times 256$ failed samples from the class ``Giant Panda''.
-        }
-    \end{subfigure}
-    \caption{Examples of class-conditioned generation on ImageNet using
-        $\markovSteps = 50$ sampling steps. Top row contains examples of
-    successful samples whereas bottom row showed failed samples. The contents of
-    the failed samples nonetheless do resemble the target class.}
-    \label{fig:imagenet}
-\end{figure}
+Despite this, our model fails to produce reasonable samples for all classes
+present in the dataset. On classes representing large scenes such as landscapes,
+the samples are convincing and diverse, however for classes requiring
+fine-grained detail the outputs merely resemble the target class. Results of
+conditional generation with four classes are shown in Figure~\ref{fig:imagenet}.
+Due to this, we did not compute perceptual metrics as the sample quality was
+known to be insufficient via inspection alone. This could be a result of lack of
+model capacity or training time, or the conditioning signal tested on MNIST
+being insufficient for ImageNet. The training of an effective conditional model
+is left for future work, as is support for zero-shot image generation using text
+prompts~\cite{ramesh2021dalle}.
 
-A relatively new method of providing a conditioning signal is to instead provide
-natural language prompts, and learn the joint distribution of prompts and
-images. At inference time, this allows for text-to-image generation which in
-turn allows for zero-shot image generation given a sufficiently sized training
-dataset. Most notably, DALL·E~\cite{ramesh2021dalle} and recently
-DALL·E-2~\cite{ramesh2022dalle2}, with the former generating VQ-VAE discrete
-latents and the latter generating continuous \textit{``CLIP Image embeddings''}.
-DALL·E-2 was able to produce high fidelity samples at $1024 \times 1024$
-resolution. Concurrently, Latent Diffusion
-Models~\cite{rombach2021highresolution} used text embeddings to condition
-sampling, again allowing for zero-shot generation. Our model is also capable of
-using such methods, turning our model from an unconditional or class-conditioned
-generative model to a text-to-image generative model. However, due to
-time-constraints we did not experiment with this approach, leaving this for
-future work.
+%A relatively new method of providing a conditioning signal is to instead provide
+%natural language prompts, and learn the joint distribution of prompts and
+%images. At inference time, this allows for text-to-image generation which in
+%turn allows for zero-shot image generation given a sufficiently sized training
+%dataset. Most notably, DALL·E~\cite{ramesh2021dalle} and recently
+%DALL·E-2~\cite{ramesh2022dalle2}, with the former generating VQ-VAE discrete
+%latents and the latter generating continuous \textit{``CLIP Image embeddings''}.
+%DALL·E-2 was able to produce high fidelity samples at $1024 \times 1024$
+%resolution. Concurrently, Latent Diffusion
+%Models~\cite{rombach2021highresolution} used text embeddings to condition
+%sampling, again allowing for zero-shot generation. Our model is also capable of
+%using such methods, turning our model from an unconditional or class-conditioned
+%generative model to a text-to-image generative model. However, due to
+%time-constraints we did not experiment with this approach, leaving this for
+%future work.
 
 \subsection{Arbitrary Image Inpainting}
 \label{subsec:evaluationInpainting}
-
-As outlined earlier, \acrlong{nar} generative models have a number of advantages
-on inpainting tasks, including supporting arbitrary masks and being able to use
-the full context available to them. We provide a number of examples of
-inpainting on FFHQ1024 and ImageNet, showcasing different patterns and different
-results given the same starting image. As our method utilises a vector quantized
-image model, it is incapable of doing fine-grained inpainting at a pixel level.
-Nonetheless, the results show consistently good inpainting results when
-operating at a \gls{vq} latent level.
 
 \begin{figure}[ht]
     \centering
@@ -297,6 +337,15 @@ operating at a \gls{vq} latent level.
         outputs at very high resolutions.
     }
 \end{figure}
+
+As outlined earlier, \acrlong{nar} generative models have a number of advantages
+on inpainting tasks, including supporting arbitrary masks and being able to use
+the full context available to them. We provide a number of examples of
+inpainting on FFHQ1024 and ImageNet, showcasing different patterns and different
+results given the same starting image. As our method utilises a vector quantized
+image model, it is incapable of doing fine-grained inpainting at a pixel level.
+Nonetheless, the results show consistently good inpainting results when
+operating at a \gls{vq} latent level.
 
 \subsection{Limitations}
 \label{subsec:evaluationLimitation}

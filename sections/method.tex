@@ -407,14 +407,16 @@ inpainting tasks that are more complex to implement with autoregressive models.
 This property also allows for higher quality and more diverse
 samples~\cite{bondtaylor2021unleashing}.
 
-The inpainting procedure, takes an image $\sample \in \real{H \times
-W \times 3}$ and a pixel-level binary mask $\pixelMask \in \{0, 1\}^{H \times
-W}$ as input. By taking $\vqganDownsample \times \vqganDownsample$ regions of
+The inpainting procedure, takes an image $\sample \in \real{H \times W \times
+3}$ and a pixel-level binary mask $\pixelMask \in \{0, 1\}^{H \times W}$ as
+input. By taking $\vqganDownsample \times \vqganDownsample$ regions of
 $\pixelMask$ and applying a logical \texttt{AND} in them, we obtain a latent
 level mask $\vqMask \in \{0,1\}^{h \times w}$. We then sample as normal from the
 latents, allowing the model full context, but only update regions that were
-masked according to $\vqMask$. Like with sampling, we then use $\vqganDecoder$
-to decode the sampled latent code, producing the output $\sample$.
+masked according to $\vqMask$. Typically, we use a lower temperature for
+inpainting ($0.3 \leq \temperature \leq 0.5$). Like with sampling, we then use
+$\vqganDecoder$ to decode the sampled latent code, producing the output
+$\sample$.
 
 Sampling at a latent-level means the model is unable to do fine-grained
 inpainting at a pixel level. The definition of the \gls{vq} mask $\vqMask$ means
