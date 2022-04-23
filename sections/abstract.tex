@@ -1,21 +1,23 @@
-% TODO: what's the contribution in a single salient idea? avoid "just taking
-% some existing approach and stuck it on without much thought."
-
-% TODO: more obvious problem statement in abstract
-% TODO: more comparisons in brackets
-
 The recent trend in generative modelling research has been to push sample
 resolutions higher whilst simultaneously reducing computational requirements for
-training and sampling. One approach is to utilize powerful \acrfull{vq}
-models to reduce computational requirements whilst still producing high
-quality samples. In this work, we push this further through the use of
-\acrfull{nar} \acrfull{sundae} and modifications to hierarchical transformers
-that have found recent success in language modelling. This approach to allows
-for very fast sampling ($\approx 2$ seconds) and training (4-6 days) of VQ
-latents from pre-trained VQ-GAN models. Furthermore, we found the NAR nature of
-the model made it suitable for complex inpainting with arbitrary masks. To
-demonstrate the scalability of our approach, we trained a new \gls{vqgan} model
-on a dataset of faces at resolutions exceeding one million pixels, ultimately
-allowing allowing for megapixel image generation in only two seconds on
-consumer-grade GPUs.
-
+training and sampling. We aim to push this trend further via the combination of
+various recent advancements in deep learning -- each representing the pinnacle
+of efficiency in their respective areas. These include \acrfull{vqgan}, a
+\gls{vq} model capable of high levels of compression; hourglass transformers, a
+highly scaleable self-attention model; and \acrfull{sundae}, a
+\acrfull{nar} text generative model. Unexpectedly, our method highlighted
+weaknesses in the original formulation of hourglass transformers when used on
+multi-dimensional data. In light of this, we propose multiple modifications to
+their architecture, which has applications in the wider field of
+multi-dimensional data modelling using hierarchical transformers. The
+combination of these techniques resulted in a generative framework with
+unparalleled levels of efficiency, in terms of scalability of our model and
+sampling speed. Our proposed framework scales to high-resolutions ($1024 \times
+1024$) easily, and can be trained quickly (4-6 days) on a single, consumer-grade
+GPU. Most crucially, the trained model can produce diverse and realistic
+megapixel samples in approximately 2 seconds. This is considerably faster
+sampling (minutes, or even tens of minutes) and training ($>10$ days) than
+existing non-adversarial methods at this resolution. In general, the framework
+is extremely flexible, supporting arbitrary number of sampling steps,
+sample-wise self-stopping, self-correction capabilities, conditional generation,
+and a \acrshort{nar} formulation that allows for arbitrary inpainting masks.
