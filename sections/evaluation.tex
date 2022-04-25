@@ -101,7 +101,7 @@
         Plots showing sample quality in terms of different metrics as sample
         proportion is changed. Lower values seem to perform better given the
         other parameters, but again the optimal range may differ if other
-        parameters are changed.
+        parameters are adjusted.
     }
     \label{fig:prop}
 \end{figure}
@@ -134,7 +134,7 @@
         \includegraphics[width=1.0\textwidth]{figures/nearest-ffhq256.png}
     \end{subfigure}
     \caption{
-        FFHQ256 samples and nearest neighbours from the dataset, based on LPIPS
+        FFHQ256 samples and their nearest neighbours in the dataset, based on LPIPS
         perceptual loss. Left-most column is a sample from our trained
         model, followed then by nearest neighbours, increasing in distance
         from left-to-right.
@@ -143,9 +143,10 @@
 
 We evaluate our method on the task of unconditional image generation on datasets
 FFHQ256, FFHQ1024, and CelebA. We use pretrained \gls{vqgan} checkpoints
-provided by the original \gls{vqgan} authors~\cite{esser2021taming}. We evaluate
-our models using FID Infinity~\cite{chong2020effectively}, Coverage, and
-Density~\cite{ferjad2020icml}, plotting how these metrics change as number of
+provided by the original \gls{vqgan} authors~\cite{esser2021taming} for $256
+\times 256$ experiments. We evaluate our models using FID
+Infinity~\cite{chong2020effectively}, coverage, and
+density~\cite{ferjad2020icml}, plotting how these metrics change as number of
 sampling steps $\markovSteps$ (Figure~\ref{fig:step}), sampling temperature
 $\temperature$ (Figure~\ref{fig:temp}), and sample proportion
 (Figure~\ref{fig:prop}) are varied. Additionally, we present representative
@@ -158,9 +159,9 @@ remain fixed. Therefore, the results do not suggest that additional sampling
 steps are always detrimental to performance, as a low number of steps will
 clearly result in poor quality results. Rather, it indicates that merely
 adding more sampling steps is not sufficient in our framework, and other
-parameters must also be adjusted to reflect a greater time budget.
+parameters must also be adjusted to reflect a higher time budget.
 
-Figure~\ref{fig:step} shows that picking a temperature in the range of $0.5$ to
+Figure~\ref{fig:temp} shows that picking a temperature in the range of $0.5$ to
 $0.7$ leads to best sample quality across a large set of samples, at the cost of
 reduced diversity. Our model is capable of sampling with a higher temperature at
 the cost of occasionally producing corrupted examples. Figure~\ref{fig:prop}
@@ -175,10 +176,10 @@ that our model is capable of generating high quality and diverse samples. Our
 aim was to push the efficiency of generative models to their limit, however we
 were still surprised at precisely how fast the model could generate --
 particularly on megapixel scale experiments. The samples in
-Figure~\ref{fig:main} were created in a mere 2 seconds on a GTX 1080Ti. This can
-be improved further with more powerful hardware and further optimisation. This
-kind of speed is unparalleled; significantly faster than prior non-adversarial
-solutions at this resolution.
+Figure~\ref{fig:main} were created in a two seconds on a GTX 1080Ti. This can be
+further improved with more powerful accelerators, further optimisation, and
+model compilation. This kind of speed is unparalleled; significantly faster than
+prior non-adversarial solutions at this resolution.
 
 \subsection{Conditional Image Generation}
 \label{subsec:evaluationConditional}
@@ -215,10 +216,13 @@ solutions at this resolution.
             $256 \times 256$ failed samples from the class ``Giant Panda''.
         }
     \end{subfigure}
-    \caption{Examples of class-conditioned generation on ImageNet using
+    \caption{
+        Examples of class-conditioned generation on ImageNet256 using
         $\markovSteps = 50$ sampling steps. Top row contains examples of
-    successful samples whereas bottom row showed failed samples. The contents of
-    the failed samples nonetheless do resemble the target class.}
+        successful samples whereas bottom row contains failed samples. The
+        contents of the failed samples resemble the target class, but are of low
+        quality.
+    }
     \label{fig:imagenet}
 \end{figure}
 
@@ -249,31 +253,31 @@ solutions at this resolution.
 
 Another critical component of an ideal generative model is the ability to
 control its generation. We explore class-conditioned image generation of
-ImageNet at $256 \times 256$ resolution, using the pretrained ImageNet
-\gls{vqgan} checkpoints provided by the original work~\cite{esser2021taming}. 
+ImageNet at $256 \times 256$ resolution, using the pretrained ImageNet256
+\gls{vqgan} checkpoints provided in the original work~\cite{esser2021taming}. 
 
 There are many valid ways of injecting a conditioning signal into generative
 models, for example passing one-hot or embedding class vectors. We use a simple
 solution proposed in~\cite{parmar2018image} to add a learned class embedding to
-every input position. To test whether their proposed method can also be applied
-to \gls{sundae}, we conducted an experiment on discretized MNIST-style
-datasets. To do so without a trained \gls{vqgan}, we treat each of the possible
-8-bit greyscale colours as if it were a codebook index, resulting in
-$\vqganNbLatents = 256$ -- generating pixels directly rather than image patches.
-The result of the experiments are shown in Figure~\ref{fig:mnist} and
-demonstrate that \gls{sundae} can indeed incorporate a conditioning signal in
-this manner.
+every input embedding. To test whether their proposed method can also be applied
+to \gls{sundae}, we conducted an experiment on discrete MNIST-style datasets. We
+treat each of the possible 8-bit greyscale colour values as a codebook
+index, resulting in $\vqganNbLatents = 256$ -- generating pixels directly rather
+than image patches. Results of these experiments are shown in
+Figure~\ref{fig:mnist} and demonstrate that \gls{sundae} can incorporate using
+this simple approach.
 
 Despite this, our model fails to produce reasonable samples for all classes
 present in ImageNet. On classes representing large scenes such as landscapes,
 the samples are convincing and diverse, however for classes requiring
 fine-grained detail the outputs merely resemble the target class. Results of
-conditional generation with four classes are shown in Figure~\ref{fig:imagenet}.
-Due to this, we chose not to compute perceptual metrics as the sample quality
-was clearly insufficient via inspection alone. This could be a result of lack of
-model capacity, lack of training time, or the conditioning strategy tested on
-MNIST being insufficient for ImageNet. The training of an effective conditional
-model is left for future work.
+conditional generation with four representative classes are shown in
+Figure~\ref{fig:imagenet}. Due to this, we chose not to compute perceptual
+metrics for conditional experiments as the sample quality was clearly
+insufficient via inspection alone. This could be a result of lack of model
+capacity, lack of training time, or the conditioning strategy tested on MNIST
+being insufficient for ImageNet. The training of an effective conditional model
+is left for future work.
 
 \subsection{Arbitrary Image Inpainting}
 \label{subsec:evaluationInpainting}
@@ -315,11 +319,10 @@ model is left for future work.
 As outlined earlier, \acrlong{nar} generative models have a number of advantages
 on inpainting tasks, including supporting arbitrary masks and being able to use
 the full context available to them. We provide a number of examples of
-inpainting on FFHQ1024 and ImageNet, showcasing different patterns and different
-results given the same starting image. As our method utilises a \gls{vq}
-image model, it is incapable of doing fine-grained inpainting at a pixel level.
-Nonetheless, the results show consistently good inpainting results when
-operating at a \gls{vq} latent level.
+inpainting on FFHQ1024, showcasing different patterns and results given the same
+starting image and mask. As our method utilises a \gls{vq} image model, it is
+incapable of doing fine-grained inpainting at a pixel level. We found in
+practise this had little effect on the perceptual quality of the outputs.
 
 \subsection{Limitations}
 \label{subsec:evaluationLimitation}
@@ -331,23 +334,23 @@ components within it. This potentially means that each image patch
 issues. However, our resulting samples are still diverse, suggesting that
 patch-wise mode collapse did not have a significant effect on the final samples.
 
-We also encountered great instability during training of our own large
-\gls{vqgan} which led to many entirely failed experiments. Additionally, the
-extreme compression ratio in the large \gls{vqgan} model resulted in occasional
-unrealistic artifacts. Though most reconstructions are of good quality, the
-occasional artifacts did result in certain samples also being corrupted. Further
-research into high compression \gls{vq} models that do not use adversarial
-components remains and open and challenging area of research. In the case where
-such a \gls{vq} model is created, it can easily be substituted into our proposed
-framework.
+We encountered great instability during training of the large \gls{vqgan} which
+led to many failed experiments. Additionally, the extreme compression ratio in
+the large \gls{vqgan} model resulted in occasional unrealistic artifacts. Though
+most reconstructions are of good quality, the artifacts did rarely appear in the
+samples. Further research into high compression \gls{vq} models that do not use
+adversarial components remains an open and challenging area of research. When
+such a \gls{vq} model is designed, it can easily be substituted into our
+proposed framework.
 
-Despite our model demonstrating extremely fast sampling, in terms of perceptual
-quality metrics, it falls short of many other
-methods~\cite{bondtaylor2021unleashing}. Though measures of perceptual quality
+Despite our model demonstrating extremely fast sampling it falls short of many
+recent methods in terms of perceptual quality
+metrics~\cite{bondtaylor2021unleashing}. Though measures of perceptual quality
 such as FID are known to be flawed~\cite{chong2020effectively}, other measures
 such as density and coverage also show inferior sample
 quality~\cite{ferjad2020icml}. This is especially true on ImageNet where many
 classes merely resemble the target class -- though this is likely due to lack of
 model capacity and training time. Despite this, the resulting samples on the
-FFHQ datasets are still very diverse and of a good perceptual quality. Further
-work would no doubt improve quality in terms of FID further.
+FFHQ datasets are still very diverse and of excellent perceptual quality.
+Further work, particularly extensive parameter sweeps, is needed to improve
+quality in terms of these perceptual metrics.
