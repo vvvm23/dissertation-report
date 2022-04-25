@@ -1,14 +1,12 @@
-% TODO: still needs narrative flow between sections
-
 This work builds upon much prior research into powerful deep generative models,
-self-supervised methods, and efficient transformer architectures. We cover
-relevant prior work into deep generative models in
-\S\ref{subsec:agm}-\ref{subsec:vqmodelling}, a specific \acrshort{nar}
-generative model \gls{sundae} \S\ref{subsec:sundae}, and a recent development
-into a efficient transformer architecture in \S\ref{subsec:hourglass}. For a
-full review on generative modelling we direct the reader to
-\citet{bondtaylor2021review}, and for further details on \gls{sundae} and
-hourglass transformers to \citet{savinov2022stepunrolled} and
+self-supervised representation methods, and efficient transformer architectures.
+We cover relevant work into deep generative models in
+\S\ref{subsec:agm}-\ref{subsec:nagm}, vector-quantized image modelling in
+\S\ref{subsec:vqmodelling}, a specific \acrshort{nar} generative model
+\gls{sundae} \S\ref{subsec:sundae}, and an efficient transformer architecture in
+\S\ref{subsec:hourglass}. For a full review on generative modelling we direct
+the reader to \citet{bondtaylor2021review}, and on \gls{sundae} and hourglass
+transformers to \citet{savinov2022stepunrolled} and
 \citet{nawrot2021hierarchical} respectively.
 
 \begin{figure}[ht!]
@@ -16,17 +14,17 @@ hourglass transformers to \citet{savinov2022stepunrolled} and
     \includegraphics[width=\textwidth]{figures/AR-NAR.pdf}
     \caption{
         \textbf{Left:} Visualization of \acrfull{ar} sampling. \gls{ar} sampling
-        proceeds one item at a time, resulting in the number of sampling steps
-        being equal to the dimensionality of the input. For each prediction, a
+        proceeds one element at a time, meaning the number of sampling steps
+        is equal to the dimensionality of the input. For each prediction, a
         probability distribution over possible tokens is predicted and then
         sampled from. Each prediction can only make use of past context --
         indicated as a green position -- so not to violate the autoregressive
         property.
         \textbf{Right:} Visualization of \acrfull{nar} sampling. \gls{nar}
-        sampling can sample an arbitrary number of items in parallel, including
-        ones previously sampled, allowing for self-correction. It can freely use
-        all context available to it, allowing for flexible inpainting and
-        potentially better predictions.
+        sampling samples an arbitrary number of elements in parallel, including
+        elements previously sampled, allowing for self-correction. It freely
+        uses all context available, allowing for flexible inpainting and
+        better predictions.
     }
 \end{figure}
 
@@ -37,11 +35,11 @@ One major deep generative model family are \acrfull{ar} models, characterised by
 a training and inference process based on the probabilistic chain rule. During
 training, they learn to maximise the likelihood of the data they are
 trained on, which leads to excellent mode coverage. Prior work using these
-methods resulted in impressive results in terms of both sample quality and
+methods resulted in impressive results in terms of sample quality and
 diversity, but are ultimately impractical in real world applications due to
 their slow sampling speed.
 
-The slow sampling speed is due to their sequential nature, defined by the chain
+The slow speed is due to their sequential nature, defined by the chain
 rule of probability. Given an input $\image = \{ \pixel{1}, \pixel{2}, \dots,
 \pixel{n} \}$, an \gls{ar} model $p_\theta(\cdot)$ generates new
 samples sequentially:
@@ -50,41 +48,43 @@ samples sequentially:
     \prod\limits^{n}_{i=1} p_\theta(\pixel{i} \vert \pixel{1}, \dots, \pixel{i-1})
 \end{equation}
 meaning that the number of sampling steps is equal to the size of the
-decomposition of $\image$, making this slow for large inputs.
+decomposition of $\image$, giving an iteration complexity of $\bigO{n}$.
 
 For certain tasks, the ordering of the decomposition of $\image$ is obvious, for
-example on text or speech. For images this is less obvious, however typically a
+example on text or speech. For images this is less clear, but typically a
 raster scan ordering is used~\cite{parmar2018image}. Certain \gls{ar} models are
-order-agnostic~\cite{hoogeboom2021autoregressive}, allow for arbitrary ordering
+order-agnostic~\cite{hoogeboom2021autoregressive}, allowing for arbitrary ordering
 to be used during training and inference.
 
 One class of \gls{ar} models are \glspl{rnn} which are an early example of using
-neural networks to model sequential data, such as text, audio, time-series data,
+neural networks to model sequential data such as text, audio, time-series data,
 or even handwriting strokes. Though they can be used as classification or
 regression models, they are also suited for use as generative models by
 modelling the relationship in Equation~\ref{eq:ar}. They suffer from a number of
 issues, most infamously vanishing gradients~\cite{pascanu2012rnn} and inability
-to model long-range relationships between items in the input.
+to model long-range relationships between elements in the input.
 \Glspl{lstm}~\cite{hoch1997lstm} improved upon \glspl{rnn} further by
 introducing dedicated memory units, allowing for the modelling of longer range
 relationships. \Glspl{gru}~\cite{cho2014gru} simplified \gls{lstm} architecture
 whilst retaining good performance. With the advent of transformer
-architectures~\cite{vaswani2017attention}, modelling even longer relationships
+architectures~\cite{vaswani2017attention}, modelling longer relationships
 became possible, even at a full-document level. It also introduced the
 capability to train on all sequence elements in parallel through the use of
 causal masking, therefore not violating the autoregressive property. Inference
-must still be done in a serial manner, however.
+must still be done in a sequential manner, however.
 
-Applying \gls{ar} models to images followed a similar trend.
+Applying \gls{ar} models to images followed a similar progression.
 PixelRNN~\cite{oord2016pixelrnn} used two-dimensional recurrent layers and
 residual connections to model the distribution of raw pixel values. The same
-paper also introduced PixelCNN, which was claimed to have worse performance but
-were faster to train. These were extended to allow for conditional generation
+paper also introduced PixelCNN, which had worse performance but is faster to
+train. These were extended to allow for conditional generation
 in~\cite{oord2016pixelcnn}. Later work augmented PixelCNN with self-attention
-mechanism, forming PixelSnail~\cite{chen2017snail}, which can model
-longer relationships than a convolutional or recurrent architecture. Image
+mechanism, forming PixelSnail~\cite{chen2017snail}, which can model longer
+relationships than a fully convolutional or recurrent architecture. Image
 Transformer~\cite{parmar2018image} later applied transformer architectures to
-the same task through an effective but conceptually simple approach.
+the same task through an effective but conceptually simple approach. In all
+cases, the iteration complexity is still $\bigO{n}$, a property intrinsic to
+\gls{ar} models.
 
 \subsection{Non-autoregressive Generative Models}
 \label{subsec:nagm}
@@ -123,7 +123,7 @@ datasets, on more complex datasets the samples and reconstructions tend to
 become blurry, suggesting a simple prior is unable to perfectly fit the
 distribution. Later work extended \glspl{vae} to be hierarchical, having
 multiple Gaussian priors~\cite{arash2020nvae,child2020vqvae} which were found to
-outperform purely autoregressive models.
+outperform \gls{ar} models.
 
 % TODO: add references for normalizing flows (eg. Glow)
 Normalizing flows are another class of generative model that allows for exact
