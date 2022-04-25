@@ -1,36 +1,14 @@
-% TODO: end is all negative
-% first is fine, so is second. indeed is bad though
-% TODO: some kind of surprise
-% TODO: what have I learned from the project?
-% TODO: anything that contradicts? Surprises? Summarise anything citeable.
-
 In this work we investigated pushing the efficiency of generative models via the
 combination of various techniques, following the general trend in generative
 modelling of simultaneously improving quality and speed of sampling using
 non-adversarial approaches. We found that the combination of these techniques
 formed a fast image generation framework. To our surprise, the proposed method
-was even faster and more scaleable than expected, able to scale with ease to
+was faster and more scaleable than expected, able to be applied with ease to
 megapixel images, and generate samples at such resolutions in seconds -- a wide
 margin faster than prior non-adversarial methods. Additionally, we found that
 previously proposed hourglass transformers are not optimally defined on
 multi-dimensional inputs and subsequently proposed adjustments to them. Our work
 demonstrates the superiority of the \acrlong{nar} paradigm, and joins a rapidly
 growing space of research into their use as a viable alternative to \acrlong{ar}
-solutions. Additional research is needed into better \gls{vq} image models and
+frameworks. Additional research is needed into better \gls{vq} image models and
 into a stronger conditional generative model.
-
-%In conclusion, we investigated pushing the efficiency of generative models via
-%the combination of various techniques, following the general trend in generative
-%modelling of simultaneously improving quality and speed of sampling using
-%non-adversarial approaches. We found that the combination of these techniques
-%did indeed result in a fast generative model that was scaled to very high
-%resolutions, demonstrating the usefulness of denoising autoencoders as
-%generative models of discrete latents. We also improved the architecture of
-%hierarchical transformers to make them more suited for multi-dimensional data.
-%Despite our framework supporting very fast sampling, there is much room for
-%further work. For one, better \gls{vq} image models that do not rely on
-%adversarial components, to avoid patch-wise mode collapse. Secondly, a more
-%through parameter search to improve the sample quality further as measured by
-%perceptual quality metrics, especially in ImageNet experiments. Finally, an
-%investigation into conditioning the generator model on text prompts, allowing
-%for very fast text-to-image generation.
