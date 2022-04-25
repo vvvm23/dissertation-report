@@ -1,8 +1,3 @@
-% TODO: would benefit from more of a third person writing prose.
-% i.e: we are currently talking in terms of "we did X and found Y" rather than
-% "because of hyp Z, we tried X and found Y, shown in fig A"
-% feels a bit "aimless" of a scientific approach.
-
 \subsection{Unconditional Image Generation}
 \label{subsec:evaluationUnconditional}
 
@@ -179,7 +174,10 @@ particularly on megapixel scale experiments. The samples in
 Figure~\ref{fig:main} were created in a two seconds on a GTX 1080Ti. This can be
 further improved with more powerful accelerators, further optimisation, and
 model compilation. This kind of speed is unparalleled; significantly faster than
-prior non-adversarial solutions at this resolution.
+prior non-adversarial solutions at this resolution. Additionally, our success
+here demonstrate the scalability of \gls{sundae} to sequence lengths of
+$N=1024$, significantly larger than the maximum length tested in the original
+work ($N=128$).
 
 \subsection{Conditional Image Generation}
 \label{subsec:evaluationConditional}
