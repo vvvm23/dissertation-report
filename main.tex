@@ -91,9 +91,9 @@ Durham, UK \\
         High-resolution samples produced using our non-autoregressive approach.
         Each $1024 \times 1024$ sample was generated in $\approx 2$ seconds on a
         GTX 1080Ti -- including both discrete latent sampling and subsequent
-        decoding. At this resolution, autoregressive and diffusion models may
-        take minutes to sample, or simply do not support this resolution.
-        Training is similarly fast, with the FFHQ256 model only taking 4 days to
+        VQ-GAN decoding. At this resolution, autoregressive and diffusion models
+        may take minutes to sample, or simply do not scale to this resolution.
+        Training is similarly fast, with the FFHQ1024 model taking 4 days to
         train on a single V100 32GB.
     }
     \label{fig:main}
