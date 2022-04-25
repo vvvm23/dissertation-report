@@ -44,13 +44,13 @@ seconds.
 \subsection{Latent Dataset Generation}
 \label{subsec:datasetGen}
 
-We use the standard two-stage scheme for vector-quantized image
+We use the standard two-stage scheme for \gls{vq} image
 modelling~\cite{oord2018neural,razavi2019generating,esser2021taming,bondtaylor2021unleashing}
 using \gls{vqgan}~\cite{esser2021taming} as our feature extractor. Where such
 models are available, we use pretrained \glspl{vqgan} for our experiments. For
 higher resolution experiments (for example,
 FFHQ1024~\cite{karras2019stylebased}), pretrained models are not available and
-so the training our own VQ-GAN was necessary (see \S\ref{subsec:megagan}). 
+so the training our own \gls{vqgan} was necessary (see \S\ref{subsec:megagan}). 
 
 The second stage is to train a discrete prior model over the extracted latent variables.
 To enable this, we first built a latent dataset using our trained \gls{vqgan}.
@@ -112,7 +112,7 @@ Hourglass transformers have been shown to efficiently handle long-sequences,
 outperform existing models using the same computational budget, and meet the
 same performance as existing models more efficiently by using an explicit
 hierarchical structure~\cite{nawrot2021hierarchical}. The same benefits should
-also apply to vector-quantized image modelling. 
+also apply to \gls{vq} image modelling. 
 
 However, the design and parameters chosen by the original authors were tailored
 for language modelling~\cite{nawrot2021hierarchical}. They also experimented
@@ -177,7 +177,7 @@ transformer on pixel-wise generation also opted to use rotary
 embeddings~\cite{nawrot2021hierarchical}. They note also that rotary embeddings
 have the advantage of being compatible with any self-attention mechanism.
 
-\textbf{Removal of Causal Constraints} -- In the original autoregressive
+\textbf{Removal of Causal Constraints} -- In the original \gls{ar}
 formulation of hourglass transformers they noted that naively resampling could
 leak to information leakage into future sequence elements -- therefore violating
 the autoregressive property~\cite{nawrot2021hierarchical}. As our approach is
@@ -212,10 +212,10 @@ masking operations required in the original work.
 \end{figure}
 
 Training at higher resolutions means greater computational requirements and
-sampling speeds. With an autoregressive model, the sampling speed can be
+sampling speeds. With an \gls{ar} model, the sampling speed can be
 especially immense as it scales linearly with data dimensionality, even with an
-auxiliary vector-quantized image model~\cite{esser2021taming}. With a
-non-autoregressive model however, the sampling speed is explicitly controlled
+auxiliary \gls{vq} image model~\cite{esser2021taming}. With a
+\gls{nar} model however, the sampling speed is explicitly controlled
 and does not directly grow as a function of input size -- excluding the
 increase in time for one network pass from using a larger model on a larger input.
 
@@ -343,22 +343,8 @@ inference time sampling steps (updating at most one token per step) as well as
 not allowing for self-correction, as once a token is unmasked it is now
 fixed~\cite{bondtaylor2021unleashing,austin2021structured}. 
 
-% TODO: a figure could be really nice too.
-
 \subsection{Generating High-Resolution Images}
 \label{subsec:sundaeSampling}
-
-%\begin{figure}[ht]
-    %\label{fig:sampling}
-    %\centering
-    %\includegraphics[width=0.9\linewidth]{figures/sampling/sampling.pdf}
-
-    %\caption{The sampling process. SUNDAE gradually denoises from $\latent_0$ to
-    %the final sample $\latent_\markovSteps$. At each step, it is possible to
-    %decode with $\vqganDecoder$ to produce a final image. By doing so, it
-    %reveals the model gradually denoises the latent $\latent$ and is capable of
-    %correcting errors accumulated during sampling.}
-%\end{figure}
 
 During sampling, we simply sample sequentially $\latent_t \sim \sundae(\latent_t
 \vert \latent_{t-1})$ for a constant number of steps $\markovSteps$, beginning
@@ -401,11 +387,11 @@ indeed self-correct errors accumulated during the sampling process.
 \label{subsec:inpainting}
 
 As noted in the original work~\cite{savinov2022stepunrolled} and other
-non-autoregressive solutions~\cite{bondtaylor2021unleashing}, one clear
-advantage of non-autoregressive models is that they are not limited to causal
+\gls{nar} solutions~\cite{bondtaylor2021unleashing}, one clear
+advantage of \gls{nar} models is that they are not limited to causal
 inpainting. In general, they support arbitrary inpainting masks which draw upon
 context from both the past and the future, enabling them to easily perform
-inpainting tasks that are more complex to implement with autoregressive models.
+inpainting tasks that are more complex to implement with \gls{ar} models.
 This property also allows for higher quality and more diverse
 samples~\cite{bondtaylor2021unleashing}.
 
@@ -432,7 +418,7 @@ effect on the perceptual quality of the outputs.
     \centering
     \begin{tabular}{|c||c c||c||c c||c||}
     \hline
-    \textbf{Dataset} & \textbf{FFHQ-256} & \textbf{FFHQ-1024} & \textbf{CelebA}
+    \textbf{Dataset} & \textbf{FFHQ256} & \textbf{FFHQ1024} & \textbf{CelebA}
                      & \textbf{MNIST} & \textbf{FashionMNIST} &
                      \textbf{ImageNet} \\
     \hline
