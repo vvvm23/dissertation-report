@@ -19,3 +19,7 @@ use of bold
 drop shadow
 
 online TeX editor for google slides
+
+language tool extension vim
+
+ltex <- vscode
