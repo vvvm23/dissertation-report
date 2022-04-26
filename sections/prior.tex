@@ -347,7 +347,8 @@ Vanilla transformers incur a hefty memory and time complexity of $O(L^2)$ for
 each block~\cite{vaswani2017attention}, dominated by costly multi-head
 self-attention mechanisms. Most research into efficient transformers focuses on
 improving the efficiency of the attention mechanisms, such as through sparse
-attention patterns or via approximations.
+attention patterns~\cite{child2019generating} or via
+approximations~\cite{xiong2021nystromformer}.
 
 Recent work has focused on making the architecture itself more efficient. Funnel
 transformers~\cite{dai2020funneltransformer} progressively downsamples the input
