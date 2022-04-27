@@ -12,8 +12,8 @@ fast sampling, but often fail to model the entire data distribution and are
 notoriously unstable due to not directly optimising for likelihood, using an
 adversarial loss as a proxy. \Glspl{vae}~\cite{kingma2013vae} offer excellent
 mode coverage and fast sampling speeds, but the resulting samples are blurry
-even at small resolutions, and cannot scale to the high resolutions obtained by
-\glspl{gan}.
+even at small resolutions, and cannot meaningfully scale to the high resolutions
+obtained by \glspl{gan}.
 
 \Gls{ar} models such as PixelSnail~\cite{chen2017snail}, Image
 Transformer~\cite{parmar2018image}, and DALL·E~\cite{parmar2018image} have
@@ -25,8 +25,8 @@ data dimensionality. This makes them infeasible for use in interactive
 applications. \Glspl{ddpm}~\cite{ho2020ddpm} and
 \glspl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt} produce samples that
 rival or exceed the quality of \glspl{gan}~\cite{dhariwal2021ddpm} whilst
-providing good mode coverage, but are plagued still by potentially requiring
-thousands of network evaluations per sample.
+providing excellent mode coverage, but are plagued still by potentially
+requiring thousands of network evaluations per sample.
 
 \Gls{vq} image
 modelling~\cite{oord2017vqvae,razavi2019generating,esser2021taming} alleviates
@@ -44,13 +44,12 @@ trilemma. In this work, we move towards such a solution, beginning from existing
 work applying generative models to discrete latents. This provides an excellent
 starting point in terms of sample quality and mode coverage, but slow sampling
 speeds despite the reduced spatial dimension of the discrete latent space. We
-address this issue by sampling latents using \gls{nar} generative models to
-close the gap, sampling speed wise, with constant iteration complexity models
-such as \glspl{gan}. Specifically, we use discrete
-\gls{sundae}~\cite{savinov2022stepunrolled} to denoise samples sampled from a
-uniform prior into samples from the discrete latent space defined by a
-pre-trained \gls{vqgan} model. We find that \gls{sundae} is an effective
-discrete prior over \gls{vqgan} latents.
+address this issue by sampling latents using a \gls{nar} generative model to
+close the gap, sampling speed wise, with models such as \glspl{gan}.
+Specifically, we use discrete \gls{sundae}~\cite{savinov2022stepunrolled} to
+denoise samples sampled from a uniform prior into samples from the discrete
+latent space defined by a trained \gls{vqgan} model. We find that
+\gls{sundae} is an effective discrete prior over \gls{vqgan} representations.
 
 \Gls{sundae} has only previously be applied to language modelling
 tasks~\cite{savinov2022stepunrolled} using
@@ -76,10 +75,10 @@ Conversely, we cheaply scale the number of layers by adding layers only at the
 downsampled resolution, allowing for considerably larger models with minor
 additional cost. To demonstrate this scalability, we train a \gls{vqgan}
 operating on $1024 \times 1024$ images and apply our framework to the resulting
-discrete latents. This results in the synthesis of megapixel
-images in as few as two seconds on a consumer-grade GPU. To our knowledge, this is
-the largest \gls{vqgan} trained in terms of input size, and the fastest
-sampling non-adversarial generative framework at this image resolution.
+discrete latents. This results in the synthesis of megapixel images in as few as
+two seconds on a consumer-grade GPU. To our knowledge, this is the largest
+\gls{vqgan} trained in terms of input size, and the fastest sampling
+non-adversarial generative framework at this image resolution.
 
 Our contributions as a result of this research project are as follows:
 \begin{itemize}
@@ -103,8 +102,8 @@ Our contributions as a result of this research project are as follows:
         resolution images of human faces. $1024 \times 1024$ images far exceeds
         the resolution of prior work using \gls{vqgan}. This allowed for the
         \textbf{generation of megapixel images in as few as two seconds} on a
-        consumer-grade GPU when combined with the trained discrete prior
-        \gls{sundae}. In contrast, prior \gls{ar} methods and \gls{nar}
-        diffusion methods take minutes to sample, or have not been scaled to
+        consumer-grade GPU when combined with our trained discrete prior
+        \gls{sundae}. In contrast, prior \gls{ar} methods and non-adversarial
+        \gls{nar} methods take minutes to sample, or have not been scaled to
         such resolutions.
 \end{itemize}
