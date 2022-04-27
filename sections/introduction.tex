@@ -1,5 +1,5 @@
 An ideal deep generative model satisfies three key requirements: high-quality
-samples, mode coverage resulting in high sample diversity, and computational
+samples, mode coverage resulting in high sample diversity, and computationally
 inexpensive sampling. Arguably, there are other desirable properties such as a
 meaningful latent space, exact likelihood calculation, and controlled
 generation. Nonetheless, no current generative model satisfies all three key
@@ -9,7 +9,7 @@ modern generative modelling research.
 
 Models such as \glspl{gan}~\cite{goodfellow2014gan} excel at high-quality and
 fast sampling, but often fail to model the entire data distribution and are
-notoriously unstable due to not directly optimising for likelihood -- using an
+notoriously unstable due to not directly optimising for likelihood, using an
 adversarial loss as a proxy. \Glspl{vae}~\cite{kingma2013vae} offer excellent
 mode coverage and fast sampling speeds, but the resulting samples are blurry
 even at small resolutions, and cannot scale to the high resolutions obtained by
@@ -31,7 +31,7 @@ thousands of network evaluations per sample.
 \Gls{vq} image
 modelling~\cite{oord2017vqvae,razavi2019generating,esser2021taming} alleviates
 sampling speed issues in \gls{ar} methods by reducing the spatial dimension at
-which discrete \gls{ar} priors operate at. This results in excellent quality
+which discrete \gls{ar} priors operate. This results in excellent quality
 samples whilst improving sampling speeds, but mandates a two-stage training
 approach and is still slower than \glspl{gan}. Recent work has
 applied diffusion models to \gls{vq} latents~\cite{bondtaylor2021unleashing}
@@ -58,7 +58,7 @@ transformer~\cite{vaswani2017attention} architectures in their autoencoder.
 Parallel work introduced a drastically more efficient variant -- the hourglass
 transformer~\cite{nawrot2021hierarchical} -- leveraging a hierarchical
 architecture targeting language modelling. Though able to be applied to discrete
-latent modelling, we propose a number of improvement that improve performance on
+latent modelling, we propose a number of improvements that improve performance on
 multi-dimensional discrete data, including modifications to resampling
 operations and introduction of axial positional
 embeddings~\cite{su2021roformer}. Though evaluated on discrete latents, these
@@ -70,7 +70,7 @@ defaults in this work.
 
 Given a fast sampling and efficient transformer architecture, we now possess a
 highly scaleable generative model, with respect to number of layers and spatial
-resolution of the latent input. Only a minority of the layer are operating at
+resolution of the latent input. Only a minority of the layers are operating at
 the same resolution as the input, reducing the impact of costly self-attention.
 Conversely, we cheaply scale the number of layers by adding layers only at the
 downsampled resolution, allowing for considerably larger models with minor

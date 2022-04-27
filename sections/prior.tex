@@ -97,7 +97,7 @@ in \glspl{gan} to many thousands in early diffusion models.
 
 The most infamous class of \gls{nar} generative model -- or generative model
 altogether -- are \acrfullpl{gan}~\cite{goodfellow2014gan}. \Glspl{gan} consist
-of two components a generator that creates samples from latent variables, and a
+of two components: a generator that creates samples from latent variables, and a
 discriminator that attempts to distinguish samples from the dataset from samples
 from the generator~\cite{goodfellow2014gan}. They are known for high-fidelity
 samples, fast sampling, unstable training, and tendency to collapse onto a
@@ -123,27 +123,27 @@ simple prior is insufficient to model the data distribution. Later work extended
 priors~\cite{arash2020nvae,child2020vqvae} which were found to outperform
 \gls{ar} models.
 
-Normalizing flows are a class of generative model that allows for exact
-likelihood calculation~\cite{dinh2014nice,dinh2016density,kingma2018glow}. They
-consist of many invertible layers that transform samples from a known
-prior distribution into samples from the data distribution. Each transformation
-must satisfy two properties: being invertible and having an easy to compute
-Jacobian for the purposes of scaling~\cite{dinh2014nice,dinh2016density}. This
-makes the architectural choices restrictive, making them parameter
-inefficient. They also must operate at the same dimensionality for each
-layer, making the training of deep networks difficult.
+Another non-adversarial class that permits sampling in a single forward pass are
+normalizing flows, a class of generative model that allows for exact likelihood
+calculation~\cite{dinh2014nice,dinh2016density,kingma2018glow}. They consist of
+many invertible layers that transform samples from a known prior distribution
+into samples from the data distribution. Each transformation must satisfy two
+properties: being invertible and having an easy to compute Jacobian for the
+purposes of scaling~\cite{dinh2014nice,dinh2016density}. This makes the
+architectural choices restrictive, making them parameter inefficient. They also
+must operate at the same dimensionality for each layer, making the training of
+deep networks difficult.
 
-Two paradigms of high interest recently are
-\acrfullpl{ddpm}~\cite{ho2020ddpm,dhariwal2021ddpm} and
-\acrfullpl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt,vahdat2021sbmlatent}.
-Both are variants of \glspl{ebm}, with the former learning to estimate the noise
-(used to iteratively move from noise to data), and the latter trained to remove
-noise, given samples from a corrupting forward process. Again, this is then used
-to move from pure noise to data, forming a generative model~\cite{song2019sbm}.
-Both are slow to sample from, but produce high quality samples that rival those
-of \glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering from mode collapse.
-The slow sampling speed can be remedied using a variety of techniques, such as
-by operating over a smaller latent space~\cite{vahdat2021sbmlatent}, devising
+\Acrfullpl{ddpm}~\cite{ho2020ddpm,dhariwal2021ddpm} and
+\acrfullpl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt,vahdat2021sbmlatent}
+have garnered much interest in recent work, with the former learning to estimate
+the noise, and the latter trained to remove noise, given samples from a
+corrupting forward process. Either method can then be used to move from pure
+noise to data, forming a generative model~\cite{song2019sbm}. Both are slow to
+sample from, but produce high quality samples that rival those of
+\glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering from mode collapse. The
+slow sampling speed can be remedied using a variety of techniques, such as
+operating over a smaller latent space~\cite{vahdat2021sbmlatent}, devising
 efficient SDE solvers~\cite{martineau2021fast}, or by diffusing ``velocities'',
 thus simplifying the denoising task~\cite{dockhorn2021langevin}. Unlike
 \glspl{gan}, both models can operate on discrete data, either by projecting
