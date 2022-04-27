@@ -20,7 +20,7 @@
 
 Our proposed method aims to push the efficiency of generative models to the
 limit via a combination of current techniques. To do so, we first use pretrained
-\glspl{vqgan} models from~\cite{esser2021taming} to generate a dataset of
+\glspl{vqgan} from~\cite{esser2021taming} to generate a dataset of
 discrete latent representations, described in \S\ref{subsec:datasetGen}. By
 operating at a latent level, we reduce the spatial resolution for our second
 stage generator. We implement our generator as a modified hourglass transformer,
@@ -82,7 +82,7 @@ with the \gls{vqgan} decoder $\vqganDecoder$, we obtain a powerful generative
 model by first sampling $\latent_0$ from a uniform prior distribution,
 iteratively denoising using \gls{sundae}, and then decoding
 $\latent_\markovSteps$ using the \gls{vqgan} decoder $\vqganDecoder$ to obtain
-the final sample $\sample$. The training of this discrete prior model, forms the
+the final sample $\sample$. The training of this discrete prior model forms the
 bulk of our work in this paper.
 
 \subsection{2D-Aware Hourglass Transformer}
@@ -93,7 +93,7 @@ bulk of our work in this paper.
     \centering
     \includegraphics[width=\textwidth]{figures/resample.pdf}
     \caption{
-        \textbf{Top:} Showing effect of resampling sequence embeddings using
+        \textbf{Top:} Showing the effect of resampling sequence embeddings using
         original formulation. Resampling will be applied to only one axis,
         resulting in resampling in only one axis of the decoded image.
         \textbf{Bottom:} Our method of resampling, extracting 
@@ -209,12 +209,12 @@ masking operations required in the original work.
 \end{figure}
 
 Training at higher resolutions means greater computational requirements and
-sampling speeds. With an \gls{ar} model, the sampling speed can be
-immense as it scales linearly with data dimensionality, even with an
-auxiliary \gls{vq} image model~\cite{esser2021taming}. With a
-\gls{nar} model however, the sampling speed is explicitly controlled
-and does not directly grow as a function of input size -- excluding the
-increase in time for one network pass from using a larger model on a larger input.
+slower sampling speeds. With an \gls{ar} model, the sampling time can be
+immense as it scales linearly with data dimensionality, even with an auxiliary
+\gls{vq} image model~\cite{esser2021taming}. With a \gls{nar} model however, the
+sampling speed is explicitly controlled and does not directly grow as a function
+of input size -- excluding the increase in time for one network pass from using
+a larger model on a larger input.
 
 We trained a larger variant of \gls{vqgan} with $\vqganNbLatents = 8192$ operating on
 $1024 \times 1024$ from FFHQ1024. To our knowledge, this is the highest resolution
@@ -280,7 +280,7 @@ consumer-grade GPUs impractical.
 
 Training \gls{vqgan} at this resolution and at our chosen downsampling rate is
 extremely computationally expensive. In our configuration we were limited to a
-global batch size of 4 across four, 32GiB Tesla V100 GPUs. This made a full
+global batch size of 4 across four 32GiB Tesla V100 GPUs. This made a full
 hyperparameter sweep of \gls{vqgan}'s parameters not possible. Therefore, we
 accepted good reconstructions on average with occasional artifacts that could
 potentially manifest in the final samples. Improving the effectiveness of \gls{vq}
