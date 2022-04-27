@@ -1,10 +1,10 @@
 This work builds upon much prior research into powerful deep generative models,
 self-supervised representation methods, and efficient transformer architectures.
-We cover relevant work into deep generative models in
-\S\ref{subsec:agm}-\ref{subsec:nagm}, vector-quantized image modelling in
+We cover relevant work into deep generative models in \S\ref{subsec:agm} and
+\S\ref{subsec:nagm}, vector-quantized image modelling in
 \S\ref{subsec:vqmodelling}, a specific \acrshort{nar} generative model
-\gls{sundae} \S\ref{subsec:sundae}, and an efficient transformer architecture in
-\S\ref{subsec:hourglass}. For a full review on generative modelling we direct
+\gls{sundae} in \S\ref{subsec:sundae}, and an efficient transformer architecture
+in \S\ref{subsec:hourglass}. For a full review on generative modelling we direct
 the reader to \citet{bondtaylor2021review}, and on \gls{sundae} and hourglass
 transformers to \citet{savinov2022stepunrolled} and
 \citet{nawrot2021hierarchical} respectively.
@@ -14,13 +14,13 @@ transformers to \citet{savinov2022stepunrolled} and
     \includegraphics[width=\textwidth]{figures/AR-NAR.pdf}
     \caption{
         \textbf{Left:} Visualization of \acrfull{ar} sampling. \gls{ar} sampling
-        proceeds one element at a time, meaning the number of sampling steps
-        is equal to the dimensionality of the input. For each prediction, a
-        probability distribution over possible tokens is predicted and then
-        sampled from. Each prediction can only make use of past context --
-        indicated as a green position -- so not to violate the autoregressive
-        property.
-        \textbf{Right:} Visualization of \acrfull{nar} sampling. \gls{nar}
+        proceeds one element at a time, meaning the number of sampling steps is
+        equal to the dimensionality of the input. For each element, a
+        probability distribution over possible discrete values is predicted and
+        subsequently sampled from. Each prediction can only make use of past
+        context -- indicated as a green position -- so not to violate the
+        autoregressive property.
+        \textbf{Right:} Visualization of \acrfull{nar} sampling. \Gls{nar}
         sampling samples an arbitrary number of elements in parallel, including
         elements previously sampled, allowing for self-correction. It freely
         uses all context available, allowing for flexible inpainting and
@@ -33,11 +33,11 @@ transformers to \citet{savinov2022stepunrolled} and
 
 One major deep generative model family are \acrfull{ar} models, characterised by
 a training and inference process based on the probabilistic chain rule. During
-training, they learn to maximise the likelihood of the data they are
-trained on, which leads to excellent mode coverage. Prior work using these
-methods resulted in impressive results in terms of sample quality and
-diversity, but are ultimately impractical in real world applications due to
-their slow sampling speed.
+training, they learn to maximise the likelihood of the data they are trained on,
+which leads to excellent mode coverage. Prior work using these methods resulted
+in impressive results in terms of sample quality and diversity, but are
+ultimately impractical in most real world applications due to their slow
+sampling speed.
 
 The slow speed is due to their sequential nature, defined by the chain
 rule of probability. Given an input $\image = \{ \pixel{1}, \pixel{2}, \dots,
@@ -51,10 +51,10 @@ meaning that the number of sampling steps is equal to the size of the
 decomposition of $\image$, giving an iteration complexity of $\bigO{n}$.
 
 For certain tasks, the ordering of the decomposition of $\image$ is obvious, for
-example on text or speech. For images this is less clear, but typically a
-raster scan ordering is used~\cite{parmar2018image}. Certain \gls{ar} models are
-order-agnostic~\cite{hoogeboom2021autoregressive}, allowing for arbitrary ordering
-to be used during training and inference.
+example on text or speech. For images this is less clear, but typically a raster
+scan ordering is used~\cite{parmar2018image}. Certain \gls{ar} models are
+order-agnostic~\cite{hoogeboom2021autoregressive}, allowing for arbitrary
+ordering to be used during training and inference.
 
 One class of \gls{ar} models are \glspl{rnn} which are an early example of using
 neural networks to model sequential data such as text, audio, time-series data,
@@ -63,15 +63,15 @@ regression models, they are also suited for use as generative models by
 modelling the relationship in Equation~\ref{eq:ar}. They suffer from a number of
 issues, most infamously vanishing gradients~\cite{pascanu2012rnn} and inability
 to model long-range relationships between elements in the input.
-\Glspl{lstm}~\cite{hoch1997lstm} improved upon \glspl{rnn} further by
-introducing dedicated memory units, allowing for the modelling of longer range
-relationships. \Glspl{gru}~\cite{cho2014gru} simplified \gls{lstm} architecture
-whilst retaining good performance. With the advent of transformer
-architectures~\cite{vaswani2017attention}, modelling longer relationships
-became possible, even at a full-document level. It also introduced the
-capability to train on all sequence elements in parallel through the use of
-causal masking, therefore not violating the autoregressive property. Inference
-must still be done in a sequential manner, however.
+\Glspl{lstm}~\cite{hoch1997lstm} improved upon \glspl{rnn} by introducing
+dedicated memory units, allowing for the modelling of long-range
+relationships. \Glspl{gru}~\cite{cho2014gru} simplified the \gls{lstm}
+architecture whilst retaining good performance. With the advent of transformer
+architectures~\cite{vaswani2017attention}, modelling longer relationships became
+possible, even at a full-document level. It also introduced the capability to
+train on all sequence elements in parallel through the use of causal masking,
+therefore not violating the autoregressive property. Inference must still be
+done in a sequential manner, however.
 
 Applying \gls{ar} models to images followed a similar progression.
 PixelRNN~\cite{oord2016pixelrnn} used two-dimensional recurrent layers and
@@ -90,10 +90,10 @@ cases, the iteration complexity is still $\bigO{n}$, a property intrinsic to
 \label{subsec:nagm}
 
 \Acrfull{nar} generative models include \glspl{gan}, \glspl{sbm} and
-\glspl{ddpm}, flow-based models, \glspl{ebm}, and implicit models. The number of
-sampling steps in \gls{nar} models is independent of the data dimensionality,
-however the actual number of steps varies greatly: from single-step generation
-in \glspl{gan} to many thousands in early diffusion models.
+\glspl{ddpm}, and flow-based models. The number of sampling steps in \gls{nar}
+models is independent of the data dimensionality, however the actual number of
+steps varies greatly: from single-step generation in \glspl{gan} to many
+thousands in early diffusion models.
 
 The most infamous class of \gls{nar} generative model -- or generative model
 altogether -- are \acrfullpl{gan}~\cite{goodfellow2014gan}. \Glspl{gan} consist
@@ -110,7 +110,7 @@ synthesis~\cite{liu2020audiogan}, and style transfer~\cite{zhu2017cyclegan}.
 They can be applied to discrete data~\cite{autume2019scratchgan}, but are
 less effective due to the non-differentiability of discrete samples.
 
-Another class of generative model are \acrfullpl{vae}~\cite{kingma2013vae} which
+\Acrfullpl{vae}~\cite{kingma2013vae} are a class of generative model which
 permit sampling in a single forward pass like \glspl{gan}, but are trained to
 maximise likelihood. Specifically, \glspl{vae} map inputs to latent variables
 that follow some easy to sample, but sufficiently complex, prior distribution. A
@@ -120,25 +120,25 @@ distribution. Although this approach is successful on simple datasets, on
 complex datasets the samples and reconstructions become blurry, suggesting a
 simple prior is insufficient to model the data distribution. Later work extended
 \glspl{vae} to be hierarchical, having multiple Gaussian
-priors~\cite{arash2020nvae,child2020vqvae} which were found to outperform
+priors~\cite{arash2020nvae,child2020vqvae}, which was found to outperform
 \gls{ar} models.
 
-Another non-adversarial class that permits sampling in a single forward pass are
-normalizing flows, a class of generative model that allows for exact likelihood
-calculation~\cite{dinh2014nice,dinh2016density,kingma2018glow}. They consist of
-many invertible layers that transform samples from a known prior distribution
-into samples from the data distribution. Each transformation must satisfy two
-properties: being invertible and having an easy to compute Jacobian for the
-purposes of scaling~\cite{dinh2014nice,dinh2016density}. This makes the
-architectural choices restrictive, making them parameter inefficient. They also
-must operate at the same dimensionality for each layer, making the training of
-deep networks difficult.
+Another non-adversarial \gls{nar} class that permits sampling in a single
+forward pass are normalizing flows, a class of generative model that allows for
+exact likelihood calculation~\cite{dinh2014nice,dinh2016density,kingma2018glow}.
+They consist of many invertible layers that transform samples from a known prior
+distribution into samples from the data distribution. Each transformation must
+satisfy two properties: being invertible and having an easy to compute Jacobian
+for scaling~\cite{dinh2014nice,dinh2016density}. This means the architectural
+choices are restricted, making them parameter inefficient. They also must
+operate at the same dimensionality for each layer, making the training of deep
+networks difficult.
 
 \Acrfullpl{ddpm}~\cite{ho2020ddpm,dhariwal2021ddpm} and
 \acrfullpl{sbm}~\cite{song2019sbm,song2020sde,song2021mlt,vahdat2021sbmlatent}
 have garnered much interest in recent work, with the former learning to estimate
-the noise, and the latter trained to remove noise, given samples from a
-corrupting forward process. Either method can then be used to move from pure
+the noise and the latter trained to remove noise, given samples from a
+corrupting forward process. Either method can then be used to move from 
 noise to data, forming a generative model~\cite{song2019sbm}. Both are slow to
 sample from, but produce high quality samples that rival those of
 \glspl{gan}~\cite{dhariwal2021ddpm} whilst not suffering from mode collapse. The
@@ -163,16 +163,16 @@ representations have been continuous, but in recent work they are often
 discrete. An early example is \gls{vqvae}~\cite{oord2017vqvae}, which has three
 main components: an encoder network, a codebook, and a decoder. The encoder
 network outputs a compressed continuous representation of the input, and the
-codebook $\vqganCodebook$ quantizes these representations, outputting a discrete
+codebook $\vqganCodebook$ quantizes these representations, outputting discrete
 indices from $1$ to the codebook size $\vqganNbLatents$. Each index $i$ maps to
-one of the codebook embeddings $e_i$. The decoder maps the quantized embeddings
-back to the original input. \Gls{vqvae} is trained end-to-end to reconstruct the
-input and to minimize the codebook loss~\cite{oord2017vqvae}. Once trained, an
-auxiliary generative model is trained to generate discrete latent
-representations. The decoder then generates the final sample given the sampled
-latent representation. In the original work, they used PixelCNN to generate the
-discrete latent codes~\cite{oord2017vqvae}, though any generative model for
-discrete data can be used.
+one of the codebook embeddings (codewords) $e_i$. The decoder maps the quantized
+embeddings to a lossy reconstruction of the input. \Gls{vqvae} is trained
+end-to-end to reconstruct the input and to minimize the codebook
+loss~\cite{oord2017vqvae}. Once trained, an auxiliary generative model is
+trained to generate the discrete latent representations. The decoder then
+decodes the sampled latent, producing the final sample. In the original work,
+PixelCNN was used to generate the discrete latent codes~\cite{oord2017vqvae},
+though any generative model for discrete data can be used.
 
 \begin{figure}[ht!]
     \centering
@@ -182,9 +182,9 @@ discrete data can be used.
         extracts continuous representations from the input. Vector
         quantization is then used to map each continuous embedding to the
         closest entry in the codebook. A decoder model takes the discretized
-        embeddings and attempts to reconstruct the input. We 
-        generate a dataset of latent embeddings from an image dataset 
-        by iterating $\image \sim \imageDataset$ and appending the resulting
+        embeddings outputs a lossy reconstruction of the input. We 
+        generate a dataset of latent representations from an image dataset 
+        by iterating $\image \in \imageDataset$ and appending the resulting
         discrete representation $\latent$ to a set $\latentDataset$.
     }
     \label{fig:vq}
@@ -196,32 +196,32 @@ number of codebooks, they experimented with at most three, applying it to $1024
 \times 1024$ images. They then sampled the hierarchical discrete representations
 using multiple PixelSnail~\cite{chen2017snail} models, each code conditioned on
 all previous levels in the hierarchy. Though faster to sample than generating
-pixels directly, at such a resolution and with multiple levels, sampling times
-were still very slow.
+pixels directly, at such a resolution and with multiple representation levels,
+sampling times were still very slow.
 
-Aside from sampling autoregressively, a reason for the slow sampling speed was
+Aside from sampling autoregressively, a reason for the slow sampling speed is
 the large spatial resolution of the discrete codes. Albeit smaller than the
 original input, \gls{vqvae} is limited in how much it can compress the signal
 via a simple reconstruction objective before it loses significant perceptual
-quality due to the rate-distortion trade-off. For example, the original
+quality, due to the rate-distortion trade-off. For example, the original
 \gls{vqvae} only has a downsampling rate of
 $\vqganDownsample=4$~\cite{oord2017vqvae} and \gls{vqvae}-2 has a top-level rate
-of $\vqganDownsample=32$ but requires three discrete latent codes 
-to achieve this~\cite{razavi2019generating}. By introducing perceptual and
-adversarial loss terms, \gls{vqgan}~\cite{esser2021taming} is able to achieve
-compression rates of $\vqganDownsample=16 \sim 32$ with only a single discrete
-latent representation whilst retaining high quality
-reconstructions~\cite{esser2021taming}. However, the greater weighting on
-perceptual and adversarial loss does mean that \gls{vqgan} sometimes edits its
-reconstructions, rather than faithfully reconstruct . Later, improvements such as
-differential data augmentation~\cite{bondtaylor2021unleashing}, codebook
-improvements, and a transformer-based architecture~\cite{yu2021vqgan} improved
-reconstruction quality further, but still rely on adversarial components.
+of $\vqganDownsample=32$ but requires three discrete latent codes to achieve
+this~\cite{razavi2019generating}. By introducing perceptual and adversarial loss
+terms, \gls{vqgan}~\cite{esser2021taming} is able to achieve a compression rate
+of $\vqganDownsample=32$ with only a single discrete latent representation
+whilst maintaining high quality reconstructions~\cite{esser2021taming}. However,
+the greater weighting on perceptual and adversarial loss does mean that
+\gls{vqgan} sometimes edits the reconstructions, rather than faithfully
+reconstruct the input. Later, improvements including differential data
+augmentation~\cite{bondtaylor2021unleashing}, codebook improvements, and a
+transformer-based architecture~\cite{yu2021vqgan} improved reconstruction
+quality further, but still rely on adversarial components.
 
-Originally designed for audio compression~\cite{zeghidour2021soundstream},
-Residual \gls{vq} proposes the use of multiple codebooks to recursively quantize
+Designed for audio compression~\cite{zeghidour2021soundstream},
+residual \gls{vq} proposes the use of multiple codebooks to recursively quantize
 and refine the residual of the input. This produces multiple discrete
-representations, which can later be reconstructed by the decoder to reconstruct
+representations, which can later be reconstructed by the decoder to recover
 the waveform. Individual codebooks can be dropped out, allowing
 for variable bit-rates~\cite{zeghidour2021soundstream}. Concurrently to our
 work, \citet{lee2022rqvae} used residual \gls{vq} to represent images with 
@@ -267,26 +267,26 @@ embedding is to compute the Euclidean distance between the embedding and each
 codeword centroid, and then pick the $\arg\min$~\cite{oord2017vqvae}, known as a
 $k$-means strategy. This can result in ``codebook collapse'', where certain
 codewords never get used, limiting the effective capacity of the model. An
-alternative is to use Gumbel-Softmax~\cite{jang2016gumbel} to select codewords ,
+alternative is to use Gumbel-Softmax~\cite{jang2016gumbel} to select codewords,
 which increases codebook utilisation but leads to worse reconstruction
 quality~\cite{bondtaylor2021unleashing}.
 The issue of codebook collapse is significant and there have been a number
-of attempts to remediate it. \cite{yu2021vqgan} found that a lower codeword
+of attempts to address it. \cite{yu2021vqgan} found that a lower codeword
 dimension and codeword normalization improved utilisation.
 \cite{zeghidour2021soundstream} proposed setting a threshold for ``stale'' codes,
 and reinitialising them to a random vector from the current batch when they
 fall below this threshold. \cite{lee2022rqvae} proposed the sharing of a single
-codebook across many quantizers and additionally stochastically sampled the
-codes as a function of their distance to the centroid, rather than
-deterministically returning the $\arg\min$.
+codebook across many quantizers and stochastically sampling the
+codes as a function of their distance to each codeword centroid, rather than
+deterministically using the $\arg\min$.
 
 All previously described approaches use \gls{vq} models to enhance existing
-\gls{ar} models, primarily to improve sampling speeds by reducing the
-spatial dimension they operate over. Little work directly addresses the
-discrete prior model. Discrete diffusion models~\cite{austin2021structured} are
-\gls{nar} approach to generating discrete data, applied to \gls{vqgan}
-latents in \citet{bondtaylor2021unleashing}, resulting in fast sampling,
-flexible inpainting, and high fidelity outputs.
+\gls{ar} models, primarily to improve sampling speeds by reducing the spatial
+dimension they operate over. Little work directly addresses the discrete prior
+model. Discrete diffusion models~\cite{austin2021structured} are a \gls{nar}
+approach to generating discrete data, applied to \gls{vqgan} latents in
+\citet{bondtaylor2021unleashing}, resulting in fast sampling, flexible
+inpainting, and high fidelity outputs.
 
 \subsection{Step-unrolled Denoising Autoencoder}
 \label{subsec:sundae}
@@ -296,7 +296,7 @@ evaluated on three language modelling tasks: unconditional text-generation,
 inpainting of Python code, and machine translation -- setting a new
 state-of-the-art among \gls{nar} models for the
 latter~\cite{savinov2022stepunrolled}. It is capable of fast sampling, producing
-high quality text samples in as few as 10 steps.
+high quality samples in as few as 10 steps.
 
 It is trained using a denoising objective, akin to 
 BERT's objective~\cite{wang2019bert} but with multiple denoising steps.
@@ -319,14 +319,15 @@ uses a far lower $\markovSteps$ than is used for
 sampling~\cite{savinov2022stepunrolled}. To compensate, they unroll the Markov
 chain to start from corrupted data produced by a \textit{corruption
 distribution} $\latent_0 \sim \corruptionDistribution(\cdot \vert \latent)$
-rather than from the prior $p_0$ so the model sees samples akin to those seen
-during the full unroll at sample time~\cite{savinov2022stepunrolled}. Typically,
-$\markovSteps = 2$ is used during training, as a single step would be similar to
-BERT's objective~\cite{devlin2019bert} which not be performant as seen in
-earlier work using BERT as a random field language model~\cite{wang2019bert}.
+rather than from the prior $p_0$ so the model during training sees inputs alike
+those seen during the full unroll at sample time~\cite{savinov2022stepunrolled}.
+Typically, $\markovSteps = 2$ is used during training, as a single step would be
+similar to BERT's objective~\cite{devlin2019bert} which would not be performant
+as seen in earlier work using BERT as a random field language
+model~\cite{wang2019bert}.
 
 The training objective of \gls{sundae} is the average of all
-cross entropy losses on the chain after $t$ steps, which is shown to form an
+cross-entropy losses on the chain after $t$ steps, which is shown to form an
 upper bound on the actual negative
 log-likelihood~\cite{savinov2022stepunrolled}. Increasing $\markovSteps$
 leads to a minor improvement in performance, but considerably slows down
@@ -337,17 +338,17 @@ rather than a ``masking''
 token~\cite{bondtaylor2021unleashing,austin2021structured}. Unmasking approaches
 means that $\markovSteps \leq N$ as at minimum, one token is unmasked per step.
 Additionally, it allows the model to ``change its mind'' about previously
-predicted elements during sampling, permitting fine-grained adjustments or
-correcting of errors.
+predicted elements during sampling, permitting fine-grained adjustments and
+correction of errors.
 
 \subsection{Hourglass Transformers}
 \label{subsec:hourglass}
 
-Vanilla transformers incur a hefty memory and time complexity of $O(L^2)$ for
-each block~\cite{vaswani2017attention}, dominated by costly multi-head
-self-attention mechanisms. Most research into efficient transformers focuses on
-improving the efficiency of the attention mechanisms, such as through sparse
-attention patterns~\cite{child2019generating} or via
+Vanilla transformers incur a memory complexity of $\bigO{L^2}$ for each
+block~\cite{vaswani2017attention}, dominated by costly multi-head self-attention
+mechanisms. Most research into efficient transformers focuses on improving the
+efficiency of the attention mechanisms using sparse attention
+patterns~\cite{child2019generating} or through linear complexity
 approximations~\cite{xiong2021nystromformer}.
 
 Recent work has focused on making the architecture itself more efficient. Funnel
@@ -370,7 +371,7 @@ to follow. Nonetheless, it is worthwhile to distill advancements into a
 selection of high level trends.
 
 \textbf{Improving quality and efficiency in non-adversarial generative models} -- 
-\glspl{gan} have long dominated as the pinnacle of sample quality and
+\Glspl{gan} have long dominated as the pinnacle of sample quality and
 efficiency. Despite this, they are plagued by previously discussed issues,
 motivating research into non-adversarial approaches of equal quality to
 \glspl{gan}. Certain non-adversarial solutions do beat \glspl{gan} in quality,
@@ -418,8 +419,8 @@ obtained without the use of
 them~\cite{child2020vqvae,arash2020nvae,hazami2022efficient}, especially with
 diffusion
 models~\cite{song2019sbm,song2020sde,dhariwal2021ddpm,song2021mlt,xiao2021trilemma,vahdat2021sbmlatent,martineau2021fast,dockhorn2021langevin}.
-A particularly powerful advantage of using a \gls{vq}-based approach is the
-compression of the spatial resolution that the generator model must operate
+The advantage of using a \gls{vq}-based approach is the
+reduction of the spatial resolution that the generator model must operate
 over, aiding in scaling to higher resolutions and improving sampling speeds.
 However, the two-stage training approach can be unwieldy without pretrained
 \gls{vq} models and makes inpainting more involved. Additionally,
