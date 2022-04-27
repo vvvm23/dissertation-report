@@ -89,7 +89,6 @@ bulk of our work in this paper.
 \label{subsec:improvedHourglass}
 
 \begin{figure}[htp]
-    \label{fig:resample}
     \centering
     \includegraphics[width=\textwidth]{figures/resample.pdf}
     \caption{
@@ -101,6 +100,7 @@ bulk of our work in this paper.
         resampling. The sequence is then flattened and passed to
         subsequent transformer layers.
     }
+    \label{fig:resample}
 \end{figure}
 
 Inspired by successes in hierarchical transformers for language
@@ -141,7 +141,8 @@ of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in each spatial axis -- eve
 distributing the resampling among the axes. In our preliminary experiments, this
 significantly improved the performance of the discrete prior model, and suspect
 the same approach could improve performance on any multi-dimensional data, which
-we leave for future work to confirm.
+we leave for future work to confirm. A comparison between the previous approach
+and our amended solution is shown in Figure~\ref{fig:resample}.
 
 For our resampling operations, we use linear resampling (following
 recommendation by \citet{nawrot2021hierarchical} to use linear resampling for
@@ -219,7 +220,7 @@ a larger model on a larger input.
 We trained a larger variant of \gls{vqgan} with $\vqganNbLatents = 8192$ operating on
 $1024 \times 1024$ from FFHQ1024. To our knowledge, this is the highest resolution
 dataset \gls{vqgan} has been applied to~\cite{esser2021taming}. Once trained,
-we generate a latent datasets as before, the only difference being an increased
+we generate the latent dataset as before, the only difference being an increased
 sequence length -- greater than \gls{sundae} was ever tested on in the original
 work~\cite{savinov2022stepunrolled}. Specifically, we obtain a downsampling rate
 of $\vqganDownsample=32$, resulting in discrete latents of size $32 \times 32 =
@@ -265,7 +266,7 @@ between the input and reconstruction. This gives rise to an interesting property
 of \gls{vqgan} where the reconstructions may be perceptually valid but 
 distinct from the input. The left reconstruction in Figure \ref{fig:recon}
 demonstrates this with a change in eye colour and a shift in hair position --
-concealing an ear piercing. This even more apparent in the right reconstruction
+concealing an ear-piercing. This even more apparent in the right reconstruction
 where all piercings are flawlessly removed -- along with adjustments to eye
 makeup.
 
@@ -280,7 +281,7 @@ consumer-grade GPUs impractical.
 
 Training \gls{vqgan} at this resolution and at our chosen downsampling rate is
 extremely computationally expensive. In our configuration we were limited to a
-global batch size of 4 across four 32GiB Tesla V100 GPUs. This made a full
+global batch size of 4 across four 32 GiB Tesla V100 GPUs. This made a full
 hyperparameter sweep of \gls{vqgan}'s parameters not possible. Therefore, we
 accepted good reconstructions on average with occasional artifacts that could
 potentially manifest in the final samples. Improving the effectiveness of \gls{vq}
@@ -362,10 +363,10 @@ low-step sampling ($\markovSteps<20$) that all tokens must be able to be updated
 in order to produce meaningful samples before the maximum number of steps is
 reached. Hence in these cases, we do not follow their proposal and instead use a
 high sample proportion ($0.7$-$1.0$). In scenarios where we are permitted a
-time-budget allowing for a large number of sample steps, the sample proportion
+time-budget allowing for many sampling steps, the sample proportion
 can be freely reduced for an increase in sample diversity.
 
-Additionally, if a individual sample does not change between step $t-1$ and $t$,
+Additionally, if an individual sample does not change between step $t-1$ and $t$,
 it is prevented from being changed further. If all samples are frozen, sampling
 terminates early, provided a minimum number of steps have been completed. This
 improves the sampling speed with little cost to the sample quality. This
@@ -407,7 +408,7 @@ Sampling at a latent level means the model is unable to do fine-grained
 inpainting at a pixel level. The definition of the \gls{vq} mask $\vqMask$ means
 that some pixels outside the mask may be altered if the pixel mask is not
 perfectly aligned with the \gls{vq} mask (when \texttt{AND} does not always
-receives all 0s or all 1s). We found in practise this had little effect on the
+receive all 0s or all 1s). We found in practise this had little effect on the
 perceptual quality of the outputs.
 
 \subsubsection*{Implementation Details}
@@ -452,9 +453,9 @@ All \gls{sundae} models are trained using the Adam
 optimizer~\cite{kingma2014adam} as realised in its AdamW implementation in
 PyTorch~\cite{paszke2019pytorch}. Similarly, all models and training scripts are
 implemented in PyTorch. For unconditional generation on $256 \times 256$ images,
-training was done on a single 24GiB Nvidia RTX TITAN. For unconditional
-generation on $1024 \times 1024$ images, training was done on a single 32GiB
+training was done on a single 24 GiB Nvidia RTX TITAN. For unconditional
+generation on $1024 \times 1024$ images, training was done on a single 32 GiB
 Nvidia V100. Finally, for conditional generation on ImageNet, training was done
-on a single 80GiB Nvidia A100. All parameters used for training the
+on a single 80 GiB Nvidia A100. All parameters used for training the
 \gls{sundae} models are shown in Table~\ref{tab:parameters}.
 

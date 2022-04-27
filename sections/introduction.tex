@@ -47,7 +47,7 @@ speeds despite the reduced spatial dimension of the discrete latent space. We
 address this issue by sampling latents using a \gls{nar} generative model to
 close the gap, sampling speed wise, with models such as \glspl{gan}.
 Specifically, we use discrete \gls{sundae}~\cite{savinov2022stepunrolled} to
-denoise samples sampled from a uniform prior into samples from the discrete
+denoise samples from a uniform prior into samples from the discrete
 latent space defined by a trained \gls{vqgan} model. We find that
 \gls{sundae} is an effective discrete prior over \gls{vqgan} representations.
 
@@ -62,7 +62,7 @@ multi-dimensional discrete data, including modifications to resampling
 operations and introduction of axial positional
 embeddings~\cite{su2021roformer}. Though evaluated on discrete latents, these
 modifications are applicable to any multi-dimensional data,
-which is valuable in a wider context outside of generative modelling. We
+which is valuable in a wider context outside generative modelling. We
 also found recommended parameters proposed in \citet{savinov2022stepunrolled}
 did not always generalise to multi-dimensional data, so we explore new sensible
 defaults in this work.
