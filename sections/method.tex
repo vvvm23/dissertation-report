@@ -3,8 +3,8 @@
     \includegraphics[width=1.0\linewidth]{figures/overall.pdf}
     \caption{
         An overview of the \gls{sundae} training and sampling of discrete latent
-        representations. Above the dashed line represents the training process,
-        whereas below the dotted line represents the sampling process. The
+        representations. Above the dashed line shows the training process,
+        whereas below the dotted line shows the sampling process. The
         training process begins by sampling $\latent \sim \latentDataset$ and
         then sampling from the corruption distribution $\latent_0 \sim
         q(\latent_0 \vert \latent)$. \Gls{sundae} then denoises for 2 to 3
@@ -38,7 +38,7 @@ Each component represents the pinnacle of performance in their respective area:
 compression ratio in \gls{vq} image models with \gls{vqgan}, fast \acrlong{nar}
 sampling of discrete data with \gls{sundae}, and transformer scalability with
 our modified hourglass transformer. Together, we obtain an extremely efficient
-generative model that permits sampling at $1024 \times 1024$ resolution in mere
+generative model that permits sampling at $1024 \times 1024$ resolution in
 seconds.
 
 \subsection{Latent Dataset Generation}
@@ -46,23 +46,23 @@ seconds.
 
 We use the standard two-stage scheme for \gls{vq} image
 modelling~\cite{oord2018neural,razavi2019generating,esser2021taming,bondtaylor2021unleashing}
-using \gls{vqgan}~\cite{esser2021taming} as our feature extractor. Where
+using \gls{vqgan}~\cite{esser2021taming} as a compression model. Where
 checkpoints are available, we use pretrained \glspl{vqgan} for our experiments.
 For higher resolution experiments (FFHQ1024~\cite{karras2019stylebased}),
 pretrained models are not available and so the training our own \gls{vqgan} was
 necessary (see \S\ref{subsec:megagan}). 
 
-The second stage is to train a discrete prior model over the extracted latent variables.
-To enable this, we generated a latent dataset using a trained \gls{vqgan}.
-This allows for faster training of our second-stage model as the discrete latent
-representations have been precomputed. A downside of this approach is that it
-limits the amount of data augmentation that can be applied to the dataset. We
-apply a simple horizontal flip to all images, effectively doubling the dataset
-size, with no other augmentation. Formally, given a dataset of images
-$\imageDataset$, a \gls{vqgan} encoder $\vqganEncoder$ with downsample factor
-$\vqganDownsample$, and \gls{vq} codebook $\vqganCodebook$ with
-number of codewords $\vqganNbLatents$, trained on $\imageDataset$, we define our
-latent dataset $\latentDataset$ as:
+The second stage is to train a discrete prior model over the extracted latent
+representations. To enable this, we generated a latent dataset using a trained
+\gls{vqgan}. This allows for faster training of our discrete prior as the
+latent representations have been precomputed. A downside of this
+approach is that it limits the amount of data augmentation that can be applied
+to the dataset. We apply a simple horizontal flip to all images, effectively
+doubling the dataset size, with no other augmentation. Formally, given a dataset
+of images $\imageDataset$, a \gls{vqgan} encoder $\vqganEncoder$ with downsample
+factor $\vqganDownsample$, and \gls{vq} codebook $\vqganCodebook$ with number of
+codewords $\vqganNbLatents$, trained on $\imageDataset$, we define our latent
+dataset $\latentDataset$ as:
 \begin{equation}
     \latentDataset = \{\vqganCodebook(\vqganEncoder(\image)) \mid \image \in \imageDataset \}
 \end{equation}
@@ -80,9 +80,10 @@ h \times w$.
 We then use $\latentDataset$ to train a discrete prior over the latents. Coupled
 with the \gls{vqgan} decoder $\vqganDecoder$, we obtain a powerful generative
 model by first sampling $\latent_0$ from a uniform prior distribution,
-iteratively denoising using \gls{sundae}, and then decoding the final latent
-$\latent_T$ using the \gls{vqgan} decoder, obtaining $\sample$. The training
-of this discrete prior model, forms the bulk of our work in this paper.
+iteratively denoising using \gls{sundae}, and then decoding
+$\latent_\markovSteps$ using the \gls{vqgan} decoder $\vqganDecoder$ to obtain
+the final sample $\sample$. The training of this discrete prior model, forms the
+bulk of our work in this paper.
 
 \subsection{2D-Aware Hourglass Transformer}
 \label{subsec:improvedHourglass}
@@ -106,7 +107,7 @@ Inspired by successes in hierarchical transformers for language
 modelling~\cite{nawrot2021hierarchical}, we modify their architecture for use
 with discrete latent representations. We will later use this architecture to
 implement a discrete prior over the \gls{vqgan} latents. Hourglass transformers
-have been shown to efficiently handle long-sequences, outperform existing models
+have been shown to efficiently handle long sequences, outperform existing models
 using the same computational budget, and meet the same performance as existing
 models more efficiently by using an explicit hierarchical
 structure~\cite{nawrot2021hierarchical}. The same benefits should also apply to
@@ -129,26 +130,24 @@ In their work, resampling is applied to the flattened embedding sequences,
 meaning that a corresponding two-dimensional vector-quantized image is resampled
 more in one axis compared to the other. In their work they did not address this,
 except for experiments on ImageNet~\cite{russakovsky2015imagenet} (downsampled
-to $32 \times 32$) where they
-resampled with a rate of $\hourglassRate=3$, corresponding to three colour
-channels. However, if they were to resample again by nesting the hourglass
-transformers, the issue of one spatial dimension being
+to $32 \times 32$) where they resampled with a rate of $\hourglassRate=3$,
+corresponding to three colour channels. However, if they were to resample again
+by nesting the hourglass transformers, the issue of one spatial dimension being
 downsampled more than others would arise.
 
 In our formulation, we reshape the flattened sequence into a two-dimensional
 form and apply resampling equally in the last two axes. With a resampling rate
-of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in each axis -- evenly
+of $\hourglassRate$ we apply $\sqrt{\hourglassRate}$ in each spatial axis -- evenly
 distributing the resampling among the axes. In our preliminary experiments, this
 significantly improved the performance of the discrete prior model, and suspect
 the same approach could improve performance on any multi-dimensional data, which
 we leave for future work to confirm.
 
 For our resampling operations, we use linear resampling (following
-recommendation by \cite{nawrot2021hierarchical} to use linear resampling on
-image tasks) and a post-resampling attention layer, providing global context to
-the resampling operations and aggregating information
-globally~\cite{nawrot2021hierarchical}. Our adjusted resampling
-method is as follows:
+recommendation by \citet{nawrot2021hierarchical} to use linear resampling for
+image tasks) and a post-resampling attention layer, providing global context and
+aggregation of information to the resampling operations ~\cite{nawrot2021hierarchical}. Our
+adjusted resampling method is as follows:
 \begin{equation}
     h' = A(\hourglassResample^{(\intercal)} \cdot R(\vh) + \vr), \;\; \hourglassResample \in
     \mathbb{R}^{\frac{(d \cdot h \cdot w)}{\hourglassRate} \times (d \cdot h \cdot w)}
@@ -167,10 +166,10 @@ embeddings~\cite{su2021roformer} as they require no additional parameters, incur
 only a small runtime cost, and can be easily extended to the multi-dimensional
 case~\cite{rope-eleutherai}, which we exploit here. Though transformers are
 clearly capable of learning that elements far apart in a flattened sequence may
-be close in a multi-dimensional final output, we found that explicitly extending
-positional embeddings to the multi-dimensional case to provide a modest boost in
-performance and improve the rate of training convergence. The original hourglass
-transformer on pixel-wise generation also opted to use rotary
+be semantically close, we found that explicitly extending positional embeddings
+to the multi-dimensional case to provide a modest boost in performance and
+improve the rate of training convergence. The original hourglass transformer on
+pixel-wise generation also opted to use rotary
 embeddings~\cite{nawrot2021hierarchical} but in the single dimensional case.
 They note also that rotary embeddings have the advantage of being compatible
 with any self-attention mechanism.
@@ -190,7 +189,7 @@ masking operations required in the original work.
     \centering
     \includegraphics[width=\textwidth]{figures/recon.pdf}
     \caption{
-        \gls{vqgan} does not produce entirely faithful reconstructions due to
+        \Gls{vqgan} does not always produce faithful reconstructions due to
         being optimised for perceptual quality rather than a direct error between
         the reconstructions and inputs. The top row contains example inputs, middle row
         contains resulting reconstructions, and the final row highlights points of interest that
@@ -199,7 +198,7 @@ masking operations required in the original work.
         \textbf{Left}: The eye colour has been brightened, and hair
         shifted to conceal an ear piercing, rather than reconstruct it.
         \textbf{Middle}: The most common reconstruction artifact occurs with
-        certain types of hair, where a repeating and unrealistic pattern occurs. The
+        certain types of hair, where a repeating and unrealistic texture appears. The
         pose of the lip is also altered. 
         \textbf{Right}: Another common artifact where text in images is
         corrupted. This is common in \gls{vq} models. Additionally,
@@ -218,7 +217,7 @@ and does not directly grow as a function of input size -- excluding the
 increase in time for one network pass from using a larger model on a larger input.
 
 We trained a larger variant of \gls{vqgan} with $\vqganNbLatents = 8192$ operating on
-$1024 \times 1024$ RGB images. To our knowledge, this is the highest resolution
+$1024 \times 1024$ from FFHQ1024. To our knowledge, this is the highest resolution
 dataset \gls{vqgan} has been applied to~\cite{esser2021taming}. Once trained,
 we generate a latent datasets as before, the only difference being an increased
 sequence length -- greater than \gls{sundae} was ever tested on in the original
@@ -226,16 +225,16 @@ work~\cite{savinov2022stepunrolled}. Specifically, we obtain a downsampling rate
 of $\vqganDownsample=32$, resulting in discrete latents of size $32 \times 32 =
 1024$.
 
-The resulting reconstructions are overall of good quality given the 
-large compression ratio we are using. However, certain artifacts in the
-reconstructions still remain. Figure \ref{fig:recon} shows examples of
-particularly prevalent artifacts including occasional unrealistic textures in
-hair (middle reconstruction) and corruption of text (right reconstruction). The
-corruption of text is a common issue in \gls{vq} image
-models~\cite{ramesh2021dalle}, and the unrealistic textures are a result of the
-extreme compression rate or a lack of model capacity.
+The resulting reconstructions are overall of good quality given the large
+compression ratio in use. However, the reconstructions are not without
+artifacts. Figure \ref{fig:recon} shows examples of particularly prevalent
+artifacts including occasional unrealistic textures in hair (middle
+reconstruction) and corruption of text (right reconstruction). The corruption of
+text is a common issue in \gls{vq} image models~\cite{ramesh2021dalle}, and the
+unrealistic textures are a result of the extreme compression rate or a lack of
+model capacity.
 
-\Gls{vqgan} is trained to minimise the true error, perceptual loss, and an
+\Gls{vqgan} is trained to minimise the mean absolute error, perceptual loss, and 
 adversarial loss~\cite{esser2021taming} in addition to a $k$-means \gls{vq}
 loss. Specifically, \gls{vqgan} is trained to minimise the following
 loss:
@@ -257,7 +256,7 @@ loss:
 layers, perceptual loss $L_\text{PER}$ implemented using a pretrained VGG16
 model~\cite{karen2014vg18}, $\nabla_{G_{-1}}[\cdot]$ is the gradient with
 respect to the last layer of the \gls{vqgan} decoder $\vqganDecoder$, and
-$sg[.]$ is the stop-gradient operator. The
+$sg[.]$ is the stop-gradient operator~\cite{oord2017vqvae}. The
 generator and discriminator model parameters are updated separately, as is
 standard procedure in \gls{gan}-based literature~\cite{esser2021taming}.
 
@@ -272,10 +271,10 @@ makeup.
 
 Using \gls{vq} image models to compress images further whilst retaining high
 quality and faithful reconstructions remains an open and challenging area of
-research. In our case at very high resolutions, this is especially true. In our
-preliminary experiments, we found a higher $\vqganDownsample$ led to the 
-majority of reconstructions being of an untenable quality. Conversely, decreasing
-$\vqganDownsample$ led to latent representations of sizes that led to large
+research -- particularly true at high resolutions. In our preliminary
+experiments, we found a higher $\vqganDownsample$ led to the majority of
+reconstructions being of an untenable quality. Conversely, decreasing
+$\vqganDownsample$ led to latent representations of sizes that resulted in large
 memory requirements in the downstream \gls{sundae} prior, making inference on
 consumer-grade GPUs impractical.
 
@@ -297,7 +296,7 @@ We train a \gls{sundae} model on the flattened (in a raster-scan format)
 where $N = \latentHeight \cdot \latentWidth$. The function $\sundae(\cdot)$ is
 implemented using our proposed 2D-aware hourglass transformer. 
 
-Given a latent $\latent \sim \latentDataset$, we first apply our corruption
+Given a latent $\latent \sim \latentDataset$, we apply our corruption
 distribution. This is done by first sampling a corruption threshold vector
 $\corruptionThreshold$ with $\corruptionThreshold_i \sim U[0, 1]$ and a random
 matrix $\mathbf{R}$ of the same shape as $\latent$ where $R_{i,j} \sim U[0,1]$.
@@ -316,46 +315,45 @@ We then iteratively unroll the current sample $\latent_{t-1}$ to obtain
 $\latent_t$ for steps $t\in \{1, \dots, \markovSteps\}$. To perform one unroll
 step, simply compute logits $\sundae(\latent_t \vert \latent_{t-1})$ and then
 sample from the resulting distribution to obtain $\latent_t$, storing the logits
-at each step. Then, compute the cross entropy loss between all logits at each
-$t$ and the target $\latent$. This differs from certain other \gls{nar} solutions
+at each step $t$. Then, compute the cross entropy loss between all logits at each
+$t$ and the target $\latent$. This differs from some \gls{nar} solutions
 which predict the corruption noise $\epsilon$~\cite{ho2020ddpm} rather than the
-target itself. The mean of the cross entropy losses is then computed to produce
+target. The mean of the cross entropy losses is then computed to produce
 the final loss: 
 \begin{equation} 
     \lossFunction{1:T} = \frac{1}{T} \left(\lossFunction{1} +
     \dots + \lossFunction{T} \right) 
 \end{equation} 
-as in \S\ref{subsec:sundae}, which then allows for backpropagation of gradients
+as in \S\ref{subsec:sundae}, which allows for the backpropagation of gradients
 and consequently the updating of parameters $\sundaeParameters$. Though the
-default $\markovSteps = 2$ performed well, we found $\markovSteps = 3$ to result
+default $\markovSteps = 2$ is sufficient, we found $\markovSteps = 3$ to result
 in more diverse samples and so used it in all latent sampling experiments.
 
 An alternative corruption distribution would be to instead use a deterministic
-method $\latent_0^{(i)}=\texttt{[MASK]}$, essentially replacing all tokens with
-$M_{i,j} = 1$ with a special masking token. This is similar to ``progressive
-unmasking'' of latents as shown in prior
+method $\latent_0^{(i)}=\texttt{[MASK]}=\vqganNbLatents+1$, essentially
+replacing all tokens with $M_{i,j} = 1$ with a special masking token. This is
+similar to ``progressive unmasking'' of latents used in prior
 work~\cite{bondtaylor2021unleashing,austin2021structured}. This strategy was not
-considered due to the use of a masking token placing an upper bound on the
-number of inference time sampling steps (updating at most one token per step) as
-well as not allowing for self-correction, as once a token is unmasked it becomes
+considered as the use of a masking token places an upper bound on $\markovSteps$
+during sampling (updating at most one token per step) as well as not allowing
+for self-correction, as once a token is unmasked it becomes
 fixed~\cite{bondtaylor2021unleashing,austin2021structured}. 
 
 \subsection{Generating High-Resolution Images}
 \label{subsec:sundaeSampling}
 
-During sampling, we simply sample sequentially $\latent_t \sim \sundae(\latent_t
-\vert \latent_{t-1})$ for a constant number of steps $\markovSteps$, beginning
+During sampling, we sample $\latent_t \sim \sundae(\latent_t \vert
+\latent_{t-1})$ for a constant number of steps $\markovSteps$, beginning
 randomly from $\latent_0$ sampled from a uniform
 distribution~\cite{savinov2022stepunrolled}. The original work proposed a number
-of improved strategies for sampling in smaller number of steps, including
+of improved strategies for sampling in a smaller number of steps, including
 low-temperature sampling and updating a random subset of
-tokens~\cite{savinov2022stepunrolled}, rather than all simultaneously.
+tokens~\cite{savinov2022stepunrolled} rather than all simultaneously.
 
-Sampling, however, with a lower temperature reduces the diversity of the
-outputs. To alleviate this, we anneal the temperature down
-from a high value ($\approx 1.0$) down to a low value during the
-sampling process. We found this retained the fast sampling speed whilst 
-improving diversity.
+Sampling with a lower temperature, however, reduces the diversity of the
+outputs. To alleviate this, we anneal the temperature down from a high value
+($\approx 1.0$) down to a low value during the sampling process. We found this
+retained the fast sampling speed whilst improving diversity.
 
 In certain latent sampling configurations, updating only a random subset of
 tokens also helps improve diversity. \citet{savinov2022stepunrolled} used this
@@ -363,7 +361,7 @@ strategy when performing low-temperature sampling. However, we found that for
 low-step sampling ($\markovSteps<20$) that all tokens must be able to be updated
 in order to produce meaningful samples before the maximum number of steps is
 reached. Hence in these cases, we do not follow their proposal and instead use a
-high sample proportion ($0.8$-$1.0$). In scenarios where we are permitted a
+high sample proportion ($0.7$-$1.0$). In scenarios where we are permitted a
 time-budget allowing for a large number of sample steps, the sample proportion
 can be freely reduced for an increase in sample diversity.
 
@@ -374,11 +372,12 @@ improves the sampling speed with little cost to the sample quality. This
 is significant when performing large-batch sampling or when the maximum number
 of steps is large.
 
-Once sampling has terminated, the sampled latent code $\latent_T$ is decoded by
-$\vqganDecoder$ to produce a final sample $\sample$. In fact, any $\latent_i$ in
-the Markov chain is a valid input to $\vqganDecoder$. Decoding during sampling
-and visualising $\sample_t$ each step $t$ shows the model gradually denoising the
-latent and correcting errors accumulated during the sampling.
+Once sampling has terminated, the sampled latent code $\latent_\markovSteps$ is
+decoded by $\vqganDecoder$ to produce a final sample $\sample$. In fact, any
+$\latent_i$ in the Markov chain is a valid input to $\vqganDecoder$. Decoding
+during sampling and visualising $\sample_t$ each step $t$ shows the model
+gradually denoising the latent and correcting errors accumulated during the
+sampling.
 
 \subsection{Arbitrary Pattern Inpainting}
 \label{subsec:inpainting}
@@ -398,15 +397,15 @@ applying a logical \texttt{AND} in them, we obtain a latent level mask $\vqMask
 \in \{0,1\}^{h \times w}$. We encode $\image$ using $\vqganEncoder$ to obtain
 $\latent$, and then initialise our starting latent $\latent_0$ by randomly
 setting points in $\latent$ where $m_\text{vq} = 1$, and keeping $\latent$ the
-same when $m_\text{vq} = 0$. We then sample starting from $\latent_0$,
-allowing the model full context, but only update regions that were masked
-according to $\vqMask$. We use a lower temperature for inpainting
-($0.3 \leq \temperature \leq 0.5$). Decoding $\latent_T$ with
-$\vqganDecoder$ produces the final result $\sample$.
+same when $m_\text{vq} = 0$. We then sample starting from $\latent_0$, allowing
+the model full context, but only update regions that were masked according to
+$\vqMask$. We use a lower temperature for inpainting ($0.3 \leq \temperature
+\leq 0.5$). Decoding $\latent_T$ with $\vqganDecoder$ produces the final result
+$\sample$, identical to the end of the sampling process.
 
-Sampling at a latent-level means the model is unable to do fine-grained
+Sampling at a latent level means the model is unable to do fine-grained
 inpainting at a pixel level. The definition of the \gls{vq} mask $\vqMask$ means
-that some pixels outside the mask may also be altered if the pixel mask is not
+that some pixels outside the mask may be altered if the pixel mask is not
 perfectly aligned with the \gls{vq} mask (when \texttt{AND} does not always
 receives all 0s or all 1s). We found in practise this had little effect on the
 perceptual quality of the outputs.

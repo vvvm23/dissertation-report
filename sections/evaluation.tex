@@ -63,7 +63,7 @@
         Plots showing sample quality in terms of different metrics as sample
         temperature $\temperature$ is changed. Given the other parameters, a good choice
         of $\temperature$ falls in the range $0.5-0.7$. However, this range may
-        differ depending on the other choice of parameters.
+        differ depending on the values of other parameters.
     }
     \label{fig:temp}
 \end{figure}
@@ -134,6 +134,7 @@
         model, followed then by nearest neighbours, increasing in distance
         from left-to-right.
     }
+    \label{fig:nearest}
 \end{figure}
 
 We evaluate our method on the task of unconditional image generation on datasets
@@ -144,34 +145,36 @@ Infinity~\cite{chong2020effectively}, coverage, and
 density~\cite{ferjad2020icml}, plotting how these metrics change as number of
 sampling steps $\markovSteps$ (Figure~\ref{fig:step}), sampling temperature
 $\temperature$ (Figure~\ref{fig:temp}), and sample proportion
-(Figure~\ref{fig:prop}) are varied. Additionally, we present representative
-unconditional samples in Figures~\ref{fig:main} \& \ref{fig:face}.
+(Figure~\ref{fig:prop}) are varied. Additionally, we show representative
+unconditional samples in Figures~\ref{fig:main} \& \ref{fig:face} and dataset
+nearest neighbours in Figure~\ref{fig:nearest} to demonstrate sample diversity
+and quality.
 
 Figure~\ref{fig:step} demonstrates a surprising property of our model:
 additional steps during the sampling process do not improve sample quality
 further. It is important to note that this only holds if the other parameters
 remain fixed. Therefore, the results do not suggest that additional sampling
-steps are always detrimental to performance, as a low number of steps will
+steps are detrimental to performance, as a low number of steps will
 clearly result in poor quality results. Rather, it indicates that merely
 adding more sampling steps is not sufficient in our framework, and other
-parameters must also be adjusted to reflect a higher time budget.
+parameters must also be adjusted to reflect changes in $\markovSteps$.
 
 Figure~\ref{fig:temp} shows that picking a temperature in the range of $0.5$ to
-$0.7$ leads to best sample quality across a large set of samples, at the cost of
-reduced diversity. Our model is capable of sampling with a higher temperature at
-the cost of occasionally producing corrupted examples. Figure~\ref{fig:prop}
-confirms the result in \citet{savinov2022stepunrolled} that sampling with a
-lower proportion leads to higher sample diversity. However, in low-step
-scenarios, low proportions cannot be used effectively as the majority of
-elements in $\latent_t$ will not have enough opportunities to update, resulting
-in low quality outputs.
+$0.7$ leads to the best sample quality across a large set of samples, at the
+cost of reduced diversity. Our model is capable of sampling with a higher
+temperature but is becomes more likely to generate corrupted examples as
+$\temperature$ increases. Figure~\ref{fig:prop} confirms the result in
+\citet{savinov2022stepunrolled} that sampling with a lower proportion leads to
+higher sample diversity. However, in low-step scenarios, low proportions cannot
+be used effectively as the majority of elements in $\latent_\markovSteps$ will
+not have had enough opportunities to update, resulting in low quality outputs.
 
-The result samples shown in Figures~\ref{fig:main} \& \ref{fig:face} demonstrate
+The samples shown in Figures~\ref{fig:main} \& \ref{fig:face} demonstrate
 that our model is capable of generating high quality and diverse samples. Our
 aim was to push the efficiency of generative models to their limit, however we
-were still surprised at precisely how fast the model could generate --
+were still surprised at precisely how fast the model could sample --
 particularly on megapixel scale experiments. The samples in
-Figure~\ref{fig:main} were created in a two seconds on a GTX 1080Ti. This can be
+Figure~\ref{fig:main} were created in two seconds on a GTX 1080Ti. This can be
 further improved with more powerful accelerators, further optimisation, and
 model compilation. This kind of speed is unparalleled; significantly faster than
 prior non-adversarial solutions at this resolution. Additionally, our success
@@ -256,26 +259,25 @@ ImageNet at $256 \times 256$ resolution, using the pretrained ImageNet256
 
 There are many valid ways of injecting a conditioning signal into generative
 models, for example passing one-hot or embedding class vectors. We use a simple
-solution proposed in~\cite{parmar2018image} to add a learned class embedding to
+solution proposed in~\cite{parmar2018image}: adding a learned class embedding to
 every input embedding. To test whether their proposed method can also be applied
 to \gls{sundae}, we conducted an experiment on discrete MNIST-style datasets. We
 treat each of the possible 8-bit greyscale colour values as a codebook
 index, resulting in $\vqganNbLatents = 256$ -- generating pixels directly rather
 than image patches. Results of these experiments are shown in
-Figure~\ref{fig:mnist} and demonstrate that \gls{sundae} can incorporate using
-this simple approach.
+Figure~\ref{fig:mnist} and demonstrate that \gls{sundae} can incorporate
+conditional information using this simple approach.
 
-Despite this, our model fails to produce reasonable samples for all classes
-present in ImageNet. On classes representing large scenes such as landscapes,
-the samples are convincing and diverse, however for classes requiring
-fine-grained detail the outputs merely resemble the target class. Results of
-conditional generation with four representative classes are shown in
-Figure~\ref{fig:imagenet}. Due to this, we chose not to compute perceptual
-metrics for conditional experiments as the sample quality was clearly
-insufficient via inspection alone. This could be a result of lack of model
-capacity, lack of training time, or the conditioning strategy tested on MNIST
-being insufficient for ImageNet. The training of an effective conditional model
-is left for future work.
+Despite this, our model fails to produce reasonable samples for all classes in
+ImageNet. On classes containing large scenes such as landscapes, the samples
+are convincing and diverse. However, for classes requiring fine-grained detail,
+the outputs merely resemble the target class. Results of conditional generation
+with four representative classes are shown in Figure~\ref{fig:imagenet}. Due to
+this, we chose not to compute perceptual metrics for conditional experiments as
+the sample quality was clearly insufficient via inspection alone. This could be
+a result of lack of model capacity, lack of training time, or the conditioning
+strategy tested on MNIST being insufficient for ImageNet. The training of a more
+effective conditional model is left for future work.
 
 \subsection{Arbitrary Image Inpainting}
 \label{subsec:evaluationInpainting}
@@ -306,11 +308,11 @@ is left for future work.
         }
     \end{subfigure}
     \caption{
-        Inpainting results on FFHQ1024. We compute multiple outputs per
-        input image and mask to demonstrate diversity of outputs. Inpainting
-        using a \gls{vq} image model cannot be applied perfectly at a
-        pixel-level. Nevertheless, the model still produces many convincing
-        outputs at very high resolutions.
+        Inpainting results on FFHQ1024. We compute multiple outputs per input
+        image and mask to demonstrate diversity of outputs. Inpainting using a
+        \gls{vq} image model that cannot be applied perfectly at a pixel-level.
+        Nevertheless, the model still produces many convincing outputs at very
+        high resolutions.
     }
 \end{figure}
 
@@ -326,15 +328,15 @@ practise this had little effect on the perceptual quality of the outputs.
 \label{subsec:evaluationLimitation}
 
 As a result of our evaluation, some limitations of our approach arise. One
-crucial weakness is that our \gls{vq} image model still utilises adversarial
-components within it. This potentially means that each image patch
-(corresponding to each codebook entry) could still suffer from mode collapse
-issues. However, our resulting samples are still diverse, suggesting that
-patch-wise mode collapse did not have a significant effect on the final samples.
+weakness is that our \gls{vq} image model utilises adversarial components
+within it. This potentially means that each image patch (corresponding to each
+codebook entry) could suffer from mode collapse issues. However, our
+resulting samples are still diverse, suggesting that patch-wise mode collapse
+did not have a significant effect on the final samples.
 
 We encountered great instability during training of the large \gls{vqgan} which
 led to many failed experiments. Additionally, the extreme compression ratio in
-the large \gls{vqgan} model resulted in occasional unrealistic artifacts. Though
+the large \gls{vqgan} model occasionally resulted in unrealistic artifacts. Though
 most reconstructions are of good quality, the artifacts did rarely appear in the
 samples. Further research into high compression \gls{vq} models that do not use
 adversarial components remains an open and challenging area of research. When
